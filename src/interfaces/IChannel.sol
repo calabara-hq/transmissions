@@ -8,22 +8,13 @@ import {IChannelTypesV1} from "./IChannelTypesV1.sol";
 /// @author @nickddsn
 
 interface IChannel {
+    // function createToken(string calldata uri, uint256 maxSupply) external returns (uint256);
 
-    function createToken(
-        string calldata uri,
-        uint256 maxSupply
-    ) external returns (uint256);
-
-    function mint(
-        address account,
-        uint256 tokenId,
-        uint256 amount,
-        bytes memory data
-    ) external;
+    // function mint(address account, uint256 tokenId, uint256 amount, bytes memory data) external;
 
     // function getTokens(
     //     uint256 tokenId
     // ) external view returns (TokenConfig memory);
+
+    function initialize(string calldata uri, bytes[] calldata setupActions) external;
 }
-
-

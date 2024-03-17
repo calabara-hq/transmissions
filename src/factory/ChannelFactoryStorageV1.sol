@@ -7,5 +7,5 @@ import {IChannelTypesV1} from "../interfaces/IChannelTypesV1.sol";
 /// @author @nickddsn
 
 contract ChannelFactoryStorageV1 {
-        address[] public deployedChannels;
+    address[] public deployedChannels;
 }
