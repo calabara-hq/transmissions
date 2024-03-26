@@ -7,6 +7,15 @@ interface ISales {
         uint256 amount;
     }
 
+    struct FeeConfig {
+        address channelTreasury;
+        uint256 uplinkFee;
+        uint256 channelFee;
+        uint256 creatorFee;
+        uint256 mintReferralFee;
+        uint256 firstMinterFee;
+    }
+
     struct SaleConfig {
         uint256 saleStart;
         uint256 saleEnd;
@@ -14,8 +23,16 @@ interface ISales {
         address createReferral;
     }
 
-    function setChannelFeeAddress(address channelTreasury) external;
-    function setCreateReferral(address _referral, uint256 tokenId) external;
-    function setCreatorAddress(address _creator, uint256 tokenId) external;
+    //function setCreateReferral(address _referral, uint256 tokenId) external;
+    function initializeSaleStrategy(
+        address channelTreasury,
+        uint256 uplinkFee,
+        uint256 channelFee,
+        uint256 creatorFee,
+        uint256 mintReferralFee,
+        uint256 firstMinterFee
+    ) external;
+
+    function handleCreateSale(uint256 tokenId, bytes calldata saleArgs) external;
     //function getFees(address _contract) external view returns (FeePair[] memory);
 }

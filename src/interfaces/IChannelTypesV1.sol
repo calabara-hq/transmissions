@@ -10,8 +10,6 @@ interface IChannelTypesV1 {
         string uri;
         uint256 maxSupply;
         uint256 totalMinted;
-        address author;
-        address createReferral;
     }
 
     struct ChannelConfig {

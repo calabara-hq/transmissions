@@ -5,8 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {ChannelFactory} from "../../src/factory/ChannelFactoryImpl.sol";
 import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
 import {Channel} from "../../src/channel/ChannelImpl.sol";
-import {ChannelFeeStorageV1} from "../../src/storage/ChannelFeeStorageV1.sol";
-import {PaidSaleStrategy} from "../../src/sales/PaidSalesStrategy.sol";
+import {CustomSaleStrategy} from "../../src/sales/CustomSaleStrategy.sol";
 import {ProxyShim} from "../../src/utils/ProxyShim.sol";
 import {Uplink1155Factory} from "../../src/proxies/Uplink1155Factory.sol";
 import {IChannel} from "../../src/interfaces/IChannel.sol";
@@ -24,10 +23,13 @@ contract ChannelFactoryTest is Test {
 
         // set up proxy
         address channelFactoryShim = address(new ProxyShim(uplink));
-        Uplink1155Factory factoryProxy = new Uplink1155Factory(channelFactoryShim, "");
+        Uplink1155Factory factoryProxy = new Uplink1155Factory(
+            channelFactoryShim,
+            ""
+        );
         // set up channel and sales contracts
         Channel channelImpl = new Channel(uplink);
-        ISales paidSalesImpl = PaidSaleStrategy(address(0));
+        ISales paidSalesImpl = CustomSaleStrategy(address(0));
         // set up factory
         channelFactoryImpl = new ChannelFactory(channelImpl, paidSalesImpl);
         channelFactory = ChannelFactory(address(factoryProxy));
@@ -40,11 +42,17 @@ contract ChannelFactoryTest is Test {
         // Create a new ERC1155 contract
 
         vm.startPrank(nick);
-        // bytes[] memory setupActions = new bytes[](1);
-        // setupActions[0] = abi.encodeWithSelector(PaidSaleStrategy.setFees.selector, nick);
+        bytes[] memory setupActions = new bytes[](1);
+        setupActions[0] = abi.encodeWithSelector(
+            CustomSaleStrategy.initializeSaleStrategy.selector,
+            nick
+        );
 
-        // address channelAddress = channelFactory.createChannel("https://example.com/api/token/", setupActions);
-        // console.log("Channel Address:", channelAddress);
+        address channelAddress = channelFactory.createChannel(
+            "https://example.com/api/token/",
+            setupActions
+        );
+        console.log("Channel Address:", channelAddress);
         vm.stopPrank();
 
         // console.log(Channel(channelAddress).getBit());

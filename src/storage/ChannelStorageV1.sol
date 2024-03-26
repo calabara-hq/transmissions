@@ -9,4 +9,5 @@ import {IChannelTypesV1} from "../interfaces/IChannelTypesV1.sol";
 contract ChannelStorageV1 is IChannelTypesV1 {
     mapping(uint256 => TokenConfig) internal tokens;
     uint256 public nextTokenId;
+    address internal uplinkFeeAddress;
 }

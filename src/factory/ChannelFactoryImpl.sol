@@ -23,14 +23,14 @@ contract ChannelFactory is
     UUPSUpgradeable
 {
     IChannel public immutable channelImpl;
-    ISales public immutable standardSalesImpl;
+    ISales public immutable customSalesImpl;
 
-    constructor(IChannel _channelImpl, ISales _standardSalesImpl) initializer {
+    constructor(IChannel _channelImpl, ISales _customSalesImpl) initializer {
         if (address(_channelImpl) == address(0)) {
             revert("ChannelFactory: Invalid Channel Implementation");
         }
         channelImpl = IChannel(_channelImpl);
-        standardSalesImpl = ISales(_standardSalesImpl);
+        customSalesImpl = ISales(_customSalesImpl);
     }
 
     function initialize(address _initOwner) public initializer {
@@ -38,13 +38,20 @@ contract ChannelFactory is
         __UUPSUpgradeable_init();
     }
 
-    function createChannel(string calldata uri, bytes[] calldata setupActions) public returns (address) {
+    function createChannel(
+        string calldata uri,
+        bytes[] calldata setupActions
+    ) public returns (address) {
         Uplink1155 newContract = new Uplink1155(address(channelImpl));
         _initializeContract(Uplink1155(newContract), uri, setupActions);
         return address(newContract);
     }
 
-    function _initializeContract(Uplink1155 newContract, string calldata uri, bytes[] calldata setupActions) private {
+    function _initializeContract(
+        Uplink1155 newContract,
+        string calldata uri,
+        bytes[] calldata setupActions
+    ) private {
         IChannelInitializer(address(newContract)).initialize(uri, setupActions);
         deployedChannels.push(address(newContract));
     }
@@ -53,5 +60,7 @@ contract ChannelFactory is
         return deployedChannels.length;
     }
 
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal override onlyOwner {}
 }
