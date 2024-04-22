@@ -1,0 +1,44 @@
+{
+    "title": "PoolTogether Hypermarketing",
+    "body": {
+        "time": 1713343184203,
+        "blocks": [
+            {
+                "id": "SliuZy8EIG",
+                "type": "paragraph",
+                "data": {
+                    "text": "The new PoolTogether is here and aims to bring onchain prize savings to all. Today, <b>you are the Head of Marketing at PoolTogether</b>. Draft your marketing message and share it with your team!"
+                }
+            },
+            {
+                "id": "nV9svm40ax",
+                "type": "paragraph",
+                "data": {
+                    "text": "Think about things like:"
+                }
+            },
+            {
+                "id": "PbMVSN4HjB",
+                "type": "list",
+                "data": {
+                    "style": "unordered",
+                    "items": [
+                        "Why and how do you use PoolTogether?",
+                        "How do you explain PoolTogether to others?",
+                        "What's the ultimate selling point for you?"
+                    ]
+                }
+            },
+            {
+                "id": "okXBNTMor3",
+                "type": "paragraph",
+                "data": {
+                    "text": "To help you get the message out, you can tap into the <a target=\"_blank\" href=\"https://www.figma.com/design/hOWWUUQBz7lxLMZxVSxxnW/PoolTogether---Brand-Kit-v2?node-id=0%3A1&t=cqvdtj3ssrWIA2mG-1\"> BrandKit </a> and <a target=\"_blank\" href=\"https://www.figma.com/file/tpksqC9zBdvPeIdXAXKbJ7/Hypermarketing-Starter-Kit?type=design&node-id=0%3A1&mode=design&t=dWuyXHJzwiO1eVHu-1\"> Hypermarketing Starter Kit </a>. Just duplicate the files in Figma to get started."
+                }
+            }
+        ],
+        "version": "2.28.2"
+    },
+    "coverUrl": "https://uplink.mypinata.cloud/ipfs/Qmd6Wy6JBxVLMwafyPT5vsiwbdRrLjTgHsnf8XFwzpcs4Q",
+    "version": "uplink-v1"
+}

@@ -3,18 +3,23 @@
 pragma solidity ^0.8.0;
 
 import {IChannelTypesV1} from "./IChannelTypesV1.sol";
-
+import {IFees} from "../fees/IFees.sol";
 /// @notice Channel
 /// @author @nickddsn
 
 interface IChannel {
-    // function createToken(string calldata uri, uint256 maxSupply) external returns (uint256);
+    function initialize(
+        string calldata uri,
+        address defaultAdmin,
+        address[] calldata admins,
+        bytes[] calldata setupActions
+    ) external;
 
-    // function mint(address account, uint256 tokenId, uint256 amount, bytes memory data) external;
+    function setChannelFeeConfig(
+        IFees feeContract,
+        bytes calldata data
+    ) external;
 
-    // function getTokens(
-    //     uint256 tokenId
-    // ) external view returns (TokenConfig memory);
-
-    function initialize(string calldata uri, bytes[] calldata setupActions) external;
+    function mintPrice() external view returns (uint256);
+    function channelFees() external view returns (uint256, uint256, uint256, uint256, uint256);
 }
