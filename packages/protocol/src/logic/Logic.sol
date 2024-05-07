@@ -85,13 +85,10 @@ contract Logic is ILogic, Ownable {
      * @return InteractionLogic the constructed logic
      */
     function _constructInteractionLogic(bytes memory data) internal returns (InteractionLogic memory) {
-        (
-            address[] memory targets,
-            bytes4[] memory signatures,
-            bytes[] memory datas,
-            bytes[] memory operators,
-            bytes[] memory literalOperands
-        ) = abi.decode(data, (address[], bytes4[], bytes[], bytes[], bytes[]));
+        (address[] memory targets, bytes4[] memory signatures, bytes[] memory datas, bytes[] memory operators, bytes[] memory literalOperands) = abi.decode(
+            data,
+            (address[], bytes4[], bytes[], bytes[], bytes[])
+        );
 
         _validateSignatures(signatures);
         _validateLogic(targets, signatures, datas, operators, literalOperands);
@@ -116,8 +113,10 @@ contract Logic is ILogic, Ownable {
         bytes[] memory literalOperands
     ) internal pure {
         require(
-            targets.length == signatures.length && signatures.length == datas.length && datas.length == operators.length
-                && operators.length == literalOperands.length,
+            targets.length == signatures.length &&
+                signatures.length == datas.length &&
+                datas.length == operators.length &&
+                operators.length == literalOperands.length,
             "Logic field lengths do not match"
         );
     }
@@ -144,11 +143,9 @@ contract Logic is ILogic, Ownable {
         if (length == 0) return true;
 
         for (uint256 i = 0; i < length; i++) {
-            bytes memory adjustedCalldata =
-                _adjustCalldata(logic.datas[i], approvedSignatures[logic.signatures[i]].calldataAddressPosition, user);
+            bytes memory adjustedCalldata = _adjustCalldata(logic.datas[i], approvedSignatures[logic.signatures[i]].calldataAddressPosition, user);
 
-            (bool success, bytes memory executionResult) =
-                _executeLogic(logic.targets[i], logic.signatures[i], adjustedCalldata);
+            (bool success, bytes memory executionResult) = _executeLogic(logic.targets[i], logic.signatures[i], adjustedCalldata);
 
             if (!success) {
                 revert CallFailed();
@@ -186,11 +183,7 @@ contract Logic is ILogic, Ownable {
      * @param data calldata with injected user address
      * @return (bool, bytes) staticcall result
      */
-    function _executeLogic(address target, bytes4 signature, bytes memory data)
-        internal
-        view
-        returns (bool, bytes memory)
-    {
+    function _executeLogic(address target, bytes4 signature, bytes memory data) internal view returns (bool, bytes memory) {
         return target.staticcall(abi.encodePacked(signature, data));
     }
 
@@ -201,11 +194,7 @@ contract Logic is ILogic, Ownable {
      * @param literalOperand operand for comparison
      * @return bool result of operation
      */
-    function _applyOperator(bytes memory operator, bytes memory executionResult, bytes memory literalOperand)
-        internal
-        view
-        returns (bool)
-    {
+    function _applyOperator(bytes memory operator, bytes memory executionResult, bytes memory literalOperand) internal view returns (bool) {
         bytes32 operatorHash = keccak256(operator);
         uint256 expectedValue = abi.decode(literalOperand, (uint256));
         if (operatorHash == keccak256(abi.encodePacked(">"))) {

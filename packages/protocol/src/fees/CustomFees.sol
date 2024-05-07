@@ -54,15 +54,9 @@ interface IFees {
     function getEthMintPrice() external view returns (uint256);
     function getErc20MintPrice() external view returns (uint256);
 
-    function requestNativeMint(address creator, address referral, address sponsor)
-        external
-        view
-        returns (NativeMintCommands[] memory);
+    function requestNativeMint(address creator, address referral, address sponsor) external view returns (NativeMintCommands[] memory);
 
-    function requestErc20Mint(address creator, address referral, address sponsor)
-        external
-        view
-        returns (Erc20MintCommands[] memory);
+    function requestErc20Mint(address creator, address referral, address sponsor) external view returns (Erc20MintCommands[] memory);
 
     function getSplits() external view returns (uint16, uint16, uint16, uint16, uint16);
 
@@ -113,26 +107,13 @@ contract CustomFees is IFees {
         emit FeeConfigSet(msg.sender, customFees[msg.sender]);
     }
 
-    function _verifyTotalBps(
-        uint16 uplinkBps,
-        uint16 channelBps,
-        uint16 creatorBps,
-        uint16 mintReferralBps,
-        uint16 sponsorBps
-    ) internal pure {
+    function _verifyTotalBps(uint16 uplinkBps, uint16 channelBps, uint16 creatorBps, uint16 mintReferralBps, uint16 sponsorBps) internal pure {
         if ((uplinkBps + channelBps + creatorBps + mintReferralBps + sponsorBps) % 1e4 != 0) {
             revert InvalidBPS();
         }
     }
 
-    function _verifySplits(
-        uint256 mintPrice,
-        uint16 uplinkBps,
-        uint16 channelBps,
-        uint16 creatorBps,
-        uint16 mintReferralBps,
-        uint16 sponsorBps
-    ) internal pure {
+    function _verifySplits(uint256 mintPrice, uint16 uplinkBps, uint16 channelBps, uint16 creatorBps, uint16 mintReferralBps, uint16 sponsorBps) internal pure {
         if ((mintPrice * uplinkBps) % 1e4 != 0) {
             revert InvalidSplit();
         }
@@ -183,11 +164,7 @@ contract CustomFees is IFees {
         return (number * splitBps) / 1e4;
     }
 
-    function requestErc20Mint(address creator, address referral, address sponsor)
-        external
-        view
-        returns (Erc20MintCommands[] memory)
-    {
+    function requestErc20Mint(address creator, address referral, address sponsor) external view returns (Erc20MintCommands[] memory) {
         if (creator == address(0)) revert("Invalid creator address");
         if (sponsor == address(0)) revert("Invalid sponsor address");
 
@@ -270,11 +247,7 @@ contract CustomFees is IFees {
         return transferCommands;
     }
 
-    function requestNativeMint(address creator, address referral, address sponsor)
-        external
-        view
-        returns (NativeMintCommands[] memory)
-    {
+    function requestNativeMint(address creator, address referral, address sponsor) external view returns (NativeMintCommands[] memory) {
         if (creator == address(0)) revert("Invalid creator address");
         if (sponsor == address(0)) revert("Invalid sponsor address");
 

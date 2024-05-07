@@ -45,14 +45,7 @@ interface IChannelFactory {
     error InvalidUpgrade();
 }
 
-contract ChannelFactory is
-    IChannelFactory,
-    ChannelFactoryStorageV1,
-    Initializable,
-    OwnableUpgradeable,
-    UUPSUpgradeable,
-    ContractVersion
-{
+contract ChannelFactory is IChannelFactory, ChannelFactoryStorageV1, Initializable, OwnableUpgradeable, UUPSUpgradeable, ContractVersion {
     constructor(IChannel _channelImpl) initializer {
         if (address(_channelImpl) == address(0)) {
             revert AddressZero();
@@ -106,12 +99,7 @@ contract ChannelFactory is
      * @param setupActions bytes[] setup actions
      * @return address deployed contract address
      */
-    function createChannel(
-        string calldata uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions
-    ) public returns (address) {
+    function createChannel(string calldata uri, address defaultAdmin, address[] calldata managers, bytes[] calldata setupActions) public returns (address) {
         Uplink1155 newContract = new Uplink1155(address(channelImpl));
         _initializeContract(newContract, uri, defaultAdmin, managers, setupActions);
         return address(newContract);

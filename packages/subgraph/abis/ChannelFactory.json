@@ -1,0 +1,361 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_channelImpl",
+        "internalType": "contract IChannel",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "UPGRADE_INTERFACE_VERSION",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "string",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "channelImpl",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "contract IChannel",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "contractName",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "string",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "contractURI",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "string",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "contractVersion",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "string",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "uri",
+        "internalType": "string",
+        "type": "string"
+      },
+      {
+        "name": "defaultAdmin",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "managers",
+        "internalType": "address[]",
+        "type": "address[]"
+      },
+      {
+        "name": "setupActions",
+        "internalType": "bytes[]",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "createChannel",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "_initOwner",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "newImplementation",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [],
+    "name": "FactoryInitialized"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "version",
+        "internalType": "uint64",
+        "type": "uint64",
+        "indexed": false
+      }
+    ],
+    "name": "Initialized"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "previousOwner",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "newOwner",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "name": "OwnershipTransferred"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "contractAddress",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "uri",
+        "internalType": "string",
+        "type": "string",
+        "indexed": false
+      },
+      {
+        "name": "defaultAdmin",
+        "internalType": "address",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "managers",
+        "internalType": "address[]",
+        "type": "address[]",
+        "indexed": false
+      }
+    ],
+    "name": "SetupNewContract"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "implementation",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "name": "Upgraded"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "target",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "AddressEmptyCode"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "AddressZero"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "implementation",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "ERC1967InvalidImplementation"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "ERC1967NonPayable"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "FailedInnerCall"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "InvalidInitialization"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "InvalidUpgrade"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "NotInitializing"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "owner",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "account",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "UUPSUnauthorizedCallContext"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "slot",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "name": "UUPSUnsupportedProxiableUUID"
+  }
+]

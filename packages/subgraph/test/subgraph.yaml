@@ -1,0 +1,68 @@
+specVersion: 1.0.0
+indexerHints:
+  prune: auto
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Channel
+    network: base-sepolia
+    source:
+      address: "0xdB0278c92E36b2B92F3aF3a477B6424736609623"
+      abi: Channel
+      startBlock: 9672725
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ApprovalForAll
+        - ConfigUpdated
+        - ERC20Transferred
+        - ETHTransferred
+        - Initialized
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
+        - TokenCreated
+        - TokenMinted
+        - TokenURIUpdated
+        - TransferBatch
+        - TransferSingle
+        - URI
+        - Upgraded
+      abis:
+        - name: Channel
+          file: ./abis/Channel.json
+      eventHandlers:
+        - event: ApprovalForAll(indexed address,indexed address,bool)
+          handler: handleApprovalForAll
+        - event: ConfigUpdated(indexed uint8,address,address,address)
+          handler: handleConfigUpdated
+        - event: ERC20Transferred(indexed address,uint256)
+          handler: handleERC20Transferred
+        - event: ETHTransferred(indexed address,uint256)
+          handler: handleETHTransferred
+        - event: Initialized(uint64)
+          handler: handleInitialized
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+        - event: TokenCreated(indexed uint256,(string,address,uint256,uint256,address))
+          handler: handleTokenCreated
+        - event: TokenMinted(indexed address,indexed address,uint256[],uint256[])
+          handler: handleTokenMinted
+        - event: TokenURIUpdated(indexed uint256,string)
+          handler: handleTokenURIUpdated
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatch
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingle
+        - event: URI(string,indexed uint256)
+          handler: handleURI
+        - event: Upgraded(indexed address)
+          handler: handleUpgraded
+      file: ./src/channel.ts

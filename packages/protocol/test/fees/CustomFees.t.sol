@@ -54,9 +54,7 @@ contract FeesTest is Test {
     }
 
     function test_customFees_freeEthMint() public {
-        bytes memory feeArgs = abi.encode(
-            0, channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 10 * 10e6, address(erc20Token)
-        );
+        bytes memory feeArgs = abi.encode(0, channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 10 * 10e6, address(erc20Token));
 
         vm.startPrank(targetChannel);
         customFeesImpl.setChannelFeeConfig(feeArgs);
@@ -189,16 +187,21 @@ contract FeesTest is Test {
 
         vm.startPrank(targetChannel);
 
-        uint256 totalBps =
-            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+        uint256 totalBps = uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (
-            (totalBps % 10000 != 0) || ((uplinkBps * ethMintPrice) % 10000 != 0)
-                || ((uplinkBps * erc20MintPrice) % 10000 != 0) || ((channelBps * ethMintPrice) % 10000 != 0)
-                || ((creatorBps * ethMintPrice) % 10000 != 0) || ((mintReferralBps * ethMintPrice) % 10000 != 0)
-                || ((sponsorBps * ethMintPrice) % 10000 != 0) || ((uplinkBps * erc20MintPrice) % 10000 != 0)
-                || ((channelBps * erc20MintPrice) % 10000 != 0) || ((creatorBps * erc20MintPrice) % 10000 != 0)
-                || ((mintReferralBps * erc20MintPrice) % 10000 != 0) || ((sponsorBps * erc20MintPrice) % 10000 != 0)
+            (totalBps % 10000 != 0) ||
+            ((uplinkBps * ethMintPrice) % 10000 != 0) ||
+            ((uplinkBps * erc20MintPrice) % 10000 != 0) ||
+            ((channelBps * ethMintPrice) % 10000 != 0) ||
+            ((creatorBps * ethMintPrice) % 10000 != 0) ||
+            ((mintReferralBps * ethMintPrice) % 10000 != 0) ||
+            ((sponsorBps * ethMintPrice) % 10000 != 0) ||
+            ((uplinkBps * erc20MintPrice) % 10000 != 0) ||
+            ((channelBps * erc20MintPrice) % 10000 != 0) ||
+            ((creatorBps * erc20MintPrice) % 10000 != 0) ||
+            ((mintReferralBps * erc20MintPrice) % 10000 != 0) ||
+            ((sponsorBps * erc20MintPrice) % 10000 != 0)
         ) {
             vm.expectRevert();
             customFeesImpl.setChannelFeeConfig(feeArgs);

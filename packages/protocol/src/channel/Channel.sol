@@ -7,16 +7,14 @@ import {Multicall} from "../utils/Multicall.sol";
 import {Initializable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
 import {IFees} from "../fees/CustomFees.sol";
-import {AccessControlUpgradeable} from
-    "openzeppelin-contracts-upgradeable/contracts/access/AccessControlUpgradeable.sol";
+import {AccessControlUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/access/AccessControlUpgradeable.sol";
 import {ILogic} from "../logic/Logic.sol";
 import {IUpgradePath, UpgradePath} from "../utils/UpgradePath.sol";
 import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ITiming} from "../timing/InfiniteRound.sol";
 import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import {ReentrancyGuardUpgradeable} from
-    "openzeppelin-contracts-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
 
 /**
  *
@@ -43,12 +41,7 @@ import {ReentrancyGuardUpgradeable} from
  *
  */
 interface IChannel {
-    function initialize(
-        string calldata uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions
-    ) external;
+    function initialize(string calldata uri, address defaultAdmin, address[] calldata managers, bytes[] calldata setupActions) external;
 
     enum ConfigUpdate {
         FEE_CONTRACT,
@@ -56,9 +49,7 @@ interface IChannel {
         TIMING_CONTRACT
     }
 
-    event ConfigUpdated(
-        ConfigUpdate indexed updateType, address feeContract, address logicContract, address timingContract
-    );
+    event ConfigUpdated(ConfigUpdate indexed updateType, address feeContract, address logicContract, address timingContract);
     event TokenCreated(uint256 indexed tokenId, ChannelStorageV1.TokenConfig token);
     event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
     event ERC20Transferred(address indexed spender, uint256 amount);
@@ -177,15 +168,10 @@ contract Channel is
         feeContract = IFees(_feeContract);
         feeContract.setChannelFeeConfig(data);
 
-        emit ConfigUpdated(
-            ConfigUpdate.FEE_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
+        emit ConfigUpdated(ConfigUpdate.FEE_CONTRACT, address(feeContract), address(logicContract), address(timingContract));
     }
 
-    function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic)
-        external
-        onlyAdminOrManager
-    {
+    function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic) external onlyAdminOrManager {
         if (_logicContract == address(0)) {
             revert AddressZero();
         }
@@ -194,9 +180,7 @@ contract Channel is
         logicContract.setCreatorLogic(creatorLogic);
         logicContract.setMinterLogic(minterLogic);
 
-        emit ConfigUpdated(
-            ConfigUpdate.LOGIC_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
+        emit ConfigUpdated(ConfigUpdate.LOGIC_CONTRACT, address(feeContract), address(logicContract), address(timingContract));
     }
 
     /**
@@ -212,9 +196,7 @@ contract Channel is
         timingContract = ITiming(_timingContract);
         timingContract.setTimingConfig(data);
 
-        emit ConfigUpdated(
-            ConfigUpdate.TIMING_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
+        emit ConfigUpdated(ConfigUpdate.TIMING_CONTRACT, address(feeContract), address(logicContract), address(timingContract));
     }
 
     function ethMintPrice() public view returns (uint256) {
@@ -225,13 +207,7 @@ contract Channel is
         return feeContract.getErc20MintPrice();
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC1155Upgradeable, AccessControlUpgradeable)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155Upgradeable, AccessControlUpgradeable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -258,11 +234,7 @@ contract Channel is
      * @param maxSupply Token supply
      * @return uint256 Id of newly created token
      */
-    function createToken(string calldata uri, address author, uint256 maxSupply)
-        public
-        nonReentrant
-        returns (uint256)
-    {
+    function createToken(string calldata uri, address author, uint256 maxSupply) public nonReentrant returns (uint256) {
         if (timingContract.getChannelState() != 1) {
             revert InvalidChannelState();
         }
@@ -299,8 +271,7 @@ contract Channel is
     function _setupNewToken(string memory newURI, uint256 maxSupply, address author) internal returns (uint256) {
         uint256 tokenId = _getAndUpdateNextTokenId();
 
-        TokenConfig memory tokenConfig =
-            TokenConfig({uri: newURI, maxSupply: maxSupply, totalMinted: 0, author: author, sponsor: msg.sender});
+        TokenConfig memory tokenConfig = TokenConfig({uri: newURI, maxSupply: maxSupply, totalMinted: 0, author: author, sponsor: msg.sender});
         tokens[tokenId] = tokenConfig;
 
         emit TokenCreated(tokenId, tokenConfig);
@@ -338,11 +309,7 @@ contract Channel is
      * @param mintReferral referral address for minting
      * @param data mint data
      */
-    function mint(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data)
-        external
-        payable
-        nonReentrant
-    {
+    function mint(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) external payable nonReentrant {
         (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
         _mintBatchWithETH(to, ids, amounts, data, mintReferral);
     }
@@ -354,11 +321,7 @@ contract Channel is
      * @param mintReferral referral address for minting
      * @param data mint data
      */
-    function mintWithERC20(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data)
-        external
-        payable
-        nonReentrant
-    {
+    function mintWithERC20(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) external payable nonReentrant {
         (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
         _mintBatchWithERC20(to, ids, amounts, data, mintReferral);
     }
@@ -399,13 +362,7 @@ contract Channel is
         _mintBatchWithERC20(to, ids, amounts, data, mintReferral);
     }
 
-    function _mintBatchWithETH(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
-    ) internal {
+    function _mintBatchWithETH(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data, address mintReferral) internal {
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
             _checkMintRequirements(token, ids[i], amounts[i]);
@@ -416,13 +373,7 @@ contract Channel is
         emit TokenMinted(to, mintReferral, ids, amounts);
     }
 
-    function _mintBatchWithERC20(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
-    ) internal {
+    function _mintBatchWithERC20(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data, address mintReferral) internal {
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
             _checkMintRequirements(token, ids[i], amounts[i]);
@@ -459,7 +410,7 @@ contract Channel is
         uint256 totalDeposited = 0;
         for (uint256 i = 0; i < commands.length; i++) {
             if (commands[i].method == IFees.NativeFeeActions.SEND_ETH) {
-                (bool success,) = commands[i].recipient.call{value: commands[i].amount * numMints}("");
+                (bool success, ) = commands[i].recipient.call{value: commands[i].amount * numMints}("");
                 if (!success) {
                     revert TransferFailed();
                 }
@@ -471,15 +422,11 @@ contract Channel is
         }
     }
 
-    function _depositERC20Rewards(IFees.Erc20MintCommands[] memory commands, uint256 totalValue, uint256 numMints)
-        internal
-    {
+    function _depositERC20Rewards(IFees.Erc20MintCommands[] memory commands, uint256 totalValue, uint256 numMints) internal {
         uint256 totalDeposited = 0;
         for (uint256 i = 0; i < commands.length; i++) {
             if (commands[i].method == IFees.Erc20FeeActions.SEND_ERC20) {
-                IERC20(commands[i].erc20Contract).safeTransferFrom(
-                    msg.sender, commands[i].recipient, commands[i].amount * numMints
-                );
+                IERC20(commands[i].erc20Contract).safeTransferFrom(msg.sender, commands[i].recipient, commands[i].amount * numMints);
                 totalDeposited += commands[i].amount * numMints;
             }
         }
@@ -508,11 +455,7 @@ contract Channel is
     /**
      * @dev Creates an array in memory with only one value for each of the elements provided.
      */
-    function _toSingletonArrays(uint256 element1, uint256 element2)
-        private
-        pure
-        returns (uint256[] memory array1, uint256[] memory array2)
-    {
+    function _toSingletonArrays(uint256 element1, uint256 element2) private pure returns (uint256[] memory array1, uint256[] memory array2) {
         /// @solidity memory-safe-assembly
         assembly {
             // Load the free memory pointer

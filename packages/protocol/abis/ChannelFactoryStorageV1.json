@@ -1,0 +1,15 @@
+[
+  {
+    "type": "function",
+    "name": "channelImpl",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IChannel"
+      }
+    ],
+    "stateMutability": "view"
+  }
+]

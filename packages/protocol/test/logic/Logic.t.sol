@@ -222,9 +222,7 @@ contract ChannelTest is Test {
 
     function test_emptyLogic() public {
         vm.startPrank(targetChannel);
-        logicImpl.setCreatorLogic(
-            abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0))
-        );
+        logicImpl.setCreatorLogic(abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0)));
         bool result = logicImpl.isCreatorApproved(nick);
         assert(result == true);
         vm.stopPrank();

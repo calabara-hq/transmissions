@@ -45,12 +45,7 @@ contract ChannelFactoryTest is Test {
     function test_initialize(address initialOwner) external {
         vm.assume(initialOwner != address(0));
         address payable proxyAddress = payable(
-            address(
-                new Uplink1155Factory(
-                    address(channelFactoryImpl),
-                    abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)
-                )
-            )
+            address(new Uplink1155Factory(address(channelFactoryImpl), abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)))
         );
         ChannelFactory proxy = ChannelFactory(proxyAddress);
         assertEq(proxy.owner(), initialOwner);
@@ -65,12 +60,7 @@ contract ChannelFactoryTest is Test {
 
         // redeploy the proxy so initial owner is set in fuzz testing
         address payable proxyAddress = payable(
-            address(
-                new Uplink1155Factory(
-                    address(channelFactoryImpl),
-                    abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)
-                )
-            )
+            address(new Uplink1155Factory(address(channelFactoryImpl), abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)))
         );
 
         ChannelFactory proxy = ChannelFactory(proxyAddress);
@@ -82,9 +72,7 @@ contract ChannelFactoryTest is Test {
 
     function test_createChannel() external {
         bytes[] memory setupActions = new bytes[](0);
-        address newChannel = channelFactory.createChannel(
-            "https://example.com/api/token/0", address(this), new address[](0), setupActions
-        );
+        address newChannel = channelFactory.createChannel("https://example.com/api/token/0", address(this), new address[](0), setupActions);
         //assertEq("https://example.com/api/token/0", IChannel(newChannel).uri());
     }
 }
