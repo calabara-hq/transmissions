@@ -59,11 +59,11 @@ interface IChannel {
     event ConfigUpdated(
         ConfigUpdate indexed updateType, address feeContract, address logicContract, address timingContract
     );
-    event TokenCreated(uint256 tokenId, ChannelStorageV1.TokenConfig token);
-    event TokenMinted(address minter, address mintReferral, uint256[] tokenIds, uint256[] amounts);
-    event ERC20Transferred(address spender, uint256 amount);
-    event ETHTransferred(address spender, uint256 amount);
-    event TokenURIUpdated(uint256 tokenId, string uri);
+    event TokenCreated(uint256 indexed tokenId, ChannelStorageV1.TokenConfig token);
+    event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
+    event ERC20Transferred(address indexed spender, uint256 amount);
+    event ETHTransferred(address indexed spender, uint256 amount);
+    event TokenURIUpdated(uint256 indexed tokenId, string uri);
 
     function setChannelFeeConfig(address feeContract, bytes calldata data) external;
     function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic) external;
