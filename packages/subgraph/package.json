@@ -15,7 +15,9 @@
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.71.1",
     "@types/node": "^20.12.10",
+    "mustache": "^4.2.0",
     "tsx": "^4.9.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "yaml2json": "^1.0.2"
   }
 }

@@ -16,7 +16,7 @@ import {
   TransferSingle,
   URI,
   Upgraded
-} from "../generated/Channel/Channel"
+} from "../generated/Contract/Contract"
 
 export function createApprovalForAllEvent(
   account: Address,

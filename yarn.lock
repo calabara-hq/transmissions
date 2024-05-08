@@ -4747,6 +4747,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mustache@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "mustache@npm:4.2.0"
+  bin:
+    mustache: bin/mustache
+  checksum: 928fcb63e3aa44a562bfe9b59ba202cccbe40a46da50be6f0dd831b495be1dd7e38ca4657f0ecab2c1a89dc7bccba0885eab7ee7c1b215830da765758c7e0506
+  languageName: node
+  linkType: hard
+
 "mz@npm:^2.7.0":
   version: 2.7.0
   resolution: "mz@npm:2.7.0"
@@ -6041,9 +6050,11 @@ __metadata:
   dependencies:
     "@graphprotocol/graph-cli": ^0.71.1
     "@types/node": ^20.12.10
+    mustache: ^4.2.0
     transmissions-protocol: "*"
     tsx: ^4.9.3
     typescript: ^5.4.5
+    yaml2json: ^1.0.2
   languageName: unknown
   linkType: soft
 
@@ -6759,6 +6770,27 @@ __metadata:
   version: 4.0.0
   resolution: "yallist@npm:4.0.0"
   checksum: 343617202af32df2a15a3be36a5a8c0c8545208f3d3dfbc6bb7c3e3b7e8c6f8e7485432e4f3b88da3031a6e20afa7c711eded32ddfb122896ac5d914e75848d5
+  languageName: node
+  linkType: hard
+
+"yaml2json@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "yaml2json@npm:1.0.2"
+  dependencies:
+    yaml: 0.2.x
+  bin:
+    yaml2json: ./index.js
+    yamltojson: ./index.js
+    yml2json: ./index.js
+    ymltojson: ./index.js
+  checksum: 7c34c730676fe612d2b1b376e7abf02074ea54ad5d7b5934596eab24126d2dcac6a4f841e4c11f3598bb7077b1c2421af87369a29403da5f4180a4af87b63ead
+  languageName: node
+  linkType: hard
+
+"yaml@npm:0.2.x":
+  version: 0.2.3
+  resolution: "yaml@npm:0.2.3"
+  checksum: 875dc4f48289afacb4f0aa37c5f9fa62e5c9547e9b3efcecec0d4549297de20812aaf34e84ffdef5f4b770631f2040e1b21b74c01ddc6d7d1cde7d345fc3daff
   languageName: node
   linkType: hard
 

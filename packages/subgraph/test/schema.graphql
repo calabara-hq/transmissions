@@ -125,7 +125,7 @@ type TransferSingle @entity(immutable: true) {
   operator: Bytes! # address
   from: Bytes! # address
   to: Bytes! # address
-  Channel_id: BigInt! # uint256
+  Contract_id: BigInt! # uint256
   value: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
@@ -135,7 +135,7 @@ type TransferSingle @entity(immutable: true) {
 type URI @entity(immutable: true) {
   id: Bytes!
   value: String! # string
-  Channel_id: BigInt! # uint256
+  Contract_id: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

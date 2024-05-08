@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Channel
+    name: Contract
     network: base-sepolia
     source:
       address: "0xdB0278c92E36b2B92F3aF3a477B6424736609623"
-      abi: Channel
+      abi: Contract
       startBlock: 9672725
     mapping:
       kind: ethereum/events
@@ -32,8 +32,8 @@ dataSources:
         - URI
         - Upgraded
       abis:
-        - name: Channel
-          file: ./abis/Channel.json
+        - name: Contract
+          file: ./abis/Contract.json
       eventHandlers:
         - event: ApprovalForAll(indexed address,indexed address,bool)
           handler: handleApprovalForAll
@@ -65,4 +65,4 @@ dataSources:
           handler: handleURI
         - event: Upgraded(indexed address)
           handler: handleUpgraded
-      file: ./src/channel.ts
+      file: ./src/contract.ts

@@ -14,7 +14,7 @@ import {
   TransferSingle as TransferSingleEvent,
   URI as URIEvent,
   Upgraded as UpgradedEvent
-} from "../generated/Channel/Channel"
+} from "../generated/Contract/Contract"
 import {
   ApprovalForAll,
   ConfigUpdated,
@@ -222,7 +222,7 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
   entity.operator = event.params.operator
   entity.from = event.params.from
   entity.to = event.params.to
-  entity.Channel_id = event.params.id
+  entity.Contract_id = event.params.id
   entity.value = event.params.value
 
   entity.blockNumber = event.block.number
@@ -235,7 +235,7 @@ export function handleTransferSingle(event: TransferSingleEvent): void {
 export function handleURI(event: URIEvent): void {
   let entity = new URI(event.transaction.hash.concatI32(event.logIndex.toI32()))
   entity.value = event.params.value
-  entity.Channel_id = event.params.id
+  entity.Contract_id = event.params.id
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
