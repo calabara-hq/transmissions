@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test, console} from "forge-std/Test.sol";
 import {IChannel, Channel} from "../../src/channel/Channel.sol";
-import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 import {Uplink1155} from "../../src/proxies/Uplink1155.sol";
 import {IUpgradePath, UpgradePath} from "../../src/utils/UpgradePath.sol";
 

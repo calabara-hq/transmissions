@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test, console} from "forge-std/Test.sol";
 import {ChannelFactory} from "../../src/factory/ChannelFactoryImpl.sol";
-import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 import {Channel, IChannel} from "../../src/channel/Channel.sol";
 import {ProxyShim} from "../../src/utils/ProxyShim.sol";
 import {Uplink1155Factory} from "../../src/proxies/Uplink1155Factory.sol";
@@ -45,7 +45,12 @@ contract ChannelFactoryTest is Test {
     function test_initialize(address initialOwner) external {
         vm.assume(initialOwner != address(0));
         address payable proxyAddress = payable(
-            address(new Uplink1155Factory(address(channelFactoryImpl), abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)))
+            address(
+                new Uplink1155Factory(
+                    address(channelFactoryImpl),
+                    abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)
+                )
+            )
         );
         ChannelFactory proxy = ChannelFactory(proxyAddress);
         assertEq(proxy.owner(), initialOwner);
@@ -60,7 +65,12 @@ contract ChannelFactoryTest is Test {
 
         // redeploy the proxy so initial owner is set in fuzz testing
         address payable proxyAddress = payable(
-            address(new Uplink1155Factory(address(channelFactoryImpl), abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)))
+            address(
+                new Uplink1155Factory(
+                    address(channelFactoryImpl),
+                    abi.encodeWithSelector(channelFactoryImpl.initialize.selector, initialOwner)
+                )
+            )
         );
 
         ChannelFactory proxy = ChannelFactory(proxyAddress);
@@ -72,7 +82,9 @@ contract ChannelFactoryTest is Test {
 
     function test_createChannel() external {
         bytes[] memory setupActions = new bytes[](0);
-        address newChannel = channelFactory.createChannel("https://example.com/api/token/0", address(this), new address[](0), setupActions);
+        address newChannel = channelFactory.createChannel(
+            "https://example.com/api/token/0", address(this), new address[](0), setupActions
+        );
         //assertEq("https://example.com/api/token/0", IChannel(newChannel).uri());
     }
 }

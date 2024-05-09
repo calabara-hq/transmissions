@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import {Test, console} from "forge-std/Test.sol";
 import {ILogic, Logic} from "../../src/logic/Logic.sol";
-import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
+import {IERC20} from "openzeppelin-contracts/token/ERC20/IERC20.sol";
+import {IERC721} from "openzeppelin-contracts/token/ERC721/IERC721.sol";
+import {IERC1155} from "openzeppelin-contracts/token/ERC1155/IERC1155.sol";
 import {MockERC20, MockERC721, MockERC1155} from "../TokenHelpers.sol";
 
 interface IMockBool {
@@ -222,7 +222,9 @@ contract ChannelTest is Test {
 
     function test_emptyLogic() public {
         vm.startPrank(targetChannel);
-        logicImpl.setCreatorLogic(abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0)));
+        logicImpl.setCreatorLogic(
+            abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0))
+        );
         bool result = logicImpl.isCreatorApproved(nick);
         assert(result == true);
         vm.stopPrank();

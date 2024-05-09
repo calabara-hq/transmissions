@@ -6,9 +6,9 @@ import {ChannelFactoryStorageV1} from "./ChannelFactoryStorageV1.sol";
 import {Uplink1155} from "../proxies/Uplink1155.sol";
 import {IChannelInitializer} from "../channel/IChannelInitializer.sol";
 import {ContractVersion} from "../version/ContractVersion.sol";
-import {OwnableUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/access/OwnableUpgradeable.sol";
-import {Initializable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable} from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  *
@@ -45,7 +45,14 @@ interface IChannelFactory {
     error InvalidUpgrade();
 }
 
-contract ChannelFactory is IChannelFactory, ChannelFactoryStorageV1, Initializable, OwnableUpgradeable, UUPSUpgradeable, ContractVersion {
+contract ChannelFactory is
+    IChannelFactory,
+    ChannelFactoryStorageV1,
+    Initializable,
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    ContractVersion
+{
     constructor(IChannel _channelImpl) initializer {
         if (address(_channelImpl) == address(0)) {
             revert AddressZero();
@@ -99,7 +106,12 @@ contract ChannelFactory is IChannelFactory, ChannelFactoryStorageV1, Initializab
      * @param setupActions bytes[] setup actions
      * @return address deployed contract address
      */
-    function createChannel(string calldata uri, address defaultAdmin, address[] calldata managers, bytes[] calldata setupActions) public returns (address) {
+    function createChannel(
+        string calldata uri,
+        address defaultAdmin,
+        address[] calldata managers,
+        bytes[] calldata setupActions
+    ) public returns (address) {
         Uplink1155 newContract = new Uplink1155(address(channelImpl));
         _initializeContract(newContract, uri, defaultAdmin, managers, setupActions);
         return address(newContract);
