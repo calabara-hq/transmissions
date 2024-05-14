@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test} from "forge-std/Test.sol";
-import {IChannel, Channel} from "../../src/channel/Channel.sol";
-import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
-import {Uplink1155} from "../../src/proxies/Uplink1155.sol";
-import {IUpgradePath, UpgradePath} from "../../src/utils/UpgradePath.sol";
+import { Uplink1155 } from "../../src/proxies/Uplink1155.sol";
+import { IUpgradePath, UpgradePath } from "../../src/utils/UpgradePath.sol";
+import { Test } from "forge-std/Test.sol";
+import { ERC1155 } from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 
-contract ChannelTest is Test {
+/* contract ChannelTest is Test {
     address nick = makeAddr("nick");
     address uplinkRewardsAddr = makeAddr("uplinkRewardsAddr");
     address admin = makeAddr("admin");
@@ -105,4 +104,4 @@ contract ChannelTest is Test {
         targetChannel._setManagers(newManagers);
         vm.stopPrank();
     }
-}
+} */

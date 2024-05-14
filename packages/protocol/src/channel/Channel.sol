@@ -1,75 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC1155Upgradeable} from "openzeppelin-contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
-import {ChannelStorageV1} from "./ChannelStorageV1.sol";
-import {Multicall} from "../utils/Multicall.sol";
-import {Initializable} from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {IFees} from "../fees/CustomFees.sol";
-import {AccessControlUpgradeable} from "openzeppelin-contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import {ILogic} from "../logic/Logic.sol";
-import {IUpgradePath, UpgradePath} from "../utils/UpgradePath.sol";
-import {ERC1967Utils} from "openzeppelin-contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {ITiming} from "../timing/InfiniteRound.sol";
-import {IERC20} from "openzeppelin-contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "openzeppelin-contracts/token/ERC20/utils/SafeERC20.sol";
-import {ReentrancyGuardUpgradeable} from "openzeppelin-contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import { ChannelStorage } from "./ChannelStorage.sol";
 
-/**
- *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░))░░░░░░░░ *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░░)))))))░░░░░░ *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░))))))))))░░░░ *
- * ░░░░░░░░░░░░░░)))))░░░░░░░)))))))))))░░░ *
- * ░░░░░░░░░░░░)))))))))░░░░░░)))))))))))░░ *
- * ░░░░░░░░░░░░))))))))))░░░░░░))))))))))░░ *
- * ░░░░░░░░░░░░░)))))))))))░░░░░))))))))))░ *
- * ░))))))░░░░░░░░))))))))))░░░░░)))))))))░ *
- * ░))))))))░░░░░░░)))))))))░░░░░░))))))))) *
- * ░░)))))))))░░░░░░)))))))))░░░░░))))))))) *
- * ░░░))))))))░░░░░░)))))))))░░░░░))))))))) *
- * ░)))))))))░░░░░░)))))))))░░░░░░))))))))) *
- * ))))))))░░░░░░░))))))))))░░░░░)))))))))) *
- * ░░░░░░░░░░░░░░))))))))))░░░░░░)))))))))░ *
- * ░░░░░░░░░░░░)))))))))))░░░░░░))))))))))░ *
- * ░░░░░░░░░░░░))))))))))░░░░░░))))))))))░░ *
- * ░░░░░░░░░░░░░)))))))░░░░░░░))))))))))░░░ *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░))))))))))░░░░ *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░░))))))))░░░░░ *
- * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░)))))░░░░░░░ *
- *
- */
+import { IFees } from "../fees/CustomFees.sol";
+
+import { ILogic } from "../logic/Logic.sol";
+
+import { IRewards, Rewards } from "../rewards/Rewards.sol";
+import { Multicall } from "../utils/Multicall.sol";
+import { IUpgradePath, UpgradePath } from "../utils/UpgradePath.sol";
+import { AccessControlUpgradeable } from "openzeppelin-contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
+import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { ERC1155Upgradeable } from "openzeppelin-contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "openzeppelin-contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import { ERC1967Utils } from "openzeppelin-contracts/proxy/ERC1967/ERC1967Utils.sol";
+
 interface IChannel {
     function initialize(
         string calldata uri,
         address defaultAdmin,
         address[] calldata managers,
-        bytes[] calldata setupActions
-    ) external;
+        bytes[] calldata setupActions,
+        bytes calldata timing
+    )
+        external;
 
-    enum ConfigUpdate {
-        FEE_CONTRACT,
-        LOGIC_CONTRACT,
-        TIMING_CONTRACT
-    }
+    function setFees(address fees, bytes calldata data) external;
+    function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
+}
 
-    event ConfigUpdated(
-        ConfigUpdate indexed updateType, address feeContract, address logicContract, address timingContract
-    );
-    event TokenCreated(uint256 indexed tokenId, ChannelStorageV1.TokenConfig token);
-    event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
-    event ERC20Transferred(address indexed spender, uint256 amount);
-    event ETHTransferred(address indexed spender, uint256 amount);
-    event TokenURIUpdated(uint256 indexed tokenId, string uri);
-
-    function setChannelFeeConfig(address feeContract, bytes calldata data) external;
-    function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic) external;
-    function setTimingConfig(address saleContract, bytes calldata data) external;
-
+abstract contract Channel is
+    IChannel,
+    Initializable,
+    Rewards,
+    ChannelStorage,
+    Multicall,
+    ERC1155Upgradeable,
+    UUPSUpgradeable,
+    AccessControlUpgradeable,
+    ReentrancyGuardUpgradeable
+{
     error FalsyLogic();
     error Unauthorized();
-    error InvalidChannelState();
     error NotMintable();
     error SoldOut();
     error InvalidAmount();
@@ -78,53 +52,49 @@ interface IChannel {
     error AddressZero();
     error InvalidUpgrade();
     error TransferFailed();
-}
 
-contract Channel is
-    IChannel,
-    ChannelStorageV1,
-    Multicall,
-    Initializable,
-    ERC1155Upgradeable,
-    UUPSUpgradeable,
-    AccessControlUpgradeable,
-    ReentrancyGuardUpgradeable
-{
-    using SafeERC20 for IERC20;
-
-    IUpgradePath internal immutable upgradePath;
+    event TokenCreated(uint256 indexed tokenId, ChannelStorage.TokenConfig token);
+    event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
+    event ERC20Transferred(address indexed spender, uint256 amount);
+    event ETHTransferred(address indexed spender, uint256 amount);
+    event TokenURIUpdated(uint256 indexed tokenId, string uri);
 
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+    IUpgradePath internal immutable upgradePath;
 
-    constructor(address _upgradePath) initializer {
-        upgradePath = UpgradePath(_upgradePath);
+    /// @notice Modifier checking if the user is an admin or has a specific role
+    /// @dev This reverts if the msg.sender is not an admin or role holder
+
+    constructor(address _upgradePath, address weth) Rewards(weth) {
+        upgradePath = IUpgradePath(_upgradePath);
     }
 
-    /**
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     *   INITIALIZER
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     */
+    modifier onlyAdminOrManager() {
+        _requireAdminOrManager(msg.sender);
+        _;
+    }
 
-    /// @notice initializer
-    /// @param uri the uri for the channel token
-    /// @param defaultAdmin the default admin for the channel
-    /// @param managers privelaged managers for the channel
-    /// @param setupActions the setup actions for the channel
-
+    /* -------------------------------------------------------------------------- */
+    /*                                INITIALIZER                                 */
+    /* -------------------------------------------------------------------------- */
     function initialize(
         string calldata uri,
         address defaultAdmin,
         address[] calldata managers,
-        bytes[] calldata setupActions
-    ) external nonReentrant initializer {
+        bytes[] calldata setupActions,
+        bytes calldata timing
+    )
+        external
+        nonReentrant
+        initializer
+    {
         __ERC1155_init(uri);
 
         __UUPSUpgradeable_init();
 
         __AccessControl_init();
 
-        /// temporarily set factory deployer as admin
+        /// temporarily set deployer as admin
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
         /// grant the default admin role
@@ -134,86 +104,21 @@ contract Channel is
         _setManagers(managers);
 
         /// set up the channel token
-        _setupNewToken(uri, 0, ERC1967Utils.getImplementation());
+        _setupNewToken(uri, 0, _implementation());
 
         if (setupActions.length > 0) {
             multicall(setupActions);
         }
 
+        setTiming(timing);
+
         /// revoke admin for deployer
         _revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    /// @notice Modifier checking if the user is an admin or has a specific role
-    /// @dev This reverts if the msg.sender is not an admin or role holder
-    modifier onlyAdminOrManager() {
-        _requireAdminOrManager(msg.sender);
-        _;
-    }
-
-    // access management functions
-
-    function isManager(address addr) external view returns (bool) {
-        return hasRole(MANAGER_ROLE, addr) || hasRole(DEFAULT_ADMIN_ROLE, addr);
-    }
-
-    function isAdmin(address addr) external view returns (bool) {
-        return hasRole(DEFAULT_ADMIN_ROLE, addr);
-    }
-
-    function revokeManager(address addr) external onlyAdminOrManager {
-        revokeRole(MANAGER_ROLE, addr);
-    }
-
-    // channel setters
-
-    function setChannelFeeConfig(address _feeContract, bytes calldata data) external onlyAdminOrManager {
-        if (_feeContract == address(0)) {
-            revert AddressZero();
-        }
-
-        feeContract = IFees(_feeContract);
-        feeContract.setChannelFeeConfig(data);
-
-        emit ConfigUpdated(
-            ConfigUpdate.FEE_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
-    }
-
-    function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic)
-        external
-        onlyAdminOrManager
-    {
-        if (_logicContract == address(0)) {
-            revert AddressZero();
-        }
-
-        logicContract = ILogic(_logicContract);
-        logicContract.setCreatorLogic(creatorLogic);
-        logicContract.setMinterLogic(minterLogic);
-
-        emit ConfigUpdated(
-            ConfigUpdate.LOGIC_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
-    }
-
-    /**
-     * @notice Used to set the timing parameters for the channel
-     * @param _timingContract Timing contract address
-     * @param data Timing contract config data
-     */
-    function setTimingConfig(address _timingContract, bytes calldata data) external onlyAdminOrManager {
-        if (_timingContract == address(0)) {
-            revert AddressZero();
-        }
-
-        timingContract = ITiming(_timingContract);
-        timingContract.setTimingConfig(data);
-
-        emit ConfigUpdated(
-            ConfigUpdate.TIMING_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
-        );
-    }
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
 
     function ethMintPrice() public view returns (uint256) {
         return feeContract.getEthMintPrice();
@@ -221,6 +126,53 @@ contract Channel is
 
     function erc20MintPrice() public view returns (uint256) {
         return feeContract.getErc20MintPrice();
+    }
+
+    function setLogic(
+        address logic,
+        bytes calldata creatorLogic,
+        bytes calldata minterLogic
+    )
+        external
+        onlyAdminOrManager
+    {
+        if (logic == address(0)) {
+            revert AddressZero();
+        }
+
+        logicContract = ILogic(logic);
+
+        logicContract.setCreatorLogic(creatorLogic);
+        logicContract.setMinterLogic(minterLogic);
+
+        //todo
+        // emit ConfigUpdated(
+        //     ConfigUpdate.LOGIC_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
+        // );
+    }
+
+    function setFees(address fees, bytes calldata data) external onlyAdminOrManager {
+        if (fees == address(0)) {
+            revert AddressZero();
+        }
+
+        feeContract = IFees(fees);
+
+        feeContract.setChannelFees(data);
+
+        //todo
+        //   emit ConfigUpdated(
+        //       ConfigUpdate.FEE_CONTRACT, address(feeContract), address(logicContract), address(timingContract)
+        //   );
+    }
+
+    /**
+     * @notice Used to get the token details
+     * @param tokenId Token id
+     * @return TokenConfig Token details
+     */
+    function getToken(uint256 tokenId) public view returns (TokenConfig memory) {
+        return tokens[tokenId];
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -233,20 +185,7 @@ contract Channel is
         return super.supportsInterface(interfaceId);
     }
 
-    function _setManagers(address[] memory managers) public onlyAdminOrManager {
-        for (uint256 i = 0; i < managers.length; i++) {
-            grantRole(MANAGER_ROLE, managers[i]);
-        }
-    }
-
-    /**
-     * @notice Used to get the token details
-     * @param tokenId Token id
-     * @return TokenConfig Token details
-     */
-    function getToken(uint256 tokenId) public view returns (TokenConfig memory) {
-        return tokens[tokenId];
-    }
+    function setTiming(bytes calldata data) public virtual;
 
     /**
      * @notice Used to create a new token in the channel
@@ -254,80 +193,39 @@ contract Channel is
      * @param uri Token uri
      * @param author Token author
      * @param maxSupply Token supply
-     * @return uint256 Id of newly created token
+     * @return tokenId Id of newly created token
      */
-    function createToken(string calldata uri, address author, uint256 maxSupply)
-        public
+    function createToken(
+        string calldata uri,
+        address author,
+        uint256 maxSupply
+    )
+        external
         nonReentrant
-        returns (uint256)
+        returns (uint256 tokenId)
     {
-        if (timingContract.getChannelState() != 1) {
-            revert InvalidChannelState();
-        }
+        tokenId = _setupNewToken(uri, maxSupply, author);
 
-        uint256 tokenId = _setupNewToken(uri, maxSupply, author);
-        timingContract.setTokenSale(tokenId);
+        _processNewToken(tokenId);
 
         _validateCreatorLogic(msg.sender);
-
-        return tokenId;
     }
 
-    /**
-     * @notice Used to update the default channel token uri
-     * @param uri Token uri
-     */
-    function updateChannelTokenUri(string calldata uri) external onlyAdminOrManager {
-        tokens[0].uri = uri;
-        emit TokenURIUpdated(0, uri);
-    }
+    function _processNewToken(uint256 tokenId) internal virtual;
 
-    function _requireAdminOrManager(address account) internal view {
-        if (!hasRole(DEFAULT_ADMIN_ROLE, account) && !hasRole(MANAGER_ROLE, account)) {
-            revert Unauthorized();
-        }
-    }
+    function _authorizeMint(uint256 tokenId) internal virtual;
 
-    function _getAndUpdateNextTokenId() internal returns (uint256) {
-        unchecked {
-            return nextTokenId++;
-        }
-    }
-
-    function _setupNewToken(string memory newURI, uint256 maxSupply, address author) internal returns (uint256) {
-        uint256 tokenId = _getAndUpdateNextTokenId();
-
-        TokenConfig memory tokenConfig =
-            TokenConfig({uri: newURI, maxSupply: maxSupply, totalMinted: 0, author: author, sponsor: msg.sender});
-        tokens[tokenId] = tokenConfig;
-
-        emit TokenCreated(tokenId, tokenConfig);
-
-        return tokenId;
-    }
-
-    function _checkMintRequirements(TokenConfig memory token, uint256 tokenId, uint256 amount) internal view {
-        require(token.maxSupply > 0, "Token is not mintable");
-        require(token.totalMinted < token.maxSupply, "Token is sold out");
-        require(amount > 0, "Amount must be greater than 0");
-        require(amount <= token.maxSupply - token.totalMinted, "Amount exceeds max supply");
-        require(timingContract.getTokenSaleState(tokenId) == 1, "Token sale not active");
-    }
-
-    function _validateCreatorLogic(address creator) internal view returns (bool) {
-        bool isApproved = logicContract.isCreatorApproved(creator);
-        if (!isApproved) {
-            revert FalsyLogic();
-        }
-    }
-
-    function _validateMinterLogic(address minter) internal view returns (bool) {
-        bool isApproved = logicContract.isMinterApproved(minter);
-        if (!isApproved) {
-            revert FalsyLogic();
-        }
-    }
-
+    /*     function mint(
+        address to,
+        uint256 tokenId,
+        uint256 amount,
+        address mintReferral,
+        bytes memory data
+    )
+        external
+        payable
+        virtual;
+    */
     /**
      * @notice mint a token in the channel
      * @param to address to mint to
@@ -336,7 +234,13 @@ contract Channel is
      * @param mintReferral referral address for minting
      * @param data mint data
      */
-    function mint(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data)
+    function mint(
+        address to,
+        uint256 tokenId,
+        uint256 amount,
+        address mintReferral,
+        bytes memory data
+    )
         external
         payable
         nonReentrant
@@ -352,7 +256,13 @@ contract Channel is
      * @param mintReferral referral address for minting
      * @param data mint data
      */
-    function mintWithERC20(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data)
+    function mintWithERC20(
+        address to,
+        uint256 tokenId,
+        uint256 amount,
+        address mintReferral,
+        bytes memory data
+    )
         external
         payable
         nonReentrant
@@ -375,7 +285,11 @@ contract Channel is
         uint256[] memory amounts,
         bytes memory data,
         address mintReferral
-    ) external payable nonReentrant {
+    )
+        external
+        payable
+        nonReentrant
+    {
         _mintBatchWithETH(to, ids, amounts, data, mintReferral);
     }
 
@@ -393,8 +307,76 @@ contract Channel is
         uint256[] memory amounts,
         bytes memory data,
         address mintReferral
-    ) external payable nonReentrant {
+    )
+        external
+        payable
+        nonReentrant
+    {
         _mintBatchWithERC20(to, ids, amounts, data, mintReferral);
+    }
+
+    /**
+     * @notice Used to update the default channel token uri
+     * @param uri Token uri
+     */
+    function updateChannelTokenUri(string calldata uri) external onlyAdminOrManager {
+        tokens[0].uri = uri;
+        emit TokenURIUpdated(0, uri);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    function _getAndUpdateNextTokenId() internal returns (uint256) {
+        unchecked {
+            return nextTokenId++;
+        }
+    }
+
+    function _setManagers(address[] memory managers) public onlyAdminOrManager {
+        for (uint256 i = 0; i < managers.length; i++) {
+            grantRole(MANAGER_ROLE, managers[i]);
+        }
+    }
+
+    function _requireAdminOrManager(address account) internal view {
+        if (!hasRole(DEFAULT_ADMIN_ROLE, account) && !hasRole(MANAGER_ROLE, account)) {
+            revert Unauthorized();
+        }
+    }
+
+    function _setupNewToken(string memory newURI, uint256 maxSupply, address author) internal returns (uint256) {
+        uint256 tokenId = _getAndUpdateNextTokenId();
+
+        TokenConfig memory tokenConfig =
+            TokenConfig({ uri: newURI, maxSupply: maxSupply, totalMinted: 0, author: author, sponsor: msg.sender });
+        tokens[tokenId] = tokenConfig;
+
+        emit TokenCreated(tokenId, tokenConfig);
+
+        return tokenId;
+    }
+
+    function _checkMintRequirements(TokenConfig memory token, uint256 tokenId, uint256 amount) internal view {
+        require(token.maxSupply > 0, "Token is not mintable");
+        require(token.totalMinted < token.maxSupply, "Token is sold out");
+        require(amount > 0, "Amount must be greater than 0");
+        require(amount <= token.maxSupply - token.totalMinted, "Amount exceeds max supply");
+    }
+
+    function _validateCreatorLogic(address creator) internal view returns (bool) {
+        bool isApproved = logicContract.isCreatorApproved(creator);
+        if (!isApproved) {
+            revert FalsyLogic();
+        }
+    }
+
+    function _validateMinterLogic(address minter) internal view returns (bool) {
+        bool isApproved = logicContract.isMinterApproved(minter);
+        if (!isApproved) {
+            revert FalsyLogic();
+        }
     }
 
     function _mintBatchWithETH(
@@ -403,11 +385,14 @@ contract Channel is
         uint256[] memory amounts,
         bytes memory data,
         address mintReferral
-    ) internal {
+    )
+        internal
+    {
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
+            _authorizeMint(ids[i]);
             _checkMintRequirements(token, ids[i], amounts[i]);
-            _handleETHRewards(ids[i], amounts[i], mintReferral, data);
+            _distributeIncomingSplit(feeContract.requestEthMint(token.author, mintReferral, token.sponsor, amounts[i]));
         }
         _mintBatch(msg.sender, ids, amounts, data);
         _validateMinterLogic(msg.sender);
@@ -420,93 +405,29 @@ contract Channel is
         uint256[] memory amounts,
         bytes memory data,
         address mintReferral
-    ) internal {
+    )
+        internal
+    {
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
+            _authorizeMint(ids[i]);
             _checkMintRequirements(token, ids[i], amounts[i]);
-            _handleERC20Rewards(ids[i], amounts[i], mintReferral, data);
+            _distributeIncomingSplit(
+                feeContract.requestErc20Mint(token.author, mintReferral, token.sponsor, amounts[i])
+            );
         }
         _mintBatch(msg.sender, ids, amounts, data);
         _validateMinterLogic(msg.sender);
         emit TokenMinted(to, mintReferral, ids, amounts);
     }
 
-    function _handleETHRewards(uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) internal {
-        TokenConfig memory token = tokens[tokenId];
-
-        uint256 price = ethMintPrice() * amount;
-
-        if (msg.value != price) {
-            revert InvalidValueSent();
-        }
-
-        _depositETHRewards(feeContract.requestNativeMint(token.author, mintReferral, token.sponsor), amount);
-        emit ETHTransferred(msg.sender, price);
-    }
-
-    function _handleERC20Rewards(uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) internal {
-        TokenConfig memory token = tokens[tokenId];
-
-        uint256 price = erc20MintPrice() * amount;
-
-        _depositERC20Rewards(feeContract.requestErc20Mint(token.author, mintReferral, token.sponsor), price, amount);
-        emit ERC20Transferred(msg.sender, price);
-    }
-
-    function _depositETHRewards(IFees.NativeMintCommands[] memory commands, uint256 numMints) internal {
-        uint256 totalDeposited = 0;
-        for (uint256 i = 0; i < commands.length; i++) {
-            if (commands[i].method == IFees.NativeFeeActions.SEND_ETH) {
-                (bool success,) = commands[i].recipient.call{value: commands[i].amount * numMints}("");
-                if (!success) {
-                    revert TransferFailed();
-                }
-                totalDeposited += commands[i].amount * numMints;
-            }
-        }
-        if (totalDeposited != msg.value) {
-            revert DepositMismatch();
-        }
-    }
-
-    function _depositERC20Rewards(IFees.Erc20MintCommands[] memory commands, uint256 totalValue, uint256 numMints)
-        internal
-    {
-        uint256 totalDeposited = 0;
-        for (uint256 i = 0; i < commands.length; i++) {
-            if (commands[i].method == IFees.Erc20FeeActions.SEND_ERC20) {
-                IERC20(commands[i].erc20Contract).safeTransferFrom(
-                    msg.sender, commands[i].recipient, commands[i].amount * numMints
-                );
-                totalDeposited += commands[i].amount * numMints;
-            }
-        }
-        if (totalDeposited != totalValue) {
-            revert DepositMismatch();
-        }
-    }
-
-    /// upgrades
-
-    /**
-     * @notice Authorizes upgrade to a new implementation if the upgrade path is registered and the caller is authorized
-     * @dev This function is called in `upgradeTo` & `upgradeToAndCall`
-     * @param newImplementation address of the new implementation
-     */
-    function _authorizeUpgrade(address newImplementation) internal view override onlyAdminOrManager {
-        if (!upgradePath.isRegisteredUpgradePath(_implementation(), newImplementation)) {
-            revert InvalidUpgrade();
-        }
-    }
-
-    function _implementation() internal view returns (address) {
-        return ERC1967Utils.getImplementation();
-    }
-
     /**
      * @dev Creates an array in memory with only one value for each of the elements provided.
      */
-    function _toSingletonArrays(uint256 element1, uint256 element2)
+    function _toSingletonArrays(
+        uint256 element1,
+        uint256 element2
+    )
         private
         pure
         returns (uint256[] memory array1, uint256[] memory array2)
@@ -528,5 +449,19 @@ contract Channel is
             // Update the free memory pointer by pointing after the second array
             mstore(0x40, add(array2, 0x40))
         }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 UPGRADES                                   */
+    /* -------------------------------------------------------------------------- */
+
+    function _authorizeUpgrade(address newImplementation) internal view override onlyAdminOrManager {
+        if (!upgradePath.isRegisteredUpgradePath(_implementation(), newImplementation)) {
+            revert InvalidUpgrade();
+        }
+    }
+
+    function _implementation() internal view returns (address) {
+        return ERC1967Utils.getImplementation();
     }
 }

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IChannel} from "../channel/Channel.sol";
-import {ChannelFactoryStorageV1} from "./ChannelFactoryStorageV1.sol";
-import {Uplink1155} from "../proxies/Uplink1155.sol";
-import {IChannelInitializer} from "../channel/IChannelInitializer.sol";
-import {ContractVersion} from "../version/ContractVersion.sol";
-import {OwnableUpgradeable} from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {Initializable} from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IChannel } from "../channel/Channel.sol";
+
+import { IChannelInitializer } from "../channel/IChannelInitializer.sol";
+import { InfiniteUplink1155 } from "../proxies/InfiniteUplink1155.sol";
+import { ContractVersion } from "../version/ContractVersion.sol";
+import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
+import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  *
@@ -45,19 +45,14 @@ interface IChannelFactory {
     error InvalidUpgrade();
 }
 
-contract ChannelFactory is
-    IChannelFactory,
-    ChannelFactoryStorageV1,
-    Initializable,
-    OwnableUpgradeable,
-    UUPSUpgradeable,
-    ContractVersion
-{
-    constructor(IChannel _channelImpl) initializer {
-        if (address(_channelImpl) == address(0)) {
+contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable, ContractVersion {
+    address public immutable infiniteChannelImpl;
+
+    constructor(address _infiniteChannelImpl) initializer {
+        if (_infiniteChannelImpl == address(0)) {
             revert AddressZero();
         }
-        channelImpl = _channelImpl;
+        infiniteChannelImpl = _infiniteChannelImpl;
     }
 
     /**
@@ -104,16 +99,21 @@ contract ChannelFactory is
      * @param defaultAdmin address default admin
      * @param managers address[] channel managers
      * @param setupActions bytes[] setup actions
+     * @param timing bytes timing data
      * @return address deployed contract address
      */
     function createChannel(
         string calldata uri,
         address defaultAdmin,
         address[] calldata managers,
-        bytes[] calldata setupActions
-    ) public returns (address) {
-        Uplink1155 newContract = new Uplink1155(address(channelImpl));
-        _initializeContract(newContract, uri, defaultAdmin, managers, setupActions);
+        bytes[] calldata setupActions,
+        bytes calldata timing
+    )
+        public
+        returns (address)
+    {
+        InfiniteUplink1155 newContract = new InfiniteUplink1155(infiniteChannelImpl);
+        _initializeContract(newContract, uri, defaultAdmin, managers, setupActions, timing);
         return address(newContract);
     }
 
@@ -148,15 +148,19 @@ contract ChannelFactory is
      * @param defaultAdmin address default admin
      * @param managers address[] channel managers
      * @param setupActions bytes[] setup actions
+     * @param timing bytes timing data
      */
     function _initializeContract(
-        Uplink1155 newContract,
+        InfiniteUplink1155 newContract,
         string calldata uri,
         address defaultAdmin,
         address[] calldata managers,
-        bytes[] calldata setupActions
-    ) private {
+        bytes[] calldata setupActions,
+        bytes calldata timing
+    )
+        private
+    {
         emit SetupNewContract(address(newContract), uri, defaultAdmin, managers);
-        IChannelInitializer(address(newContract)).initialize(uri, defaultAdmin, managers, setupActions);
+        IChannelInitializer(address(newContract)).initialize(uri, defaultAdmin, managers, setupActions, timing);
     }
 }

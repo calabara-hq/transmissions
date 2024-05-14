@@ -1,255 +1,303 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test, console} from "forge-std/Test.sol";
-import {CustomFees, IFees} from "../../src/fees/CustomFees.sol";
-import {MockERC20} from "../TokenHelpers.sol";
+import { CustomFees, IFees } from "../../src/fees/CustomFees.sol";
+
+import { IRewards, Rewards } from "../../src/rewards/Rewards.sol";
+import { MockERC20 } from "../TokenHelpers.sol";
+import { Test, console } from "forge-std/Test.sol";
 
 contract FeesTest is Test {
     address nick = makeAddr("nick");
     address uplinkRewardsAddr = makeAddr("uplink");
     address targetChannel = makeAddr("targetChannel");
     address channelTreasury = makeAddr("channelTreasury");
+
     IFees customFeesImpl = new CustomFees(uplinkRewardsAddr);
+
     MockERC20 erc20Token = new MockERC20("testERC20", "TEST1");
 
     function test_customFees_bps() public {
         bytes memory feeArgs = abi.encode(
-            777000000000000,
             channelTreasury,
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            10 * 10e6,
+            777_000_000_000_000,
+            100_000_000,
             address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
-        assertEq(customFeesImpl.getEthMintPrice(), 777000000000000);
+        assertEq(customFeesImpl.getEthMintPrice(), 777_000_000_000_000);
 
-        IFees.NativeMintCommands[] memory ethCommands = customFeesImpl.requestNativeMint(nick, nick, nick);
+        address creator = makeAddr("creator");
+        address referral = makeAddr("referral");
+        address sponsor = makeAddr("sponsor");
 
-        IFees.Erc20MintCommands[] memory erc20Commands = customFeesImpl.requestErc20Mint(nick, nick, nick);
+        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(creator, referral, sponsor, 1);
 
-        assertEq(ethCommands.length, 5);
-        assertEq(erc20Commands.length, 5);
+        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(creator, referral, sponsor, 1);
 
-        assertEq(ethCommands[0].amount, 77700000000000); // 10%
-        assertEq(ethCommands[1].amount, 77700000000000); // 10%
-        assertEq(ethCommands[2].amount, 77700000000000); // 10%
-        assertEq(ethCommands[3].amount, 77700000000000); // 10%
-        assertEq(ethCommands[4].amount, 466200000000000); // 60%
+        // eth validation
+        assertEq(ethSplit.recipients.length, 5);
+        assertEq(ethSplit.allocations.length, 5);
+        assertEq(ethSplit.totalAllocation, 777_000_000_000_000);
+        assertEq(ethSplit.token, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
 
-        assertEq(erc20Commands[0].amount, 10000000); // 10%
-        assertEq(erc20Commands[1].amount, 10000000); // 10%
-        assertEq(erc20Commands[2].amount, 10000000); // 10%
-        assertEq(erc20Commands[3].amount, 10000000); // 10%
-        assertEq(erc20Commands[4].amount, 60000000); // 60%
+        assertEq(ethSplit.recipients[0], referral);
+        assertEq(ethSplit.recipients[1], sponsor);
+        assertEq(ethSplit.recipients[2], uplinkRewardsAddr);
+        assertEq(ethSplit.recipients[3], channelTreasury);
+        assertEq(ethSplit.recipients[4], creator);
+
+        assertEq(ethSplit.allocations[0], 77_700_000_000_000); // 10%
+        assertEq(ethSplit.allocations[1], 77_700_000_000_000); // 10%
+        assertEq(ethSplit.allocations[2], 77_700_000_000_000); // 10%
+        assertEq(ethSplit.allocations[3], 77_700_000_000_000); // 10%
+        assertEq(ethSplit.allocations[4], 466_200_000_000_000); // 60%
+
+        // erc20 validation
+
+        assertEq(erc20Split.recipients.length, 5);
+        assertEq(erc20Split.allocations.length, 5);
+        assertEq(erc20Split.totalAllocation, 100_000_000);
+        assertEq(erc20Split.token, address(erc20Token));
+
+        assertEq(erc20Split.recipients[0], referral);
+        assertEq(erc20Split.recipients[1], sponsor);
+        assertEq(erc20Split.recipients[2], uplinkRewardsAddr);
+        assertEq(erc20Split.recipients[3], channelTreasury);
+        assertEq(erc20Split.recipients[4], creator);
+
+        assertEq(erc20Split.allocations[0], 10_000_000); // 10%
+        assertEq(erc20Split.allocations[1], 10_000_000); // 10%
+        assertEq(erc20Split.allocations[2], 10_000_000); // 10%
+        assertEq(erc20Split.allocations[3], 10_000_000); // 10%
+        assertEq(erc20Split.allocations[4], 60_000_000); // 60%
 
         vm.stopPrank();
     }
 
     function test_customFees_freeEthMint() public {
-        bytes memory feeArgs = abi.encode(0, channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 10 * 10e6, address(erc20Token));
+        bytes memory feeArgs = abi.encode(
+            channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
+        );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
         assertEq(customFeesImpl.getEthMintPrice(), 0);
 
-        IFees.NativeMintCommands[] memory ethCommands = customFeesImpl.requestNativeMint(nick, nick, nick);
+        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
 
-        assertEq(ethCommands.length, 0);
+        assertEq(ethSplit.recipients.length, 0);
+        assertEq(ethSplit.allocations.length, 0);
+        assertEq(ethSplit.totalAllocation, 0);
 
         vm.stopPrank();
     }
 
-    function test_generateCustomFees_nullChannelTreasury() public {
+    function test_customFees_nullChannelTreasury() public {
         bytes memory feeArgs = abi.encode(
-            777000000000000,
             address(0),
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            10 * 10e6,
+            777_000_000_000_000,
+            100_000_000,
             address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
-        IFees.NativeMintCommands[] memory nativeMintCommands = customFeesImpl.requestNativeMint(nick, nick, nick);
-        IFees.Erc20MintCommands[] memory erc20Commands = customFeesImpl.requestErc20Mint(nick, nick, nick);
+        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
+        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
 
-        assertEq(nativeMintCommands.length, 4);
-        assertEq(erc20Commands.length, 4);
+        assertEq(ethSplit.recipients.length, 4);
+        assertEq(ethSplit.allocations.length, 4);
+
+        assertEq(erc20Split.recipients.length, 4);
+        assertEq(erc20Split.allocations.length, 4);
         vm.stopPrank();
     }
 
-    function test_generateCustomFees_nullReferral() public {
+    function test_customFees_nullReferral() public {
         bytes memory feeArgs = abi.encode(
-            777000000000000,
             channelTreasury,
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            10 * 10e6,
+            777_000_000_000_000,
+            100_000_000,
             address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
-        IFees.NativeMintCommands[] memory nativeMintCommands = customFeesImpl.requestNativeMint(nick, address(0), nick);
-        IFees.Erc20MintCommands[] memory erc20Commands = customFeesImpl.requestErc20Mint(nick, address(0), nick);
+        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, address(0), nick, 1);
+        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(nick, address(0), nick, 1);
 
-        assertEq(nativeMintCommands.length, 4);
-        assertEq(erc20Commands.length, 4);
+        assertEq(ethSplit.recipients.length, 4);
+        assertEq(ethSplit.allocations.length, 4);
+
+        assertEq(erc20Split.recipients.length, 4);
+        assertEq(erc20Split.allocations.length, 4);
 
         vm.stopPrank();
     }
 
-    function test_generateCustomFees_revertOnNullCreator() public {
+    function test_customFees_revertOnNullCreator() public {
         bytes memory feeArgs = abi.encode(
-            777000000000000,
             channelTreasury,
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            10 * 10e6,
+            777_000_000_000_000,
+            100_000_000,
             address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
         vm.expectRevert();
-        customFeesImpl.requestNativeMint(address(0), nick, nick);
+        customFeesImpl.requestEthMint(address(0), nick, nick, 1);
         vm.expectRevert();
-        customFeesImpl.requestErc20Mint(address(0), nick, nick);
+        customFeesImpl.requestErc20Mint(address(0), nick, nick, 1);
 
         vm.stopPrank();
     }
 
-    function test_generateCustomFees_revertOnNullSponsor() public {
+    function test_customFees_revertOnNullSponsor() public {
         bytes memory feeArgs = abi.encode(
-            777000000000000,
             channelTreasury,
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            10 * 10e6,
+            777_000_000_000_000,
+            100_000_000,
             address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
         vm.expectRevert();
-        customFeesImpl.requestNativeMint(nick, nick, address(0));
+        customFeesImpl.requestEthMint(nick, nick, address(0), 1);
         vm.expectRevert();
-        customFeesImpl.requestErc20Mint(nick, nick, address(0));
+        customFeesImpl.requestErc20Mint(nick, nick, address(0), 1);
         vm.stopPrank();
     }
 
-    function test_initializeCustomFees_fuzz(
-        uint256 ethMintPrice,
+    function test_customFees_fuzz(
         uint16 uplinkBps,
         uint16 channelBps,
         uint16 creatorBps,
         uint16 mintReferralBps,
         uint16 sponsorBps,
+        uint256 ethMintPrice,
         uint256 erc20MintPrice,
         address erc20Address
-    ) public {
+    )
+        public
+    {
         bytes memory feeArgs = abi.encode(
-            ethMintPrice,
             channelTreasury,
             uplinkBps,
             channelBps,
             creatorBps,
             mintReferralBps,
             sponsorBps,
+            ethMintPrice,
             erc20MintPrice,
             erc20Address
         );
 
         vm.startPrank(targetChannel);
 
-        uint256 totalBps = uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+        uint256 totalBps =
+            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (
-            (totalBps % 10000 != 0) ||
-            ((uplinkBps * ethMintPrice) % 10000 != 0) ||
-            ((uplinkBps * erc20MintPrice) % 10000 != 0) ||
-            ((channelBps * ethMintPrice) % 10000 != 0) ||
-            ((creatorBps * ethMintPrice) % 10000 != 0) ||
-            ((mintReferralBps * ethMintPrice) % 10000 != 0) ||
-            ((sponsorBps * ethMintPrice) % 10000 != 0) ||
-            ((uplinkBps * erc20MintPrice) % 10000 != 0) ||
-            ((channelBps * erc20MintPrice) % 10000 != 0) ||
-            ((creatorBps * erc20MintPrice) % 10000 != 0) ||
-            ((mintReferralBps * erc20MintPrice) % 10000 != 0) ||
-            ((sponsorBps * erc20MintPrice) % 10000 != 0)
+            (totalBps % 10_000 != 0) || ((uplinkBps * ethMintPrice) % 10_000 != 0)
+                || ((uplinkBps * erc20MintPrice) % 10_000 != 0) || ((channelBps * ethMintPrice) % 10_000 != 0)
+                || ((creatorBps * ethMintPrice) % 10_000 != 0) || ((mintReferralBps * ethMintPrice) % 10_000 != 0)
+                || ((sponsorBps * ethMintPrice) % 10_000 != 0) || ((uplinkBps * erc20MintPrice) % 10_000 != 0)
+                || ((channelBps * erc20MintPrice) % 10_000 != 0) || ((creatorBps * erc20MintPrice) % 10_000 != 0)
+                || ((mintReferralBps * erc20MintPrice) % 10_000 != 0) || ((sponsorBps * erc20MintPrice) % 10_000 != 0)
         ) {
             vm.expectRevert();
-            customFeesImpl.setChannelFeeConfig(feeArgs);
+            customFeesImpl.setChannelFees(feeArgs);
             return;
         }
 
-        customFeesImpl.setChannelFeeConfig(feeArgs);
+        customFeesImpl.setChannelFees(feeArgs);
 
-        IFees.Erc20MintCommands[] memory erc20Commands;
-        IFees.NativeMintCommands[] memory ethCommands = customFeesImpl.requestNativeMint(nick, nick, nick);
+        IRewards.Split memory erc20Split;
+        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
 
         // expect revert if erc20 mints not configured
         if (erc20Address == address(0) || erc20MintPrice == 0) {
             vm.expectRevert();
-            customFeesImpl.requestErc20Mint(nick, nick, nick);
+            customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
         } else {
-            erc20Commands = customFeesImpl.requestErc20Mint(nick, nick, nick);
+            erc20Split = customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
         }
 
-        uint8 ethCommandsLength_expected;
-        uint8 erc20CommandsLength_expected;
+        uint8 ethSplitLength_expected;
+        uint8 erc20SplitLength_expected;
 
         if (ethMintPrice == 0) {
-            ethCommandsLength_expected = 0;
+            ethSplitLength_expected = 0;
         } else {
             if (uplinkBps > 0) {
-                ethCommandsLength_expected++;
-                erc20CommandsLength_expected++;
+                ethSplitLength_expected++;
+                erc20SplitLength_expected++;
             }
             if (channelBps > 0) {
-                ethCommandsLength_expected++;
-                erc20CommandsLength_expected++;
+                ethSplitLength_expected++;
+                erc20SplitLength_expected++;
             }
             if (creatorBps > 0) {
-                ethCommandsLength_expected++;
-                erc20CommandsLength_expected++;
+                ethSplitLength_expected++;
+                erc20SplitLength_expected++;
             }
             if (mintReferralBps > 0) {
-                ethCommandsLength_expected++;
-                erc20CommandsLength_expected++;
+                ethSplitLength_expected++;
+                erc20SplitLength_expected++;
             }
             if (sponsorBps > 0) {
-                ethCommandsLength_expected++;
-                erc20CommandsLength_expected++;
+                ethSplitLength_expected++;
+                erc20SplitLength_expected++;
             }
         }
 
-        assertEq(ethCommands.length, ethCommandsLength_expected);
-        assertEq(erc20Commands.length, erc20CommandsLength_expected);
+        assertEq(ethSplit.recipients.length, ethSplitLength_expected);
+        assertEq(ethSplit.allocations.length, ethSplitLength_expected);
+
+        assertEq(erc20Split.recipients.length, erc20SplitLength_expected);
+        assertEq(erc20Split.allocations.length, erc20SplitLength_expected);
+
+        if (erc20Split.allocations.length > 0) {
+            assertEq(erc20Split.totalAllocation, erc20MintPrice);
+        }
+
+        if (ethSplit.allocations.length > 0) {
+            assertEq(ethSplit.totalAllocation, ethMintPrice);
+        }
     }
 }
