@@ -40,11 +40,11 @@ contract Rewards is IRewards {
         _validateSplit(split);
 
         if (_isNativeToken(split.token)) {
-            for (uint256 i = 0; i < split.recipients.length; i++) {
+            for (uint256 i; i < split.recipients.length; i++) {
                 _processETHTransfer(split.recipients[i], split.allocations[i]);
             }
         } else {
-            for (uint256 i = 0; i < split.recipients.length; i++) {
+            for (uint256 i; i < split.recipients.length; i++) {
                 _processERC20Transfer(split.recipients[i], split.allocations[i], split.token);
             }
         }

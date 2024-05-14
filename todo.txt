@@ -1,0 +1,25 @@
+1. inspect gas usage
+
+## learnings
+
+calling logic contract is not that expensive (~25k gas)
+generating fee split is not that expensive (~20k gas)
+
+
+2. optimize tests
+3. convert fee computations to a library
+4. short circuit in cases where fees or logic is empty?
+
+### thoughts
+
+best case, short circuit happens before the external call.
+the only way to do this is to set the implementation address to zero.
+
+for logic, allow address 0. but this is suboptimal as creator and minter logic are seperate.
+we can short circuit inside each call, and that's what we'll do. 
+
+TODO - need to apply some rules for fees
+
+otherwise, the next best way is to return early from inside the logic / fee contracts
+
+5. name and position callbacks properly
