@@ -1,0 +1,119 @@
+[
+  {
+    "type": "function",
+    "name": "initialize",
+    "inputs": [
+      {
+        "name": "_initOwner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "isRegisteredUpgradePath",
+    "inputs": [
+      {
+        "name": "baseImpl",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "upgradeImpl",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "registerUpgradePath",
+    "inputs": [
+      {
+        "name": "baseImpls",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "upgradeImpl",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "removeUpgradePath",
+    "inputs": [
+      {
+        "name": "baseImpl",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "upgradeImpl",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "UpgradePathContractInitialized",
+    "inputs": [],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpgradeRegistered",
+    "inputs": [
+      {
+        "name": "baseImpl",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "upgradeImpl",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "UpgradeRemoved",
+    "inputs": [
+      {
+        "name": "baseImpl",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "upgradeImpl",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  }
+]

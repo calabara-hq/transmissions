@@ -1,0 +1,266 @@
+[
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_initOwner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "approveLogic",
+    "inputs": [
+      {
+        "name": "signature",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      },
+      {
+        "name": "calldataAddressPosition",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "isCreatorApproved",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isMinterApproved",
+    "inputs": [
+      {
+        "name": "user",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setCreatorLogic",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setMinterLogic",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "CreatorLogicSet",
+    "inputs": [
+      {
+        "name": "channel",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "logic",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct ILogic.InteractionLogic",
+        "components": [
+          {
+            "name": "targets",
+            "type": "address[]",
+            "internalType": "address[]"
+          },
+          {
+            "name": "signatures",
+            "type": "bytes4[]",
+            "internalType": "bytes4[]"
+          },
+          {
+            "name": "datas",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "operators",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "literalOperands",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          }
+        ]
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "MinterLogicSet",
+    "inputs": [
+      {
+        "name": "channel",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "logic",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct ILogic.InteractionLogic",
+        "components": [
+          {
+            "name": "targets",
+            "type": "address[]",
+            "internalType": "address[]"
+          },
+          {
+            "name": "signatures",
+            "type": "bytes4[]",
+            "internalType": "bytes4[]"
+          },
+          {
+            "name": "datas",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "operators",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          },
+          {
+            "name": "literalOperands",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          }
+        ]
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      {
+        "name": "previousOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "CallFailed",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "OwnableInvalidOwner",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  }
+]

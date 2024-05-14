@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC20} from "openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
+import {ERC20} from "openzeppelin-contracts/token/ERC20/ERC20.sol";
+import {ERC721} from "openzeppelin-contracts/token/ERC721/ERC721.sol";
+import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 
 // Simple ERC20 token with minting capability for testing
 contract MockERC20 is ERC20 {

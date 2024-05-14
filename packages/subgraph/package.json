@@ -1,0 +1,23 @@
+{
+  "name": "subgraph",
+  "version": "1.0.0",
+  "author": "nick",
+  "main": "index.ts",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "extract-abis": "yarn tsx script/extract-abis.ts"
+  },
+  "dependencies": {
+    "transmissions-protocol": "*"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.71.1",
+    "@types/node": "^20.12.10",
+    "mustache": "^4.2.0",
+    "tsx": "^4.9.3",
+    "typescript": "^5.4.5",
+    "yaml2json": "^1.0.2"
+  }
+}

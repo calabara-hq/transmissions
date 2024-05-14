@@ -5,12 +5,12 @@ import {Test, console} from "forge-std/Test.sol";
 import {console2} from "forge-std/Test.sol";
 import {ChannelFactory} from "../../src/factory/ChannelFactoryImpl.sol";
 import {IChannel, Channel} from "../../src/channel/Channel.sol";
-import {ERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/ERC1155.sol";
-import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
+import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
+import {IERC1155} from "openzeppelin-contracts/token/ERC1155/IERC1155.sol";
 import {Uplink1155} from "../../src/proxies/Uplink1155.sol";
 import {CustomFees, IFees} from "../../src/fees/CustomFees.sol";
-import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {IERC721} from "openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {IERC20} from "openzeppelin-contracts/token/ERC20/IERC20.sol";
+import {IERC721} from "openzeppelin-contracts/token/ERC721/IERC721.sol";
 import {ILogic, Logic} from "../../src/logic/Logic.sol";
 import {IUpgradePath, UpgradePath} from "../../src/utils/UpgradePath.sol";
 import {MockERC20, MockERC721, MockERC1155} from "../TokenHelpers.sol";
@@ -164,7 +164,7 @@ contract ChannelTest is Test {
         vm.deal(address(minter), 777000000000000);
         targetChannel.mint{value: 777000000000000}(minter, 1, 1, creator, "");
 
-        assertEq(IERC1155(targetChannel).balanceOf(minter, 1), 1);
+        assertEq(IERC1155(address(targetChannel)).balanceOf(minter, 1), 1);
 
         /// @dev 80% of mint price since creator is also first minter and mint referrer
         assertEq(creator.balance, 621600000000000);
@@ -197,7 +197,7 @@ contract ChannelTest is Test {
         targetChannel.mintWithERC20(minter, 1, numTokens, creator, "");
 
         // verify mint occured
-        assertEq(IERC1155(targetChannel).balanceOf(minter, 1), numTokens);
+        assertEq(IERC1155(address(targetChannel)).balanceOf(minter, 1), numTokens);
         // verify creator received 80% of the erc20 mint price
         assertEq(erc20Token.balanceOf(creator), creatorErc20StartingBalance + (8e19 * numTokens));
 

@@ -1,22 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC1155Upgradeable} from "openzeppelin-contracts-upgradeable/contracts/token/ERC1155/ERC1155Upgradeable.sol";
+import {ERC1155Upgradeable} from "openzeppelin-contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import {ChannelStorageV1} from "./ChannelStorageV1.sol";
 import {Multicall} from "../utils/Multicall.sol";
-import {Initializable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/contracts/proxy/utils/UUPSUpgradeable.sol";
+import {Initializable} from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IFees} from "../fees/CustomFees.sol";
-import {AccessControlUpgradeable} from
-    "openzeppelin-contracts-upgradeable/contracts/access/AccessControlUpgradeable.sol";
+import {AccessControlUpgradeable} from "openzeppelin-contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ILogic} from "../logic/Logic.sol";
 import {IUpgradePath, UpgradePath} from "../utils/UpgradePath.sol";
-import {ERC1967Utils} from "openzeppelin-contracts/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import {ERC1967Utils} from "openzeppelin-contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ITiming} from "../timing/InfiniteRound.sol";
-import {IERC20} from "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import {ReentrancyGuardUpgradeable} from
-    "openzeppelin-contracts-upgradeable/contracts/utils/ReentrancyGuardUpgradeable.sol";
+import {IERC20} from "openzeppelin-contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "openzeppelin-contracts/token/ERC20/utils/SafeERC20.sol";
+import {ReentrancyGuardUpgradeable} from "openzeppelin-contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 
 /**
  *
@@ -59,11 +57,11 @@ interface IChannel {
     event ConfigUpdated(
         ConfigUpdate indexed updateType, address feeContract, address logicContract, address timingContract
     );
-    event TokenCreated(uint256 tokenId, ChannelStorageV1.TokenConfig token);
-    event TokenMinted(address minter, address mintReferral, uint256[] tokenIds, uint256[] amounts);
-    event ERC20Transferred(address spender, uint256 amount);
-    event ETHTransferred(address spender, uint256 amount);
-    event TokenURIUpdated(uint256 tokenId, string uri);
+    event TokenCreated(uint256 indexed tokenId, ChannelStorageV1.TokenConfig token);
+    event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
+    event ERC20Transferred(address indexed spender, uint256 amount);
+    event ETHTransferred(address indexed spender, uint256 amount);
+    event TokenURIUpdated(uint256 indexed tokenId, string uri);
 
     function setChannelFeeConfig(address feeContract, bytes calldata data) external;
     function setLogic(address _logicContract, bytes calldata creatorLogic, bytes calldata minterLogic) external;

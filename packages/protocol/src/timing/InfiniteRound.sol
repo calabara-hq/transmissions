@@ -27,7 +27,7 @@ contract InfiniteRound is ITiming {
      * @param data abi encoded duration
      */
     function setTimingConfig(bytes calldata data) external {
-        (uint40 duration) = abi.decode(data, (uint40));
+        uint40 duration = abi.decode(data, (uint40));
         require(duration > 0, "Invalid duration");
         saleDuration[msg.sender] = duration;
         emit TimingConfigSet(msg.sender, duration);
