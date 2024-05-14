@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import { ChannelFactory } from "../../src/factory/ChannelFactoryImpl.sol";
+import { Deployment } from "../src/DeployConfig.sol";
+import { DeployFns } from "../src/DeployFns.sol";
 import "forge-std/Script.sol";
-import {console} from "forge-std/Test.sol";
-import {DeployFns} from "../src/DeployFns.sol";
-import {Deployment} from "../src/DeployConfig.sol";
-import {ChannelFactory} from "../../src/factory/ChannelFactoryImpl.sol";
+import { console } from "forge-std/Test.sol";
 
 contract FullSuiteDeploy is DeployFns {
     function run() external returns (string memory) {

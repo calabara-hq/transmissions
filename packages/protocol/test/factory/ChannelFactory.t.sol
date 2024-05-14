@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Test, console} from "forge-std/Test.sol";
-import {ChannelFactory} from "../../src/factory/ChannelFactoryImpl.sol";
-import {ERC1155} from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
-import {Channel, IChannel} from "../../src/channel/Channel.sol";
-import {ProxyShim} from "../../src/utils/ProxyShim.sol";
-import {Uplink1155Factory} from "../../src/proxies/Uplink1155Factory.sol";
-import {UpgradePath} from "../../src/utils/UpgradePath.sol";
+import { Channel, IChannel } from "../../src/channel/Channel.sol";
+import { ChannelFactory } from "../../src/factory/ChannelFactoryImpl.sol";
+
+import { InfiniteChannel } from "../../src/channel/InfiniteChannel.sol";
+import { Uplink1155Factory } from "../../src/proxies/Uplink1155Factory.sol";
+import { ProxyShim } from "../../src/utils/ProxyShim.sol";
+import { UpgradePath } from "../../src/utils/UpgradePath.sol";
+import { Test, console } from "forge-std/Test.sol";
+import { ERC1155 } from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
 
 contract ChannelFactoryTest is Test {
     address nick = 0xedcC867bc8B5FEBd0459af17a6f134F41f422f0C;
@@ -20,9 +22,9 @@ contract ChannelFactoryTest is Test {
         address channelFactoryShim = address(new ProxyShim(uplink));
         Uplink1155Factory factoryProxy = new Uplink1155Factory(channelFactoryShim, "");
         // set up channel
-        Channel channelImpl = new Channel(address(new UpgradePath()));
+        address infiniteChannelImpl = address(new InfiniteChannel(address(new UpgradePath()), address(0)));
         // set up factory
-        channelFactoryImpl = new ChannelFactory(channelImpl);
+        channelFactoryImpl = new ChannelFactory(infiniteChannelImpl);
         channelFactory = ChannelFactory(address(factoryProxy));
         vm.startPrank(uplink);
         channelFactory.upgradeToAndCall(address(channelFactoryImpl), "");
@@ -59,7 +61,7 @@ contract ChannelFactoryTest is Test {
     function test_upgrade(address initialOwner) external {
         vm.assume(initialOwner != address(0));
 
-        IChannel newChannelContract = IChannel(makeAddr("newChannelContract"));
+        address newChannelContract = makeAddr("newChannelContract");
 
         ChannelFactory newFactoryImpl = new ChannelFactory(newChannelContract);
 
@@ -77,13 +79,13 @@ contract ChannelFactoryTest is Test {
         assertEq(proxy.owner(), initialOwner);
         vm.prank(initialOwner);
         proxy.upgradeToAndCall(address(newFactoryImpl), new bytes(0));
-        assertEq(address(proxy.channelImpl()), address(newChannelContract));
+        assertEq(address(proxy.infiniteChannelImpl()), address(newChannelContract));
     }
 
     function test_createChannel() external {
         bytes[] memory setupActions = new bytes[](0);
         address newChannel = channelFactory.createChannel(
-            "https://example.com/api/token/0", address(this), new address[](0), setupActions
+            "https://example.com/api/token/0", address(this), new address[](0), setupActions, new bytes(0)
         );
         //assertEq("https://example.com/api/token/0", IChannel(newChannel).uri());
     }

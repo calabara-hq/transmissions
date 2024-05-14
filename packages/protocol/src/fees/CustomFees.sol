@@ -1,94 +1,108 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import { IRewards } from "../rewards/Rewards.sol";
+import { Test, console } from "forge-std/Test.sol";
+
 interface IFees {
-    enum NativeFeeActions {
-        SEND_ETH
-    }
-
-    enum Erc20FeeActions {
-        SEND_ERC20
-    }
-
-    struct NativeMintCommands {
-        // Method for operation
-        NativeFeeActions method;
-        // Arguments used for this operation
-        address recipient;
-        uint256 amount;
-    }
-
-    struct Erc20MintCommands {
-        // Method for operation
-        Erc20FeeActions method;
-        // Arguments used for this operation
-        address erc20Contract;
-        address recipient;
-        uint256 amount;
-    }
-
-    struct Splits {
-        uint16 uplinkBps;
-        uint16 channelBps;
-        uint16 creatorBps;
-        uint16 mintReferralBps;
-        uint16 sponsorBps;
-    }
-
-    struct Erc20MintConfig {
-        uint256 erc20MintPrice;
-        address erc20Contract;
-    }
-
-    struct FeeConfig {
-        uint256 ethMintPrice;
-        address channelTreasury;
-        Splits splits;
-        Erc20MintConfig tokenMintConfig;
-    }
-
-    event FeeConfigSet(address indexed channel, FeeConfig feeconfig);
-
-    function setChannelFeeConfig(bytes calldata data) external;
-
+    function setChannelFees(bytes calldata data) external;
     function getEthMintPrice() external view returns (uint256);
     function getErc20MintPrice() external view returns (uint256);
+    function requestEthMint(
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 amount
+    )
+        external
+        view
+        returns (IRewards.Split memory);
+    function requestErc20Mint(
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 amount
+    )
+        external
+        view
+        returns (IRewards.Split memory);
 
-    function requestNativeMint(address creator, address referral, address sponsor) external view returns (NativeMintCommands[] memory);
-
-    function requestErc20Mint(address creator, address referral, address sponsor) external view returns (Erc20MintCommands[] memory);
-
-    function getSplits() external view returns (uint16, uint16, uint16, uint16, uint16);
+    event FeeConfigSet(address indexed channel, CustomFees.FeeConfig feeconfig);
 
     error InvalidBPS();
     error InvalidSplit();
 }
 
 contract CustomFees is IFees {
-    mapping(address => FeeConfig) public customFees;
+    struct FeeConfig {
+        address channelTreasury;
+        uint16 uplinkBps;
+        uint16 channelBps;
+        uint16 creatorBps;
+        uint16 mintReferralBps;
+        uint16 sponsorBps;
+        uint256 ethMintPrice;
+        uint256 erc20MintPrice;
+        address erc20Contract;
+    }
+
+    mapping(address => FeeConfig) public channelFees;
     address internal immutable uplinkRewardsAddress;
+
+    address NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     constructor(address _uplinkRewardsAddress) {
         if (_uplinkRewardsAddress == address(0)) revert("Invalid uplink rewards address");
         uplinkRewardsAddress = _uplinkRewardsAddress;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+     * @notice Getter for the channel eth mint price.
+     * @return uint256 eth mint price.
+     */
+    function getEthMintPrice() external view returns (uint256) {
+        return channelFees[msg.sender].ethMintPrice;
+    }
+
+    /**
+     * @notice Getter for the channel erc20 mint price.
+     * @return uint256 erc20 mint price.
+     */
+    function getErc20MintPrice() external view returns (uint256) {
+        return channelFees[msg.sender].erc20MintPrice;
+    }
+
+    function getFeeBps() external view returns (uint16, uint16, uint16, uint16, uint16) {
+        FeeConfig memory feeConfig = channelFees[msg.sender];
+        return (
+            feeConfig.uplinkBps,
+            feeConfig.channelBps,
+            feeConfig.creatorBps,
+            feeConfig.mintReferralBps,
+            feeConfig.sponsorBps
+        );
+    }
+
     /**
      * @notice Setter for the channel fee configuration.
      * @param data abi encoded representation of the fee configuration.
      */
-    function setChannelFeeConfig(bytes calldata data) external {
+    function setChannelFees(bytes calldata data) external {
         (
-            uint256 ethMintPrice,
             address channelTreasury,
             uint16 uplinkBps,
             uint16 channelBps,
             uint16 creatorBps,
             uint16 mintReferralBps,
             uint16 sponsorBps,
+            uint256 ethMintPrice,
             uint256 erc20MintPrice,
             address erc20Contract
-        ) = abi.decode(data, (uint256, address, uint16, uint16, uint16, uint16, uint16, uint256, address));
+        ) = abi.decode(data, (address, uint16, uint16, uint16, uint16, uint16, uint256, uint256, address));
 
         _verifyTotalBps(uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
         _verifySplits(ethMintPrice, uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
@@ -97,23 +111,179 @@ contract CustomFees is IFees {
             _verifySplits(erc20MintPrice, uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
         }
 
-        customFees[msg.sender] = FeeConfig(
-            ethMintPrice,
+        channelFees[msg.sender] = FeeConfig(
             channelTreasury,
-            Splits(uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps),
-            Erc20MintConfig(erc20MintPrice, erc20Contract)
+            uplinkBps,
+            channelBps,
+            creatorBps,
+            mintReferralBps,
+            sponsorBps,
+            ethMintPrice,
+            erc20MintPrice,
+            erc20Contract
         );
 
-        emit FeeConfigSet(msg.sender, customFees[msg.sender]);
+        emit FeeConfigSet(msg.sender, channelFees[msg.sender]);
     }
 
-    function _verifyTotalBps(uint16 uplinkBps, uint16 channelBps, uint16 creatorBps, uint16 mintReferralBps, uint16 sponsorBps) internal pure {
+    function requestEthMint(
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 amount
+    )
+        external
+        view
+        returns (IRewards.Split memory)
+    {
+        FeeConfig memory feeConfig = channelFees[msg.sender];
+        return _requestMint(NATIVE_TOKEN, feeConfig, creator, referral, sponsor, amount);
+    }
+
+    function requestErc20Mint(
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 amount
+    )
+        external
+        view
+        returns (IRewards.Split memory)
+    {
+        FeeConfig memory feeConfig = channelFees[msg.sender];
+        if (feeConfig.erc20Contract == address(0) || feeConfig.erc20MintPrice == 0) {
+            revert("ERC20 minting is not enabled");
+        }
+
+        return _requestMint(feeConfig.erc20Contract, feeConfig, creator, referral, sponsor, amount);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    function _requestMint(
+        address token,
+        FeeConfig memory feeConfig,
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 amount
+    )
+        internal
+        view
+        returns (IRewards.Split memory)
+    {
+        if (creator == address(0)) revert("Invalid creator address");
+        if (sponsor == address(0)) revert("Invalid sponsor address");
+
+        address[] memory _recipients = new address[](5);
+        uint256[] memory _allocations = new uint256[](5);
+
+        uint8 commandCount = 0;
+
+        bool isNative = _isNativeToken(token);
+
+        if (feeConfig.mintReferralBps > 0) {
+            if (referral == address(0)) {
+                // if no referral, add it to the channel bps
+                feeConfig.channelBps += feeConfig.mintReferralBps;
+            } else {
+                _recipients[commandCount] = referral;
+                _allocations[commandCount] = amount
+                    * _calculateSplitFromBps(
+                        isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.mintReferralBps
+                    );
+                commandCount++;
+            }
+        }
+
+        if (feeConfig.sponsorBps > 0) {
+            _recipients[commandCount] = sponsor;
+            _allocations[commandCount] = amount
+                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.sponsorBps);
+            commandCount++;
+        }
+
+        if (feeConfig.uplinkBps > 0) {
+            _recipients[commandCount] = uplinkRewardsAddress;
+            _allocations[commandCount] = amount
+                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.uplinkBps);
+            commandCount++;
+        }
+
+        if (feeConfig.channelBps > 0) {
+            if (feeConfig.channelTreasury == address(0)) {
+                // if no channel treasury, add to creator bps
+                feeConfig.creatorBps += feeConfig.channelBps;
+            } else {
+                _recipients[commandCount] = feeConfig.channelTreasury;
+                _allocations[commandCount] = amount
+                    * _calculateSplitFromBps(
+                        isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.channelBps
+                    );
+                commandCount++;
+            }
+        }
+
+        if (feeConfig.creatorBps > 0) {
+            _recipients[commandCount] = creator;
+            _allocations[commandCount] = amount
+                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.creatorBps);
+            commandCount++;
+        }
+
+        address[] memory recipients = new address[](commandCount);
+        uint256[] memory allocations = new uint256[](commandCount);
+
+        uint256 totalValue;
+
+        for (uint256 i = 0; i < commandCount; i++) {
+            recipients[i] = _recipients[i];
+            allocations[i] = _allocations[i];
+            totalValue += _allocations[i];
+        }
+
+        if (commandCount > 0) {
+            require(
+                totalValue == amount * (isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice),
+                "error in fee split total value calculation"
+            );
+        }
+
+        return IRewards.Split(recipients, allocations, totalValue, token);
+    }
+
+    function _isNativeToken(address token) internal view returns (bool) {
+        return token == NATIVE_TOKEN;
+    }
+
+    function _verifyTotalBps(
+        uint16 uplinkBps,
+        uint16 channelBps,
+        uint16 creatorBps,
+        uint16 mintReferralBps,
+        uint16 sponsorBps
+    )
+        internal
+        pure
+    {
         if ((uplinkBps + channelBps + creatorBps + mintReferralBps + sponsorBps) % 1e4 != 0) {
             revert InvalidBPS();
         }
     }
 
-    function _verifySplits(uint256 mintPrice, uint16 uplinkBps, uint16 channelBps, uint16 creatorBps, uint16 mintReferralBps, uint16 sponsorBps) internal pure {
+    function _verifySplits(
+        uint256 mintPrice,
+        uint16 uplinkBps,
+        uint16 channelBps,
+        uint16 creatorBps,
+        uint16 mintReferralBps,
+        uint16 sponsorBps
+    )
+        internal
+        pure
+    {
         if ((mintPrice * uplinkBps) % 1e4 != 0) {
             revert InvalidSplit();
         }
@@ -131,195 +301,7 @@ contract CustomFees is IFees {
         }
     }
 
-    /**
-     * @notice Getter for the channel eth mint price.
-     * @return uint256 eth mint price.
-     */
-    function getEthMintPrice() external view returns (uint256) {
-        FeeConfig memory feeConfig = customFees[msg.sender];
-        return feeConfig.ethMintPrice;
-    }
-
-    /**
-     * @notice Getter for the channel erc20 mint price.
-     * @return uint256 erc20 mint price.
-     */
-    function getErc20MintPrice() external view returns (uint256) {
-        FeeConfig memory feeConfig = customFees[msg.sender];
-        return feeConfig.tokenMintConfig.erc20MintPrice;
-    }
-
-    function getSplits() external view returns (uint16, uint16, uint16, uint16, uint16) {
-        FeeConfig memory feeConfig = customFees[msg.sender];
-        return (
-            feeConfig.splits.uplinkBps,
-            feeConfig.splits.channelBps,
-            feeConfig.splits.creatorBps,
-            feeConfig.splits.mintReferralBps,
-            feeConfig.splits.sponsorBps
-        );
-    }
-
     function _calculateSplitFromBps(uint256 number, uint16 splitBps) internal pure returns (uint256) {
         return (number * splitBps) / 1e4;
-    }
-
-    function requestErc20Mint(address creator, address referral, address sponsor) external view returns (Erc20MintCommands[] memory) {
-        if (creator == address(0)) revert("Invalid creator address");
-        if (sponsor == address(0)) revert("Invalid sponsor address");
-
-        FeeConfig memory feeConfig = customFees[msg.sender];
-
-        if (feeConfig.tokenMintConfig.erc20Contract == address(0) || feeConfig.tokenMintConfig.erc20MintPrice == 0) {
-            revert("ERC20 minting is not enabled");
-        }
-
-        uint256 commandCount = 0;
-        Erc20MintCommands[] memory tempCommands = new Erc20MintCommands[](5); // Maximum size assuming all fees are applicable
-
-        // Calculate mint referral fees
-        if (feeConfig.splits.mintReferralBps > 0) {
-            if (referral == address(0)) {
-                feeConfig.splits.channelBps += feeConfig.splits.mintReferralBps; // Add to channel bps if no referral
-            } else {
-                tempCommands[commandCount++] = Erc20MintCommands(
-                    Erc20FeeActions.SEND_ERC20,
-                    feeConfig.tokenMintConfig.erc20Contract,
-                    referral,
-                    _calculateSplitFromBps(feeConfig.tokenMintConfig.erc20MintPrice, feeConfig.splits.mintReferralBps)
-                );
-            }
-        }
-
-        // Handle sponsor fees
-        if (feeConfig.splits.sponsorBps > 0) {
-            tempCommands[commandCount++] = Erc20MintCommands(
-                Erc20FeeActions.SEND_ERC20,
-                feeConfig.tokenMintConfig.erc20Contract,
-                sponsor,
-                _calculateSplitFromBps(feeConfig.tokenMintConfig.erc20MintPrice, feeConfig.splits.sponsorBps)
-            );
-        }
-
-        // Handle uplink fees (assuming uplink address needs to be passed as parameter or managed elsewhere)
-        if (feeConfig.splits.uplinkBps > 0) {
-            // Placeholder for the uplink address; must be determined outside of this function or through another config
-            tempCommands[commandCount++] = Erc20MintCommands(
-                Erc20FeeActions.SEND_ERC20,
-                feeConfig.tokenMintConfig.erc20Contract,
-                uplinkRewardsAddress,
-                _calculateSplitFromBps(feeConfig.tokenMintConfig.erc20MintPrice, feeConfig.splits.uplinkBps)
-            );
-        }
-
-        /// Handle channel fees
-        /// if channel treasury is address 0, route the treasury rewards to the creator
-        /// otherwise set the channel mint command
-        if (feeConfig.splits.channelBps > 0) {
-            if (feeConfig.channelTreasury == address(0)) {
-                feeConfig.splits.creatorBps += feeConfig.splits.channelBps;
-            } else {
-                tempCommands[commandCount++] = Erc20MintCommands(
-                    Erc20FeeActions.SEND_ERC20,
-                    feeConfig.tokenMintConfig.erc20Contract,
-                    feeConfig.channelTreasury,
-                    _calculateSplitFromBps(feeConfig.tokenMintConfig.erc20MintPrice, feeConfig.splits.channelBps)
-                );
-            }
-        }
-
-        /// Handle creator fees
-        if (feeConfig.splits.creatorBps > 0) {
-            tempCommands[commandCount++] = Erc20MintCommands(
-                Erc20FeeActions.SEND_ERC20,
-                feeConfig.tokenMintConfig.erc20Contract,
-                creator,
-                _calculateSplitFromBps(feeConfig.tokenMintConfig.erc20MintPrice, feeConfig.splits.creatorBps)
-            );
-        }
-
-        // Compile the list of actual commands to return
-        Erc20MintCommands[] memory transferCommands = new Erc20MintCommands[](commandCount);
-        for (uint256 i = 0; i < commandCount; i++) {
-            transferCommands[i] = tempCommands[i];
-        }
-
-        return transferCommands;
-    }
-
-    function requestNativeMint(address creator, address referral, address sponsor) external view returns (NativeMintCommands[] memory) {
-        if (creator == address(0)) revert("Invalid creator address");
-        if (sponsor == address(0)) revert("Invalid sponsor address");
-
-        FeeConfig memory feeConfig = customFees[msg.sender];
-
-        if (feeConfig.ethMintPrice == 0) return new NativeMintCommands[](0);
-
-        uint256 commandCount = 0;
-        NativeMintCommands[] memory tempCommands = new NativeMintCommands[](5); // Maximum size assuming all fees are applicable
-
-        // Calculate mint referral fees
-        if (feeConfig.splits.mintReferralBps > 0) {
-            if (referral == address(0)) {
-                feeConfig.splits.channelBps += feeConfig.splits.mintReferralBps; // Add to channel bps if no referral
-            } else {
-                tempCommands[commandCount++] = NativeMintCommands(
-                    NativeFeeActions.SEND_ETH,
-                    referral,
-                    _calculateSplitFromBps(feeConfig.ethMintPrice, feeConfig.splits.mintReferralBps)
-                );
-            }
-        }
-
-        // Handle sponsor fees
-        if (feeConfig.splits.sponsorBps > 0) {
-            tempCommands[commandCount++] = NativeMintCommands(
-                NativeFeeActions.SEND_ETH,
-                sponsor,
-                _calculateSplitFromBps(feeConfig.ethMintPrice, feeConfig.splits.sponsorBps)
-            );
-        }
-
-        // Handle uplink fees (assuming uplink address needs to be passed as parameter or managed elsewhere)
-        if (feeConfig.splits.uplinkBps > 0) {
-            // Placeholder for the uplink address; must be determined outside of this function or through another config
-            tempCommands[commandCount++] = NativeMintCommands(
-                NativeFeeActions.SEND_ETH,
-                uplinkRewardsAddress,
-                _calculateSplitFromBps(feeConfig.ethMintPrice, feeConfig.splits.uplinkBps)
-            );
-        }
-
-        /// Handle channel fees
-        /// if channel treasury is address 0, route the treasury rewards to the creator
-        /// otherwise set the channel fee command
-        if (feeConfig.splits.channelBps > 0) {
-            if (feeConfig.channelTreasury == address(0)) {
-                feeConfig.splits.creatorBps += feeConfig.splits.channelBps;
-            } else {
-                tempCommands[commandCount++] = NativeMintCommands(
-                    NativeFeeActions.SEND_ETH,
-                    feeConfig.channelTreasury,
-                    _calculateSplitFromBps(feeConfig.ethMintPrice, feeConfig.splits.channelBps)
-                );
-            }
-        }
-
-        /// Handle creator fees
-        if (feeConfig.splits.creatorBps > 0) {
-            tempCommands[commandCount++] = NativeMintCommands(
-                NativeFeeActions.SEND_ETH,
-                creator,
-                _calculateSplitFromBps(feeConfig.ethMintPrice, feeConfig.splits.creatorBps)
-            );
-        }
-
-        // Compile the list of actual commands to return
-        NativeMintCommands[] memory transferCommands = new NativeMintCommands[](commandCount);
-        for (uint256 i = 0; i < commandCount; i++) {
-            transferCommands[i] = tempCommands[i];
-        }
-
-        return transferCommands;
     }
 }
