@@ -241,23 +241,26 @@ contract FeesTest is Test {
       uint80(mintReferralBps) +
       uint80(sponsorBps);
 
-    if (
-      (totalBps % 10_000 != 0) ||
-      ((uplinkBps * ethMintPrice) % 10_000 != 0) ||
-      ((uplinkBps * erc20MintPrice) % 10_000 != 0) ||
-      ((channelBps * ethMintPrice) % 10_000 != 0) ||
-      ((creatorBps * ethMintPrice) % 10_000 != 0) ||
-      ((mintReferralBps * ethMintPrice) % 10_000 != 0) ||
-      ((sponsorBps * ethMintPrice) % 10_000 != 0) ||
-      ((uplinkBps * erc20MintPrice) % 10_000 != 0) ||
-      ((channelBps * erc20MintPrice) % 10_000 != 0) ||
-      ((creatorBps * erc20MintPrice) % 10_000 != 0) ||
-      ((mintReferralBps * erc20MintPrice) % 10_000 != 0) ||
-      ((sponsorBps * erc20MintPrice) % 10_000 != 0)
-    ) {
-      vm.expectRevert();
-      customFeesImpl.setChannelFees(feeArgs);
-      return;
+    if (ethMintPrice != 0) {
+      // if eth mint price is zero, none of these checks matter as the fn would return early (free mint)
+      if (
+        (totalBps % 10_000 != 0) ||
+        ((uplinkBps * ethMintPrice) % 10_000 != 0) ||
+        ((uplinkBps * erc20MintPrice) % 10_000 != 0) ||
+        ((channelBps * ethMintPrice) % 10_000 != 0) ||
+        ((creatorBps * ethMintPrice) % 10_000 != 0) ||
+        ((mintReferralBps * ethMintPrice) % 10_000 != 0) ||
+        ((sponsorBps * ethMintPrice) % 10_000 != 0) ||
+        ((uplinkBps * erc20MintPrice) % 10_000 != 0) ||
+        ((channelBps * erc20MintPrice) % 10_000 != 0) ||
+        ((creatorBps * erc20MintPrice) % 10_000 != 0) ||
+        ((mintReferralBps * erc20MintPrice) % 10_000 != 0) ||
+        ((sponsorBps * erc20MintPrice) % 10_000 != 0)
+      ) {
+        vm.expectRevert();
+        customFeesImpl.setChannelFees(feeArgs);
+        return;
+      }
     }
 
     customFeesImpl.setChannelFees(feeArgs);
@@ -266,7 +269,7 @@ contract FeesTest is Test {
     IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
 
     // expect revert if erc20 mints not configured
-    if (erc20Address == address(0) || erc20MintPrice == 0) {
+    if (erc20Address == address(0) || erc20MintPrice == 0 || ethMintPrice == 0) {
       vm.expectRevert();
       customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
     } else {

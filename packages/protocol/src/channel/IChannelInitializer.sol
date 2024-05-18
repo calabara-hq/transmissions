@@ -2,23 +2,11 @@
 pragma solidity ^0.8.0;
 
 interface IChannelInitializer {
-    function initialize(
-        string memory newContractURI,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        bytes calldata timing
-    )
-        external;
-}
-
-interface IInfiniteChannelInitializer {
-    function initialize(
-        string memory newContractURI,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        uint40 saleDuration
-    )
-        external;
+  function initialize(
+    string memory newContractURI,
+    address defaultAdmin,
+    address[] calldata managers,
+    bytes[] calldata setupActions,
+    bytes calldata timing
+  ) external;
 }

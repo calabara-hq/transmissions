@@ -35,6 +35,7 @@ contract CustomFees is IFees {
     uint16 creatorBps;
     uint16 mintReferralBps;
     uint16 sponsorBps;
+    uint16 padding;
     uint256 ethMintPrice;
     uint256 erc20MintPrice;
     address erc20Contract;
@@ -98,8 +99,9 @@ contract CustomFees is IFees {
       address erc20Contract
     ) = abi.decode(data, (address, uint16, uint16, uint16, uint16, uint16, uint256, uint256, address));
 
-    // if neither token price is set, assume a free mint and return early
-    //if (ethMintPrice == 0 && erc20MintPrice == 0) return;
+    // if eth price is 0, assume a free mint and return early
+    // it doesn't make sense to have a free eth mint & priced erc20 mint, so just check eth
+    if (ethMintPrice == 0) return;
 
     _verifyTotalBps(uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
     _verifySplits(ethMintPrice, uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
@@ -115,6 +117,7 @@ contract CustomFees is IFees {
       creatorBps,
       mintReferralBps,
       sponsorBps,
+      0,
       ethMintPrice,
       erc20MintPrice,
       erc20Contract
@@ -260,7 +263,7 @@ contract CustomFees is IFees {
       uint80(mintReferralBps) +
       uint80(sponsorBps);
 
-    if (totalBps % 1e4 != 0) {
+    if (totalBps != 1e4) {
       revert InvalidBPS();
     }
   }

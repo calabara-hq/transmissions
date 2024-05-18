@@ -6,6 +6,7 @@ import { ChannelStorage } from "./ChannelStorage.sol";
 import { IFees } from "../fees/CustomFees.sol";
 
 import { ILogic } from "../logic/Logic.sol";
+import { Test, console } from "forge-std/Test.sol";
 
 import { IRewards, Rewards } from "../rewards/Rewards.sol";
 import { Multicall } from "../utils/Multicall.sol";
@@ -199,17 +200,6 @@ abstract contract Channel is
 
   function _authorizeMint(uint256 tokenId) internal virtual;
 
-  /*     function mint(
-        address to,
-        uint256 tokenId,
-        uint256 amount,
-        address mintReferral,
-        bytes memory data
-    )
-        external
-        payable
-        virtual;
-    */
   /**
    * @notice mint a token in the channel
    * @param to address to mint to
@@ -339,6 +329,8 @@ abstract contract Channel is
   }
 
   function _validateCreatorLogic(address creator) internal view returns (bool) {
+    // return true if no logic contract set
+    if (address(logicContract) == address(0)) return true;
     bool isApproved = logicContract.isCreatorApproved(creator);
     if (!isApproved) {
       revert FalsyLogic();
@@ -346,6 +338,8 @@ abstract contract Channel is
   }
 
   function _validateMinterLogic(address minter) internal view returns (bool) {
+    // return true if no logic contract set
+    if (address(logicContract) == address(0)) return true;
     bool isApproved = logicContract.isMinterApproved(minter);
     if (!isApproved) {
       revert FalsyLogic();
