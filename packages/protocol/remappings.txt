@@ -1,0 +1,7 @@
+
+ds-test/=node_modules/ds-test/src/
+erc4626-tests/=node_modules/@openzeppelin/contracts/lib/erc4626-tests/
+forge-std/=node_modules/forge-std/src/
+openzeppelin-contracts-upgradeable/=node_modules/@openzeppelin/contracts-upgradeable/
+openzeppelin-contracts/=node_modules/@openzeppelin/contracts/
+solady/=node_modules/solady/src
