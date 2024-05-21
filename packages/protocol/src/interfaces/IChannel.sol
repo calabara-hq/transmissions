@@ -25,6 +25,8 @@ interface IChannel {
         address indexed updater, ConfigUpdate indexed updateType, address feeContract, address logicContract
     );
 
+    function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
+
     function initialize(
         string memory newContractURI,
         address defaultAdmin,

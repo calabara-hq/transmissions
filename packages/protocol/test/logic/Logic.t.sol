@@ -45,6 +45,12 @@ contract ChannelTest is Test {
         mockBool = new MockBool();
     }
 
+    function test_logic_versioning() external {
+        assertEq("1.0.0", logicImpl.contractVersion());
+        assertEq("Channel Logic", logicImpl.contractName());
+        assertEq(logicImpl.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    }
+
     function test_creatorLogic_erc20Rule() external {
         address[] memory targets = new address[](1);
         bytes4[] memory signatures = new bytes4[](1);
@@ -222,13 +228,50 @@ contract ChannelTest is Test {
         vm.stopPrank();
     }
 
+    function test_logic_unapprovedRule() external {
+        ILogic newImpl = new Logic(address(this));
+
+        address[] memory targets = new address[](1);
+        bytes4[] memory signatures = new bytes4[](1);
+        bytes[] memory datas = new bytes[](1);
+        bytes[] memory operators = new bytes[](1);
+        bytes[] memory literalOperands = new bytes[](1);
+
+        targets[0] = address(erc20Token);
+        signatures[0] = IERC20.balanceOf.selector;
+        datas[0] = abi.encode(address(0));
+        operators[0] = abi.encodePacked(">");
+        literalOperands[0] = abi.encode(uint256(3 * 10 ** 18));
+
+        vm.startPrank(targetChannel);
+        vm.expectRevert();
+        newImpl.setCreatorLogic(abi.encode(targets, signatures, datas, operators, literalOperands));
+
+        vm.stopPrank();
+    }
+
     function test_emptyLogic() public {
         vm.startPrank(targetChannel);
+
+        bool creatorResult = logicImpl.isCreatorApproved(nick);
+        assert(creatorResult == true);
+
+        bool minterResult = logicImpl.isMinterApproved(nick);
+        assert(minterResult == true);
+
         logicImpl.setCreatorLogic(
             abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0))
         );
-        bool result = logicImpl.isCreatorApproved(nick);
-        assert(result == true);
+        logicImpl.setMinterLogic(
+            abi.encode(new address[](0), new bytes4[](0), new bytes[](0), new bytes[](0), new bytes[](0))
+        );
+
+        creatorResult = logicImpl.isCreatorApproved(nick);
+        assert(creatorResult == true);
+
+        minterResult = logicImpl.isMinterApproved(nick);
+        assert(minterResult == true);
+
         vm.stopPrank();
     }
 

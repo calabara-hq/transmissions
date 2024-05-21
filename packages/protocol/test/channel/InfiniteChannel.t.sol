@@ -114,7 +114,7 @@ contract InfiniteChannelTest is Test {
         );
     }
 
-    function test_initializeWithProxy() external {
+    function test_infChannel_initializeWithProxy() external {
         InfiniteChannel newChannelImpl = new InfiniteChannel(address(upgradePath), address(0));
         InfiniteChannel sampleChannel = InfiniteChannel(payable(address(new InfiniteUplink1155(address(channelImpl)))));
         sampleChannel.initialize(
@@ -123,5 +123,11 @@ contract InfiniteChannelTest is Test {
         assertEq("https://example.com/api/token/0", sampleChannel.getToken(0).uri);
         assertEq(0, sampleChannel.getToken(0).maxSupply);
         assertEq(0, sampleChannel.getToken(0).totalMinted);
+    }
+
+    function test_infChannel_versioning() external {
+        assertEq("1.0.0", targetChannel.contractVersion());
+        assertEq("Infinite Channel", targetChannel.contractName());
+        assertEq(targetChannel.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     }
 }

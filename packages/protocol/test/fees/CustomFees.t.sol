@@ -19,6 +19,12 @@ contract FeesTest is Test {
 
     MockERC20 erc20Token = new MockERC20("testERC20", "TEST1");
 
+    function test_customFees_versioning() external {
+        assertEq("1.0.0", customFeesImpl.contractVersion());
+        assertEq("Custom Fees", customFeesImpl.contractName());
+        assertEq(customFeesImpl.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    }
+
     function test_customFees_bps() public {
         bytes memory feeArgs = abi.encode(
             channelTreasury,
@@ -84,25 +90,6 @@ contract FeesTest is Test {
 
         vm.stopPrank();
     }
-
-    /*     function test_customFees_freeEthMint() public {
-        bytes memory feeArgs = abi.encode(
-    channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
-        );
-
-        vm.startPrank(targetChannel);
-        customFeesImpl.setChannelFees(feeArgs);
-
-        assertEq(customFeesImpl.getEthMintPrice(), 0);
-
-        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
-
-        assertEq(ethSplit.recipients.length, 0);
-        assertEq(ethSplit.allocations.length, 0);
-        assertEq(ethSplit.totalAllocation, 0);
-
-        vm.stopPrank();
-    } */
 
     function test_customFees_nullChannelTreasury() public {
         bytes memory feeArgs = abi.encode(
@@ -205,6 +192,32 @@ contract FeesTest is Test {
         vm.stopPrank();
     }
 
+    function test_customFees_revertOnFreeMint() public {
+        bytes memory feeArgs = abi.encode(
+            channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
+        );
+
+        vm.startPrank(targetChannel);
+        vm.expectRevert();
+        customFeesImpl.setChannelFees(feeArgs);
+
+        vm.expectRevert();
+        customFeesImpl.requestEthMint(nick, nick, nick, 1);
+        vm.expectRevert();
+        customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+
+        vm.stopPrank();
+    }
+
+    function test_customFees_revertOnMissingConfig() public {
+        vm.startPrank(targetChannel);
+        vm.expectRevert();
+        customFeesImpl.requestEthMint(nick, nick, nick, 1);
+        vm.expectRevert();
+        customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+        vm.stopPrank();
+    }
+
     function test_feeVerification(
         uint16 uplinkBps,
         uint16 channelBps,
@@ -228,7 +241,6 @@ contract FeesTest is Test {
             erc20MintPrice,
             erc20Address
         );
-        // customFeesImpl._verifyTotalBps(uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
         uint256 totalBps =
             uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
@@ -238,25 +250,6 @@ contract FeesTest is Test {
         } else {
             customFeesImpl.setChannelFees(feeArgs);
         }
-    }
-
-    function test_revertOnInvalidSplits() public {
-        bytes memory feeArgs = abi.encode(
-            channelTreasury,
-            uint16(1234),
-            uint16(766),
-            uint16(6000),
-            uint16(1000),
-            uint16(1000),
-            777_000_000_000_000,
-            100_000_000,
-            address(erc20Token)
-        );
-
-        vm.startPrank(targetChannel);
-        // vm.expectRevert();
-        customFeesImpl.setChannelFees(feeArgs);
-        vm.stopPrank();
     }
 
     function test_customFees_fuzz(

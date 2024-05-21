@@ -43,8 +43,6 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         nonReentrant
         initializer
     {
-        __ERC1155_init(uri);
-
         __UUPSUpgradeable_init();
 
         __AccessControlEnumerable_init();
@@ -55,7 +53,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         /// grant the default admin role
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
 
-        /// set up the managers
+        /// set the managers
         setManagers(managers);
 
         /// set the timing configuration
@@ -76,10 +74,18 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
     /* -------------------------------------------------------------------------- */
 
+    /**
+     * @notice Get the ETH mint price for tokens in the channel
+     * @return uint256 ETH price in wei
+     */
     function ethMintPrice() public view returns (uint256) {
         return feeContract.getEthMintPrice();
     }
 
+    /**
+     * @notice Get the ERC20 mint price for tokens in the channel
+     * @return uint256 ERC20 price in wei
+     */
     function erc20MintPrice() public view returns (uint256) {
         return feeContract.getErc20MintPrice();
     }
@@ -89,7 +95,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
      * @param tokenId Token id
      * @return TokenConfig Token details
      */
-    function getToken(uint256 tokenId) public view returns (TokenConfig memory) {
+    function getToken(uint256 tokenId) external view returns (TokenConfig memory) {
         return tokens[tokenId];
     }
 
@@ -102,6 +108,14 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         emit TokenURIUpdated(0, uri);
     }
 
+    /**
+     * @notice Set the logic structure for the channel
+     * @dev Address 0 is acceptable, and is treated as a no-op on logic validation
+     * @dev Only call into the logic contract if the address is not 0
+     * @param logic Address of the logic contract
+     * @param creatorLogic Creator logic initialization data
+     * @param minterLogic Minter logic initialization data
+     */
     function setLogic(
         address logic,
         bytes calldata creatorLogic,
@@ -110,25 +124,29 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         external
         onlyAdminOrManager
     {
-        if (logic == address(0)) {
-            revert ADDRESS_ZERO();
-        }
-
         logicContract = ILogic(logic);
 
-        logicContract.setCreatorLogic(creatorLogic);
-        logicContract.setMinterLogic(minterLogic);
+        if (logic != address(0)) {
+            logicContract.setCreatorLogic(creatorLogic);
+            logicContract.setMinterLogic(minterLogic);
+        }
 
         emit ConfigUpdated(msg.sender, ConfigUpdate.LOGIC_CONTRACT, address(feeContract), address(logicContract));
     }
 
     /**
-     * free mints are handled here. free mint = setting the contract to 0
+     * @notice Set the fee structure for the channel
+     * @dev Address 0 is acceptable, and is treated as a no-op on logic validation todo
+     * @dev Only call into the logic contract if the address is not 0
+     * @param fees Address of the fee contract
+     * @param data Fee contract initialization data
      */
     function setFees(address fees, bytes calldata data) external onlyAdminOrManager {
         feeContract = IFees(fees);
 
-        if (fees != address(0)) feeContract.setChannelFees(data);
+        if (fees != address(0)) {
+            feeContract.setChannelFees(data);
+        }
 
         emit ConfigUpdated(msg.sender, ConfigUpdate.FEE_CONTRACT, address(feeContract), address(logicContract));
     }
@@ -312,9 +330,9 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
             TokenConfig memory token = tokens[ids[i]];
             _processMint(ids[i]);
             _checkMintRequirements(token, amounts[i]);
-            _distributeIncomingSplit(feeContract.requestEthMint(token.author, mintReferral, token.sponsor, amounts[i]));
+            _handleETHSplit(token, amounts[i], mintReferral);
         }
-        _mintBatch(msg.sender, ids, amounts, data);
+        _mintBatch(to, ids, amounts, data);
         _validateMinterLogic(msg.sender);
         emit TokenMinted(to, mintReferral, ids, amounts);
     }
@@ -332,13 +350,23 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
             TokenConfig memory token = tokens[ids[i]];
             _processMint(ids[i]);
             _checkMintRequirements(token, amounts[i]);
-            _distributeIncomingSplit(
-                feeContract.requestErc20Mint(token.author, mintReferral, token.sponsor, amounts[i])
-            );
+            _handleERC20Split(token, amounts[i], mintReferral);
         }
-        _mintBatch(msg.sender, ids, amounts, data);
+        _mintBatch(to, ids, amounts, data);
         _validateMinterLogic(msg.sender);
         emit TokenMinted(to, mintReferral, ids, amounts);
+    }
+
+    function _handleETHSplit(TokenConfig memory token, uint256 amount, address mintReferral) internal {
+        if (address(feeContract) != address(0)) {
+            _distributeIncomingSplit(feeContract.requestEthMint(token.author, mintReferral, token.sponsor, amount));
+        }
+    }
+
+    function _handleERC20Split(TokenConfig memory token, uint256 amount, address mintReferral) internal {
+        if (address(feeContract) != address(0)) {
+            _distributeIncomingSplit(feeContract.requestErc20Mint(token.author, mintReferral, token.sponsor, amount));
+        }
     }
 
     /**

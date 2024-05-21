@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface ILogic {
+import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
+
+interface ILogic is IVersionedContract {
     struct InteractionLogic {
         address[] targets;
         bytes4[] signatures;

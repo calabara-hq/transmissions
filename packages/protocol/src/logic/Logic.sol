@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import { ILogic } from "../interfaces/ILogic.sol";
-import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 import { Ownable } from "openzeppelin-contracts/access/Ownable.sol";
+
 import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
 
-contract Logic is ILogic, Ownable, IVersionedContract {
+contract Logic is ILogic, Ownable {
     mapping(address => InteractionLogic) internal creatorLogic;
     mapping(address => InteractionLogic) internal minterLogic;
 
@@ -23,6 +23,10 @@ contract Logic is ILogic, Ownable, IVersionedContract {
         approvedSignatures[signature] = ApprovedSignature(true, calldataAddressPosition);
     }
 
+    /**
+     * @notice Set the creator logic for a channel
+     * @param data abi encoded representation of the logic
+     */
     function setCreatorLogic(bytes memory data) external {
         InteractionLogic memory logic = _constructInteractionLogic(data);
         if (logic.targets.length > 0) {
@@ -32,6 +36,10 @@ contract Logic is ILogic, Ownable, IVersionedContract {
         emit CreatorLogicSet(msg.sender, logic);
     }
 
+    /**
+     * @notice Set the minter logic for a channel
+     * @param data abi encoded representation of the logic
+     */
     function setMinterLogic(bytes memory data) external {
         InteractionLogic memory logic = _constructInteractionLogic(data);
         if (logic.targets.length > 0) {
@@ -62,7 +70,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice construct the interaction logic for a channel
+     * @dev construct the interaction logic for a channel
      * @param data abi encoded representation of the logic
      * @return InteractionLogic the constructed logic
      */
@@ -82,7 +90,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal helper function to make sure lengths of logic arrays match
+     * @dev internal helper function to make sure lengths of logic arrays match
      * @param targets array of target addresses
      * @param signatures array of function signatures
      * @param datas array of calldata
@@ -108,7 +116,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal function to check registry of valid signatures
+     * @dev internal function to check registry of valid signatures
      * @param signatures array of function signatures
      */
     function _validateSignatures(bytes4[] memory signatures) internal view {
@@ -123,7 +131,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal function to loop through logic and apply operators on execution results
+     * @dev internal function to loop through logic and apply operators on execution results
      * @param logic the logic to execute
      * @param user the user address to use in staticCalls
      * @return bool is user approved
@@ -151,7 +159,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal helper function to inject user address into calldata
+     * @dev internal helper function to inject user address into calldata
      * @param data existing calldata
      * @param position index of address argument in calldata
      * @param addr user address
@@ -170,7 +178,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal helper function to make staticcall
+     * @dev internal helper function to make staticcall
      * @param target target contract
      * @param signature function signature
      * @param data calldata with injected user address
@@ -189,7 +197,7 @@ contract Logic is ILogic, Ownable, IVersionedContract {
     }
 
     /**
-     * @notice internal helper function to apply operator to execution result
+     * @dev internal helper function to apply operator to execution result
      * @param operator comparison operator string
      * @param executionResult result of staticcall
      * @param literalOperand operand for comparison

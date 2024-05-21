@@ -3,11 +3,10 @@ pragma solidity ^0.8.0;
 
 import { IFees } from "../interfaces/IFees.sol";
 
-import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 import { IRewards } from "../rewards/Rewards.sol";
 import { Test, console } from "forge-std/Test.sol";
 
-contract CustomFees is IFees, IVersionedContract {
+contract CustomFees is IFees {
     struct FeeConfig {
         address channelTreasury;
         uint16 uplinkBps;
@@ -114,6 +113,7 @@ contract CustomFees is IFees, IVersionedContract {
         returns (IRewards.Split memory)
     {
         FeeConfig memory feeConfig = channelFees[msg.sender];
+        if (feeConfig.ethMintPrice == 0) revert INVALID_ETH_MINT_PRICE();
         return _requestMint(NATIVE_TOKEN, feeConfig, creator, referral, sponsor, amount);
     }
 

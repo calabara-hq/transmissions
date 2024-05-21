@@ -34,19 +34,13 @@ contract ChannelFactoryTest is Test {
         vm.stopPrank();
     }
 
-    function test_contractVersion() external {
+    function test_factory_versioning() external {
         assertEq("1.0.0", channelFactory.contractVersion());
+        assertEq("Uplink Channel Factory", channelFactory.contractName());
+        assertEq(channelFactory.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     }
 
-    function test_contractName() external {
-        assertEq(channelFactory.contractName(), "Uplink Channel Factory");
-    }
-
-    function test_contractURI() external {
-        assertEq(channelFactory.contractURI(), "https://github.com/calabara-hq/transmissions/");
-    }
-
-    function test_initialize(address initialOwner) external {
+    function test_factory_initialize(address initialOwner) external {
         vm.assume(initialOwner != address(0));
         address payable proxyAddress = payable(
             address(
@@ -60,7 +54,7 @@ contract ChannelFactoryTest is Test {
         assertEq(proxy.owner(), initialOwner);
     }
 
-    function test_upgrade(address initialOwner) external {
+    function test_factory_upgrade(address initialOwner) external {
         vm.assume(initialOwner != address(0));
 
         address newChannelContract = makeAddr("newChannelContract");
@@ -84,10 +78,10 @@ contract ChannelFactoryTest is Test {
         assertEq(address(proxy.infiniteChannelImpl()), address(newChannelContract));
     }
 
-    function test_createChannel() external {
+    function test_factory_createChannel() external {
         address newChannel = channelFactory.createInfiniteChannel(
             "https://example.com/api/token/0", address(this), new address[](0), new bytes[](0), abi.encode(120)
         );
-        //assertEq("https://example.com/api/token/0", IChannel(newChannel).uri());
+        assertEq("https://example.com/api/token/0", IChannel(newChannel).getToken(0).uri);
     }
 }

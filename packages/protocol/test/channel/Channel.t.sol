@@ -202,6 +202,20 @@ contract ChannelTest is Test {
         vm.stopPrank();
     }
 
+    function test_channel_emptyLogicAndFees() external {
+        ChannelHarness newChannelImpl = new ChannelHarness(address(upgradePath), address(0));
+        bytes[] memory setupActions = new bytes[](0);
+        newChannelImpl.initialize(
+            "https://example.com/api/token/0", nick, new address[](0), setupActions, abi.encode(100)
+        );
+
+        // try to create a token
+        newChannelImpl.createToken("sampleToken", nick, 100);
+
+        // try to mint a token
+        newChannelImpl.mint(nick, 1, 1, nick, "");
+    }
+
     function test_initialize() external {
         ChannelHarness newChannelImpl = new ChannelHarness(address(upgradePath), address(0));
         newChannelImpl.initialize(
