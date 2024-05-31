@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 interface IManagedChannel {
-    error UNAUTHORIZED();
-    error INVALID_UPGRADE();
+    error Unauthorized();
+    error InvalidUpgrade();
 
     event ManagersUpdated(address[] managers);
     event ManagerRenounced(address indexed manager);

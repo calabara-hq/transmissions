@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import { Test, console } from "forge-std/Test.sol";
 
-import { InfiniteChannel } from "../../src/channel/InfiniteChannel.sol";
+import { InfiniteChannel } from "../../src/channel/transport/InfiniteChannel.sol";
 
 import { CustomFees } from "../../src/fees/CustomFees.sol";
 import { Logic } from "../../src/logic/Logic.sol";
@@ -25,6 +25,7 @@ contract InfiniteChannelTest is Test {
     address nick = makeAddr("nick");
     address uplink = makeAddr("uplink");
     address uplinkRewardsAddr = makeAddr("uplink rewards");
+    address channelTreasury = makeAddr("channel treasury");
     address admin = makeAddr("admin");
     address sampleAdmin1 = makeAddr("sampleAdmin1");
     address sampleAdmin2 = makeAddr("sampleAdmin2");
@@ -56,62 +57,6 @@ contract InfiniteChannelTest is Test {
         erc20Token = new MockERC20("testERC20", "TEST1");
         erc721Token = new MockERC721("testERC721", "TEST2");
         erc1155Token = new MockERC1155("testERC1155");
-
-        bytes[] memory setupActions = new bytes[](2);
-
-        /// fees
-
-        bytes memory feeArgs = abi.encode(
-            makeAddr("channel treasury"),
-            uint16(1000),
-            uint16(1000),
-            uint16(6000),
-            uint16(1000),
-            uint16(1000),
-            777_000_000_000_000,
-            10 * 10e18,
-            address(erc20Token)
-        );
-        setupActions[0] = abi.encodeWithSelector(Channel.setFees.selector, address(customFeesImpl), feeArgs);
-
-        /// creator logic
-
-        address[] memory creatorTargets = new address[](1);
-        bytes4[] memory creatorSignatures = new bytes4[](1);
-        bytes[] memory creatorDatas = new bytes[](1);
-        bytes[] memory creatorOperators = new bytes[](1);
-        bytes[] memory creatorLiteralOperands = new bytes[](1);
-
-        creatorTargets[0] = address(erc20Token);
-        creatorSignatures[0] = IERC20.balanceOf.selector;
-        creatorDatas[0] = abi.encode(address(0));
-        creatorOperators[0] = abi.encodePacked(">");
-        creatorLiteralOperands[0] = abi.encode(uint256(3 * 10 ** 18));
-
-        /// minter logic
-
-        address[] memory minterTargets = new address[](1);
-        bytes4[] memory minterSignatures = new bytes4[](1);
-        bytes[] memory minterDatas = new bytes[](1);
-        bytes[] memory minterOperators = new bytes[](1);
-        bytes[] memory minterLiteralOperands = new bytes[](1);
-
-        minterTargets[0] = address(erc721Token);
-        minterSignatures[0] = IERC721.balanceOf.selector;
-        minterDatas[0] = abi.encode(address(0));
-        minterOperators[0] = abi.encodePacked(">");
-        minterLiteralOperands[0] = abi.encode(1);
-
-        setupActions[1] = abi.encodeWithSelector(
-            Channel.setLogic.selector,
-            address(logicImpl),
-            abi.encode(creatorTargets, creatorSignatures, creatorDatas, creatorOperators, creatorLiteralOperands),
-            abi.encode(minterTargets, minterSignatures, minterDatas, minterOperators, minterLiteralOperands)
-        );
-
-        targetChannel.initialize(
-            "https://example.com/api/token/0", nick, new address[](0), setupActions, abi.encode(100)
-        );
     }
 
     function test_infChannel_initializeWithProxy() external {
@@ -129,5 +74,25 @@ contract InfiniteChannelTest is Test {
         assertEq("1.0.0", targetChannel.contractVersion());
         assertEq("Infinite Channel", targetChannel.contractName());
         assertEq(targetChannel.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    }
+
+    function test_infChannel_revertOnInvalidTimingConfig() external {
+        vm.expectRevert();
+        targetChannel.initialize(
+            "https://example.com/api/token/0", nick, new address[](0), new bytes[](0), abi.encode(0)
+        );
+    }
+
+    function test_infChannel_revertOnSaleEnd() external {
+        targetChannel.initialize(
+            "https://example.com/api/token/0", nick, new address[](0), new bytes[](0), abi.encode(1)
+        );
+
+        targetChannel.createToken("test", nick, 100);
+
+        vm.warp(block.timestamp + 10);
+
+        vm.expectRevert();
+        targetChannel.mint(nick, 1, 1, address(0), "");
     }
 }

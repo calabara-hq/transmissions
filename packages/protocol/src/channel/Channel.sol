@@ -22,11 +22,11 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     /*                              VIRTUAL FUNCTIONS                             */
     /* -------------------------------------------------------------------------- */
 
-    function _processNewToken(uint256 tokenId) internal virtual;
+    function _transportProcessNewToken(uint256 tokenId) internal virtual;
 
-    function _processMint(uint256 tokenId) internal view virtual;
+    function _transportProcessMint(uint256 tokenId) internal virtual;
 
-    function setTiming(bytes calldata data) public virtual;
+    function setTransportConfig(bytes calldata data) public payable virtual;
 
     /* -------------------------------------------------------------------------- */
     /*                                INITIALIZER                                 */
@@ -37,9 +37,10 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         address defaultAdmin,
         address[] calldata managers,
         bytes[] calldata setupActions,
-        bytes calldata timing
+        bytes calldata transportConfig
     )
         external
+        payable
         nonReentrant
         initializer
     {
@@ -47,26 +48,26 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
         __AccessControlEnumerable_init();
 
-        /// temporarily set deployer as admin
+        /// @dev temporarily set deployer as admin
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
-        /// grant the default admin role
+        /// @dev grant the default admin role
         _grantRole(DEFAULT_ADMIN_ROLE, defaultAdmin);
 
-        /// set the managers
+        /// @dev set the managers
         setManagers(managers);
 
-        /// set the timing configuration
-        setTiming(timing);
+        /// @dev set the transport configuration
+        setTransportConfig(transportConfig);
 
-        /// set up the channel token
+        /// @dev set up the channel token
         _setupNewToken(uri, 0, _implementation());
 
         if (setupActions.length > 0) {
             multicall(setupActions);
         }
 
-        /// revoke admin for deployer
+        /// @dev revoke admin for deployer
         _revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
@@ -106,6 +107,10 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     function updateChannelTokenUri(string calldata uri) external onlyAdminOrManager {
         tokens[0].uri = uri;
         emit TokenURIUpdated(0, uri);
+    }
+
+    function getUserStats(address user) public view returns (UserStats memory) {
+        return userStats[user];
     }
 
     /**
@@ -170,8 +175,12 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     {
         tokenId = _setupNewToken(uri, maxSupply, author);
 
-        _processNewToken(tokenId);
+        /// @dev increment the sponsor's numCreations
+        userStats[msg.sender].numCreations += 1;
 
+        _transportProcessNewToken(tokenId);
+
+        /// @dev msg.sender used instead of author to allow for onchain sponsorships
         _validateCreatorLogic(msg.sender);
     }
 
@@ -195,7 +204,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         nonReentrant
     {
         (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
-        _mintBatchWithETH(to, ids, amounts, data, mintReferral);
+        _mintBatchWithETH(to, ids, amounts, mintReferral, data);
     }
 
     /**
@@ -217,7 +226,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         nonReentrant
     {
         (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
-        _mintBatchWithERC20(to, ids, amounts, data, mintReferral);
+        _mintBatchWithERC20(to, ids, amounts, mintReferral, data);
     }
 
     /**
@@ -225,21 +234,21 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
      * @param to address to mint to
      * @param ids token ids to mint
      * @param amounts amounts to mint
-     * @param data mint data
      * @param mintReferral referral address for minting
+     * @param data mint data
      */
     function mintBatchWithETH(
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
+        address mintReferral,
+        bytes memory data
     )
         external
         payable
         nonReentrant
     {
-        _mintBatchWithETH(to, ids, amounts, data, mintReferral);
+        _mintBatchWithETH(to, ids, amounts, mintReferral, data);
     }
 
     /**
@@ -247,21 +256,21 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
      * @param to address to mint to
      * @param ids token ids to mint
      * @param amounts amounts to mint
-     * @param data mint data
      * @param mintReferral referral address for minting
+     * @param data mint data
      */
     function mintBatchWithERC20(
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
+        address mintReferral,
+        bytes memory data
     )
         external
         payable
         nonReentrant
     {
-        _mintBatchWithERC20(to, ids, amounts, data, mintReferral);
+        _mintBatchWithERC20(to, ids, amounts, mintReferral, data);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -321,51 +330,102 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
+        address mintReferral,
+        bytes memory data
     )
         internal
     {
+        address[] memory creators = new address[](ids.length);
+        address[] memory referrals = new address[](ids.length);
+        address[] memory sponsors = new address[](ids.length);
+        uint256 totalMints = 0;
+
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
-            _processMint(ids[i]);
             _checkMintRequirements(token, amounts[i]);
-            _handleETHSplit(token, amounts[i], mintReferral);
+
+            tokens[ids[i]].totalMinted += amounts[i];
+
+            /// @dev increment the minter's numMints
+            userStats[msg.sender].numMints += amounts[i];
+
+            _transportProcessMint(ids[i]);
+
+            creators[i] = token.author;
+            referrals[i] = mintReferral;
+            sponsors[i] = token.sponsor;
         }
+
+        // /// @dev increment the minter's numMints
+        // userStats[msg.sender].numMints += totalMints;
+
+        _handleETHSplit(creators, referrals, sponsors, amounts, mintReferral);
+
         _mintBatch(to, ids, amounts, data);
         _validateMinterLogic(msg.sender);
-        emit TokenMinted(to, mintReferral, ids, amounts);
+        emit TokenMinted(to, mintReferral, ids, amounts, data);
     }
 
     function _mintBatchWithERC20(
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
+        address mintReferral,
+        bytes memory data
+    )
+        internal
+    {
+        address[] memory creators = new address[](ids.length);
+        address[] memory referrals = new address[](ids.length);
+        address[] memory sponsors = new address[](ids.length);
+
+        for (uint256 i = 0; i < ids.length; i++) {
+            TokenConfig memory token = tokens[ids[i]];
+            _checkMintRequirements(token, amounts[i]);
+
+            tokens[ids[i]].totalMinted += amounts[i];
+            userStats[msg.sender].numMints += amounts[i];
+
+            _transportProcessMint(ids[i]);
+
+            creators[i] = token.author;
+            referrals[i] = mintReferral;
+            sponsors[i] = token.sponsor;
+        }
+
+        // generate fee commands with batched data and get one large split
+        _handleERC20Split(creators, referrals, sponsors, amounts, mintReferral);
+
+        _mintBatch(to, ids, amounts, data);
+        _validateMinterLogic(msg.sender);
+        emit TokenMinted(to, mintReferral, ids, amounts, data);
+    }
+
+    function _handleETHSplit(
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts,
         address mintReferral
     )
         internal
     {
-        for (uint256 i = 0; i < ids.length; i++) {
-            TokenConfig memory token = tokens[ids[i]];
-            _processMint(ids[i]);
-            _checkMintRequirements(token, amounts[i]);
-            _handleERC20Split(token, amounts[i], mintReferral);
-        }
-        _mintBatch(to, ids, amounts, data);
-        _validateMinterLogic(msg.sender);
-        emit TokenMinted(to, mintReferral, ids, amounts);
-    }
-
-    function _handleETHSplit(TokenConfig memory token, uint256 amount, address mintReferral) internal {
         if (address(feeContract) != address(0)) {
-            _distributeIncomingSplit(feeContract.requestEthMint(token.author, mintReferral, token.sponsor, amount));
+            _distributePassThroughSplit(feeContract.requestEthMint(creators, referrals, sponsors, amounts));
         }
     }
 
-    function _handleERC20Split(TokenConfig memory token, uint256 amount, address mintReferral) internal {
+    function _handleERC20Split(
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts,
+        address mintReferral
+    )
+        internal
+    {
         if (address(feeContract) != address(0)) {
-            _distributeIncomingSplit(feeContract.requestErc20Mint(token.author, mintReferral, token.sponsor, amount));
+            _distributePassThroughSplit(feeContract.requestErc20Mint(creators, referrals, sponsors, amounts));
         }
     }
 

@@ -4,12 +4,19 @@ pragma solidity ^0.8.0;
 import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 
 interface ILogic is IVersionedContract {
+    enum InteractionPowerType {
+        UNIFORM,
+        WEIGHTED
+    }
+
     struct InteractionLogic {
         address[] targets;
         bytes4[] signatures;
         bytes[] datas;
         bytes[] operators;
         bytes[] literalOperands;
+        InteractionPowerType[] interactionPowerType;
+        uint256[] interactionPower;
     }
 
     struct ApprovedSignature {

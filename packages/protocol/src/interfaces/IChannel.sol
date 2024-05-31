@@ -18,7 +18,9 @@ interface IChannel {
     }
 
     event TokenCreated(uint256 indexed tokenId, ChannelStorage.TokenConfig token);
-    event TokenMinted(address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts);
+    event TokenMinted(
+        address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts, bytes data
+    );
 
     event TokenURIUpdated(uint256 indexed tokenId, string uri);
     event ConfigUpdated(
@@ -28,17 +30,17 @@ interface IChannel {
     function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
 
     function initialize(
-        string memory newContractURI,
+        string memory uri,
         address defaultAdmin,
         address[] calldata managers,
         bytes[] calldata setupActions,
-        bytes calldata timing
+        bytes calldata transportConfig
     )
-        external;
+        external
+        payable;
 
     function setFees(address fees, bytes calldata data) external;
     function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
-    function setTiming(bytes calldata data) external;
     function updateChannelTokenUri(string calldata uri) external;
     function createToken(string calldata uri, address author, uint256 maxSupply) external returns (uint256 tokenId);
     function mint(
@@ -63,8 +65,8 @@ interface IChannel {
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
+        address mintReferral,
+        bytes memory data
     )
         external
         payable;
@@ -72,8 +74,8 @@ interface IChannel {
         address to,
         uint256[] memory ids,
         uint256[] memory amounts,
-        bytes memory data,
-        address mintReferral
+        address mintReferral,
+        bytes memory data
     )
         external
         payable;

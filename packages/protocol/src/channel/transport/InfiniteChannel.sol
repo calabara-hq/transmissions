@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
-import { Channel } from "./Channel.sol";
+import { IVersionedContract } from "../../interfaces/IVersionedContract.sol";
+import { Channel } from "../Channel.sol";
 
 /**
  * @title InfiniteChannel
  * @author nick
  *
- * Infinite channels run "forever". The channel will indefinitely accept new tokens.
- * A global saleDuration is set, which is used to calculate the sale end for each new token.
+ * @dev Infinite channels run "forever". The channel will indefinitely accept new tokens.
+ * @dev A global saleDuration is set, which is used to calculate the sale end for each new token.
  */
 contract InfiniteChannel is Channel, IVersionedContract {
     error SALE_OVER();
-    error INVALID_DURATION();
+    error INVALID_TIMING();
 
     event TokenSaleSet(address indexed caller, uint256 indexed tokenId, uint40 saleEnd);
 
@@ -32,7 +32,8 @@ contract InfiniteChannel is Channel, IVersionedContract {
      * @notice Set the sale duration for a channel
      * @param data encoded duration
      */
-    function setTiming(bytes calldata data) public override onlyAdminOrManager {
+    function setTransportConfig(bytes calldata data) public payable override onlyAdminOrManager {
+        if (msg.value > 0) revert("This function does not accept ether");
         uint40 duration = abi.decode(data, (uint40));
         _setDuration(duration);
     }
@@ -42,15 +43,15 @@ contract InfiniteChannel is Channel, IVersionedContract {
     /* -------------------------------------------------------------------------- */
 
     function _setDuration(uint40 _duration) internal {
-        if (_duration == 0) revert INVALID_DURATION();
+        if (_duration == 0) revert INVALID_TIMING();
         saleDuration = _duration;
     }
 
-    function _processNewToken(uint256 tokenId) internal override {
+    function _transportProcessNewToken(uint256 tokenId) internal override {
         _setTokenSale(tokenId);
     }
 
-    function _processMint(uint256 tokenId) internal view override {
+    function _transportProcessMint(uint256 tokenId) internal override {
         if (block.timestamp > saleEnd[tokenId]) {
             revert SALE_OVER();
         }

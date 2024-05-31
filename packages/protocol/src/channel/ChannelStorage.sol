@@ -19,6 +19,16 @@ contract ChannelStorage {
     /// @dev channel logic contract
     ILogic public logicContract;
 
+    /// @dev user stats
+    mapping(address => UserStats) public userStats;
+
+    struct UserStats {
+        /// @dev number of tokens created by user
+        uint256 numCreations;
+        /// @dev number of tokens minted by user
+        uint256 numMints;
+    }
+
     struct TokenConfig {
         /// @dev token uri
         string uri;

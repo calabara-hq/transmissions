@@ -19,19 +19,19 @@ interface IFees is IVersionedContract {
     function getEthMintPrice() external view returns (uint256);
     function getErc20MintPrice() external view returns (uint256);
     function requestEthMint(
-        address creator,
-        address referral,
-        address sponsor,
-        uint256 amount
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts
     )
         external
         view
         returns (IRewards.Split memory);
     function requestErc20Mint(
-        address creator,
-        address referral,
-        address sponsor,
-        uint256 amount
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts
     )
         external
         view

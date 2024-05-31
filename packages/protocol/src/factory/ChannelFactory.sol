@@ -5,6 +5,7 @@ import { IChannel } from "../channel/Channel.sol";
 import { IChannelFactory } from "../interfaces/IChannelFactory.sol";
 import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 
+import { FiniteUplink1155 } from "../proxies/FiniteUplink1155.sol";
 import { InfiniteUplink1155 } from "../proxies/InfiniteUplink1155.sol";
 import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -36,25 +37,19 @@ import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/
  */
 contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     address public immutable infiniteChannelImpl;
+    address public immutable finiteChannelImpl;
 
-    constructor(address _infiniteChannelImpl) initializer {
-        if (_infiniteChannelImpl == address(0)) {
+    constructor(address _infiniteChannelImpl, address _finiteChannelImpl) initializer {
+        if (_infiniteChannelImpl == address(0) || _finiteChannelImpl == address(0)) {
             revert AddressZero();
         }
         infiniteChannelImpl = _infiniteChannelImpl;
+        finiteChannelImpl = _finiteChannelImpl;
     }
 
-    /**
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     *   EXTERNAL FUNCTIONS
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     */
-
-    /**
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     *   PUBLIC FUNCTIONS
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     */
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
 
     /**
      * @notice Factory initializer
@@ -69,10 +64,10 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
     /**
      * @notice Create a new infinite channel
      * @param uri string URI for the channel
-     * @param defaultAdmin address default admin
+     * @param defaultAdmin address of default admin
      * @param managers address[] channel managers
      * @param setupActions bytes[] setup actions
-     * @param timing bytes timing data
+     * @param transportConfig bytes transport config
      * @return address deployed contract address
      */
     function createInfiniteChannel(
@@ -80,22 +75,43 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         address defaultAdmin,
         address[] calldata managers,
         bytes[] calldata setupActions,
-        bytes calldata timing
+        bytes calldata transportConfig
     )
         external
         returns (address)
     {
         InfiniteUplink1155 newContract = new InfiniteUplink1155(infiniteChannelImpl);
-        _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, timing);
+        _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
         return address(newContract);
     }
 
     /**
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     *   INTERNAL FUNCTIONS
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+     * @notice Create a new finite channel
+     * @param uri string URI for the channel
+     * @param defaultAdmin address of default admin
+     * @param managers address[] channel managers
+     * @param setupActions bytes[] setup actions
+     * @param transportConfig bytes transport config
+     * @return address deployed contract address
      */
+    function createFiniteChannel(
+        string calldata uri,
+        address defaultAdmin,
+        address[] calldata managers,
+        bytes[] calldata setupActions,
+        bytes calldata transportConfig
+    )
+        external
+        returns (address)
+    {
+        FiniteUplink1155 newContract = new FiniteUplink1155(infiniteChannelImpl);
+        _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
+        return address(newContract);
+    }
 
+    /* -------------------------------------------------------------------------- */
+    /*                             INTERNAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
     /**
      * @notice Authorize factory upgrade
      * @param newImplementation address of the new implementation
@@ -108,12 +124,9 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         }
     }
 
-    /**
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     *   PRIVATE FUNCTIONS
-     * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-     */
-
+    /* -------------------------------------------------------------------------- */
+    /*                              PRIVATE FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
     /**
      * @notice Internal helper to deploy a new channel
      * @param newContract address of the new contract
@@ -121,7 +134,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
      * @param defaultAdmin address default admin
      * @param managers address[] channel managers
      * @param setupActions bytes[] setup actions
-     * @param timing bytes timing data
+     * @param transportConfig bytes transportConfig
      */
     function _initializeContract(
         address newContract,
@@ -129,12 +142,12 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         address defaultAdmin,
         address[] calldata managers,
         bytes[] calldata setupActions,
-        bytes calldata timing
+        bytes calldata transportConfig
     )
         private
     {
-        emit SetupNewContract(newContract, uri, defaultAdmin, managers, timing);
-        IChannel(newContract).initialize(uri, defaultAdmin, managers, setupActions, timing);
+        emit SetupNewContract(newContract, uri, defaultAdmin, managers, transportConfig);
+        IChannel(newContract).initialize(uri, defaultAdmin, managers, setupActions, transportConfig);
     }
 
     /* -------------------------------------------------------------------------- */

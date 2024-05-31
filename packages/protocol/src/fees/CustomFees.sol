@@ -103,10 +103,10 @@ contract CustomFees is IFees {
     }
 
     function requestEthMint(
-        address creator,
-        address referral,
-        address sponsor,
-        uint256 amount
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts
     )
         external
         view
@@ -114,14 +114,14 @@ contract CustomFees is IFees {
     {
         FeeConfig memory feeConfig = channelFees[msg.sender];
         if (feeConfig.ethMintPrice == 0) revert INVALID_ETH_MINT_PRICE();
-        return _requestMint(NATIVE_TOKEN, feeConfig, creator, referral, sponsor, amount);
+        return _requestMint(NATIVE_TOKEN, feeConfig, creators, referrals, sponsors, amounts);
     }
 
     function requestErc20Mint(
-        address creator,
-        address referral,
-        address sponsor,
-        uint256 amount
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts
     )
         external
         view
@@ -132,7 +132,7 @@ contract CustomFees is IFees {
             revert ERC20_MINTING_DISABLED();
         }
 
-        return _requestMint(feeConfig.erc20Contract, feeConfig, creator, referral, sponsor, amount);
+        return _requestMint(feeConfig.erc20Contract, feeConfig, creators, referrals, sponsors, amounts);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -142,86 +142,88 @@ contract CustomFees is IFees {
     function _requestMint(
         address token,
         FeeConfig memory feeConfig,
-        address creator,
-        address referral,
-        address sponsor,
-        uint256 amount
+        address[] memory creators,
+        address[] memory referrals,
+        address[] memory sponsors,
+        uint256[] memory amounts
     )
         internal
         view
         returns (IRewards.Split memory)
     {
-        if (creator == address(0) || sponsor == address(0)) revert ADDRESS_ZERO();
+        uint256 creatorsLength = creators.length;
+        address[] memory _recipients = new address[](creatorsLength * 5);
+        uint256[] memory _allocations = new uint256[](creatorsLength * 5);
 
-        address[] memory _recipients = new address[](5);
-        uint256[] memory _allocations = new uint256[](5);
-
-        uint8 commandCount = 0;
+        uint256 totalValue = 0;
+        uint256 commandCount = 0;
+        uint256 totalAmount = 0;
 
         bool isNative = _isNativeToken(token);
+        uint256 mintPrice = isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice;
 
-        if (feeConfig.mintReferralBps > 0) {
-            if (referral == address(0)) {
-                // if no referral, add it to the channel bps
-                feeConfig.channelBps += feeConfig.mintReferralBps;
-            } else {
-                _recipients[commandCount] = referral;
-                _allocations[commandCount] = amount
-                    * _calculateSplitFromBps(
-                        isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.mintReferralBps
-                    );
+        for (uint256 i = 0; i < creatorsLength; i++) {
+            address creator = creators[i];
+            address sponsor = sponsors[i];
+            uint256 amount = amounts[i];
+
+            if (creator == address(0) || sponsor == address(0)) revert ADDRESS_ZERO();
+
+            totalAmount += amount;
+
+            if (feeConfig.mintReferralBps > 0) {
+                address referral = referrals[i];
+                if (referral == address(0)) {
+                    feeConfig.channelBps += feeConfig.mintReferralBps;
+                } else {
+                    _recipients[commandCount] = referral;
+                    _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.mintReferralBps);
+                    commandCount++;
+                }
+            }
+
+            if (feeConfig.sponsorBps > 0) {
+                _recipients[commandCount] = sponsor;
+                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.sponsorBps);
                 commandCount++;
             }
-        }
 
-        if (feeConfig.sponsorBps > 0) {
-            _recipients[commandCount] = sponsor;
-            _allocations[commandCount] = amount
-                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.sponsorBps);
-            commandCount++;
-        }
-
-        if (feeConfig.uplinkBps > 0) {
-            _recipients[commandCount] = uplinkRewardsAddress;
-            _allocations[commandCount] = amount
-                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.uplinkBps);
-            commandCount++;
-        }
-
-        if (feeConfig.channelBps > 0) {
-            if (feeConfig.channelTreasury == address(0)) {
-                // if no channel treasury, add to creator bps
-                feeConfig.creatorBps += feeConfig.channelBps;
-            } else {
-                _recipients[commandCount] = feeConfig.channelTreasury;
-                _allocations[commandCount] = amount
-                    * _calculateSplitFromBps(
-                        isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.channelBps
-                    );
+            if (feeConfig.uplinkBps > 0) {
+                _recipients[commandCount] = uplinkRewardsAddress;
+                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.uplinkBps);
                 commandCount++;
             }
-        }
 
-        if (feeConfig.creatorBps > 0) {
-            _recipients[commandCount] = creator;
-            _allocations[commandCount] = amount
-                * _calculateSplitFromBps(isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice, feeConfig.creatorBps);
-            commandCount++;
+            if (feeConfig.channelBps > 0) {
+                address channelTreasury = feeConfig.channelTreasury;
+                if (channelTreasury == address(0)) {
+                    feeConfig.creatorBps += feeConfig.channelBps;
+                } else {
+                    _recipients[commandCount] = channelTreasury;
+                    _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.channelBps);
+                    commandCount++;
+                }
+            }
+
+            if (feeConfig.creatorBps > 0) {
+                _recipients[commandCount] = creator;
+                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.creatorBps);
+                commandCount++;
+            }
         }
 
         address[] memory recipients = new address[](commandCount);
         uint256[] memory allocations = new uint256[](commandCount);
 
-        uint256 totalValue;
-
         for (uint256 i = 0; i < commandCount; i++) {
             recipients[i] = _recipients[i];
-            allocations[i] = _allocations[i];
-            totalValue += _allocations[i];
+            uint256 allocation = _allocations[i];
+            allocations[i] = allocation;
+            totalValue += allocation;
         }
 
         if (commandCount > 0) {
-            if (totalValue != amount * (isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice)) {
+            if (totalValue != totalAmount * mintPrice) {
                 revert TOTAL_VALUE_MISMATCH();
             }
         }

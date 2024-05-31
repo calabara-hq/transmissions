@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import { IUpgradePath } from "../interfaces/IUpgradePath.sol";
+
 import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
@@ -13,6 +14,10 @@ contract UpgradePath is IUpgradePath, OwnableUpgradeable {
 
     constructor() { }
 
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
+
     /**
      * @notice Factory initializer
      * @param _initOwner address of the owner
@@ -20,20 +25,6 @@ contract UpgradePath is IUpgradePath, OwnableUpgradeable {
     function initialize(address _initOwner) external initializer {
         __Ownable_init(_initOwner);
         emit UpgradePathContractInitialized();
-    }
-
-    /**
-     * @notice The URI of the upgrade path contract
-     */
-    function contractURI() external pure returns (string memory) {
-        return "https://github.com/calabara-hq/transmissions/";
-    }
-
-    /**
-     * @notice The name of the upgrade path contract
-     */
-    function contractName() external pure returns (string memory) {
-        return "Uplink Channel Upgrade Path";
     }
 
     /**
@@ -68,5 +59,33 @@ contract UpgradePath is IUpgradePath, OwnableUpgradeable {
         delete isAllowedUpgrade[baseImpl][upgradeImpl];
 
         emit UpgradeRemoved(baseImpl, upgradeImpl);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                  VERSIONING                                */
+    /* -------------------------------------------------------------------------- */
+
+    /**
+     * @notice Returns the contract version
+     * @return string contract version
+     */
+    function contractVersion() external pure returns (string memory) {
+        return "1.0.0";
+    }
+
+    /**
+     * @notice Returns the contract uri
+     * @return string contract uri
+     */
+    function contractURI() external pure returns (string memory) {
+        return "https://github.com/calabara-hq/transmissions/packages/protocol";
+    }
+
+    /**
+     * @notice Returns the contract name
+     * @return string contract name
+     */
+    function contractName() external pure returns (string memory) {
+        return "Upgrade Path";
     }
 }

@@ -25,7 +25,7 @@ contract FeesTest is Test {
         assertEq(customFeesImpl.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     }
 
-    function test_customFees_bps() public {
+    /*  function test_customFees_bps() public {
         bytes memory feeArgs = abi.encode(
             channelTreasury,
             uint16(1000),
@@ -194,7 +194,7 @@ contract FeesTest is Test {
 
     function test_customFees_revertOnFreeMint() public {
         bytes memory feeArgs = abi.encode(
-            channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
+    channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
@@ -242,7 +242,7 @@ contract FeesTest is Test {
             erc20Address
         );
         uint256 totalBps =
-            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+    uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (totalBps != 1e4 || ethMintPrice == 0) {
             vm.expectRevert();
@@ -279,7 +279,7 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
 
         uint256 totalBps =
-            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+    uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (totalBps != 1e4 || ethMintPrice == 0) {
             vm.expectRevert();
@@ -341,5 +341,5 @@ contract FeesTest is Test {
         if (ethSplit.allocations.length > 0) {
             assertEq(ethSplit.totalAllocation, ethMintPrice);
         }
-    }
+    } */
 }

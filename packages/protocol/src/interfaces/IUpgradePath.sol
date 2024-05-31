@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IUpgradePath {
+import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
+
+interface IUpgradePath is IVersionedContract {
     event UpgradePathContractInitialized();
+    event UpgradeRegistered(address indexed baseImpl, address indexed upgradeImpl);
+    event UpgradeRemoved(address indexed baseImpl, address indexed upgradeImpl);
 
     function initialize(address _initOwner) external;
 
@@ -11,7 +15,4 @@ interface IUpgradePath {
     function registerUpgradePath(address[] memory baseImpls, address upgradeImpl) external;
 
     function removeUpgradePath(address baseImpl, address upgradeImpl) external;
-
-    event UpgradeRegistered(address indexed baseImpl, address indexed upgradeImpl);
-    event UpgradeRemoved(address indexed baseImpl, address indexed upgradeImpl);
 }

@@ -7,17 +7,27 @@ interface IChannelFactory is IVersionedContract {
     error AddressZero();
     error InvalidUpgrade();
 
-    event SetupNewContract(
-        address indexed contractAddress, string uri, address defaultAdmin, address[] managers, bytes timing
-    );
     event FactoryInitialized();
+    event SetupNewContract(
+        address indexed contractAddress, string uri, address defaultAdmin, address[] managers, bytes transportConfig
+    );
 
     function createInfiniteChannel(
         string calldata uri,
         address defaultAdmin,
         address[] calldata managers,
         bytes[] calldata setupActions,
-        bytes calldata timing
+        bytes calldata transportConfig
+    )
+        external
+        returns (address);
+
+    function createFiniteChannel(
+        string calldata uri,
+        address defaultAdmin,
+        address[] calldata managers,
+        bytes[] calldata setupActions,
+        bytes calldata transportConfig
     )
         external
         returns (address);

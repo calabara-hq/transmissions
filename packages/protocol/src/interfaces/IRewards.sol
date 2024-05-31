@@ -6,6 +6,7 @@ interface IRewards {
     error SPLIT_LENGTH_MISMATCH();
     error INVALID_TOTAL_ALLOCATION();
     error ERC20_TRANSFER_FAILED();
+    error INSUFFICIENT_BALANCE();
 
     event ERC20Transferred(address indexed spender, address indexed recipient, uint256 amount, address indexed token);
     event ETHTransferred(address indexed spender, address indexed recipient, uint256 amount);
@@ -15,10 +16,5 @@ interface IRewards {
         uint256[] allocations;
         uint256 totalAllocation;
         address token;
-    }
-
-    struct SplitReceipt {
-        Split split;
-        bool fulfilled;
     }
 }

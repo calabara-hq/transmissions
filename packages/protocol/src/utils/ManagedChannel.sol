@@ -143,13 +143,13 @@ contract ManagedChannel is
 
     function _requireAdminOrManager(address account) internal view {
         if (!hasRole(DEFAULT_ADMIN_ROLE, account) && !hasRole(MANAGER_ROLE, account)) {
-            revert UNAUTHORIZED();
+            revert Unauthorized();
         }
     }
 
     function _requireAdmin(address account) internal view {
         if (!hasRole(DEFAULT_ADMIN_ROLE, account)) {
-            revert UNAUTHORIZED();
+            revert Unauthorized();
         }
     }
 
@@ -159,7 +159,7 @@ contract ManagedChannel is
 
     function _authorizeUpgrade(address newImplementation) internal view override onlyAdminOrManager {
         if (!upgradePath.isRegisteredUpgradePath(_implementation(), newImplementation)) {
-            revert INVALID_UPGRADE();
+            revert InvalidUpgrade();
         }
     }
 
