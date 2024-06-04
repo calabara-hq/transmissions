@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import { Channel } from "../../src/channel/Channel.sol";
 
 import { FiniteChannel } from "../../src/channel/transport/FiniteChannel.sol";
+
 import { InfiniteChannel } from "../../src/channel/transport/InfiniteChannel.sol";
 import { Test, console } from "forge-std/Test.sol";
 
@@ -11,6 +12,7 @@ import { IUpgradePath } from "../../src/interfaces/IUpgradePath.sol";
 import { UpgradePath } from "../../src/utils/UpgradePath.sol";
 import { Test, console } from "forge-std/Test.sol";
 
+import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { FiniteUplink1155 } from "../../src/proxies/FiniteUplink1155.sol";
 import { InfiniteUplink1155 } from "../../src/proxies/InfiniteUplink1155.sol";
 
@@ -57,13 +59,11 @@ contract ChannelTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 1),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: 100,
-                    userMintLimit: 100,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: ranks,
                         allocations: allocations,
                         totalAllocation: 100 ether,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+                        token: NativeTokenLib.NATIVE_TOKEN
                     })
                 })
             )
@@ -79,7 +79,7 @@ contract ChannelTest is Test {
         vm.startPrank(admin);
 
         vm.expectEmit();
-        emit IUpgradePath.UpgradeRegistered(oldImpls[0], newImpl);
+        emit UpgradePath.UpgradeRegistered(oldImpls[0], newImpl);
         upgradePath.registerUpgradePath(oldImpls, newImpl);
 
         vm.expectEmit();
@@ -87,7 +87,7 @@ contract ChannelTest is Test {
         proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
 
         vm.expectEmit();
-        emit IUpgradePath.UpgradeRemoved(oldImpls[0], newImpl);
+        emit UpgradePath.UpgradeRemoved(oldImpls[0], newImpl);
         upgradePath.removeUpgradePath(oldImpls[0], newImpl);
 
         vm.stopPrank();

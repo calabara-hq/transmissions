@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import { IFees } from "../fees/CustomFees.sol";
-import { ILogic } from "../logic/Logic.sol";
+import { IFees } from "../interfaces/IFees.sol";
+import { ILogic } from "../interfaces/ILogic.sol";
+import { IUpgradePath } from "../interfaces/IUpgradePath.sol";
 
-import { IUpgradePath } from "../utils/UpgradePath.sol";
 /// @notice Channel Storage
-/// @author @nickddsn
+/// @author @nick
 
 contract ChannelStorage {
     /// @dev channel tokens

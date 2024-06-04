@@ -4,29 +4,6 @@ pragma solidity ^0.8.0;
 import { ChannelStorage } from "../channel/ChannelStorage.sol";
 
 interface IChannel {
-    error FALSY_LOGIC();
-    error NotMintable();
-    error SoldOut();
-    error InvalidAmount();
-    error InvalidValueSent();
-    error DepositMismatch();
-    error ADDRESS_ZERO();
-
-    enum ConfigUpdate {
-        FEE_CONTRACT,
-        LOGIC_CONTRACT
-    }
-
-    event TokenCreated(uint256 indexed tokenId, ChannelStorage.TokenConfig token);
-    event TokenMinted(
-        address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts, bytes data
-    );
-
-    event TokenURIUpdated(uint256 indexed tokenId, string uri);
-    event ConfigUpdated(
-        address indexed updater, ConfigUpdate indexed updateType, address feeContract, address logicContract
-    );
-
     function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
 
     function initialize(

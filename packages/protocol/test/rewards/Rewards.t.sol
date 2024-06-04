@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IRewards } from "../../src/interfaces/IRewards.sol";
 import { Rewards } from "../../src/rewards/Rewards.sol";
 import { MockERC20 } from "../utils/TokenHelpers.t.sol";
 
+import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { WETH } from "../utils/WETH.t.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Test, console } from "forge-std/Test.sol";
@@ -12,7 +12,9 @@ import { Test, console } from "forge-std/Test.sol";
 contract RewardsHarness is Rewards {
     constructor(address weth) Rewards(weth) { }
 
-    function distributePassThroughSplit(IRewards.Split memory split) external payable {
+    using NativeTokenLib for address;
+
+    function distributePassThroughSplit(Rewards.Split memory split) external payable {
         _distributePassThroughSplit(split);
     }
 
@@ -20,7 +22,7 @@ contract RewardsHarness is Rewards {
         _depositToEscrow(token, amount);
     }
 
-    function distributeEscrowSplit(IRewards.Split memory split) external {
+    function distributeEscrowSplit(Rewards.Split memory split) external {
         _distributeEscrowSplit(split);
     }
 
@@ -61,11 +63,11 @@ contract RewardsTest is Test {
         allocations[1] = 200;
         totalAllocation += 200;
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
-            token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+            token: NativeTokenLib.NATIVE_TOKEN
         });
 
         vm.deal(nick, totalAllocation);
@@ -92,7 +94,7 @@ contract RewardsTest is Test {
         allocations[1] = 200_000;
         totalAllocation += 200_000;
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
@@ -123,11 +125,11 @@ contract RewardsTest is Test {
         allocations[1] = 200;
         totalAllocation += 200;
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
-            token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+            token: NativeTokenLib.NATIVE_TOKEN
         });
 
         vm.deal(nick, totalAllocation);
@@ -157,19 +159,17 @@ contract RewardsTest is Test {
         allocations[1] = 200;
         totalAllocation += 200;
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
-            token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+            token: NativeTokenLib.NATIVE_TOKEN
         });
 
         vm.deal(nick, totalAllocation);
         vm.startPrank(nick);
 
-        rewardsImpl.depositToEscrow{ value: totalAllocation }(
-            0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, totalAllocation
-        );
+        rewardsImpl.depositToEscrow{ value: totalAllocation }(NativeTokenLib.NATIVE_TOKEN, totalAllocation);
 
         rewardsImpl.distributeEscrowSplit(split);
 
@@ -186,7 +186,7 @@ contract RewardsTest is Test {
     function test_rewards_depositEscrowETH(uint256 amount) public {
         vm.deal(nick, amount);
         vm.startPrank(nick);
-        rewardsImpl.depositToEscrow{ value: amount }(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, amount);
+        rewardsImpl.depositToEscrow{ value: amount }(NativeTokenLib.NATIVE_TOKEN, amount);
         assertEq(address(rewardsImpl).balance, amount);
         vm.stopPrank();
     }
@@ -203,8 +203,8 @@ contract RewardsTest is Test {
     function test_rewards_withdrawETHFromEscrow(uint256 amount) public {
         vm.deal(nick, amount);
         vm.startPrank(nick);
-        rewardsImpl.depositToEscrow{ value: amount }(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, amount);
-        rewardsImpl.withdrawFromEscrow(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, nick, amount);
+        rewardsImpl.depositToEscrow{ value: amount }(NativeTokenLib.NATIVE_TOKEN, amount);
+        rewardsImpl.withdrawFromEscrow(NativeTokenLib.NATIVE_TOKEN, nick, amount);
         assertEq(address(rewardsImpl).balance, 0);
         assertEq(nick.balance, amount);
         vm.stopPrank();
@@ -235,19 +235,17 @@ contract RewardsTest is Test {
             recipients[i] = vm.addr(i + 1);
         }
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
-            token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+            token: NativeTokenLib.NATIVE_TOKEN
         });
 
         vm.deal(nick, totalAllocation);
         vm.startPrank(nick);
 
-        rewardsImpl.depositToEscrow{ value: totalAllocation }(
-            0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, totalAllocation
-        );
+        rewardsImpl.depositToEscrow{ value: totalAllocation }(NativeTokenLib.NATIVE_TOKEN, totalAllocation);
         vm.stopPrank();
 
         vm.assume(totalAllocation > 0);
@@ -275,7 +273,7 @@ contract RewardsTest is Test {
             recipients[i] = vm.addr(i + 1);
         }
 
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: recipients,
             allocations: allocations,
             totalAllocation: totalAllocation,
@@ -318,19 +316,19 @@ contract RewardsTest is Test {
         }
 
         if (recipients.length != allocations.length) {
-            vm.expectRevert(IRewards.SPLIT_LENGTH_MISMATCH.selector);
+            vm.expectRevert(Rewards.SplitLengthMismatch.selector);
             rewardsImpl.validateIncomingAllocations(recipients, allocations, _totalAllocation);
             return;
         }
 
         if (_totalAllocation == 0) {
-            vm.expectRevert(IRewards.INVALID_TOTAL_ALLOCATION.selector);
+            vm.expectRevert(Rewards.InvalidTotalAllocation.selector);
             rewardsImpl.validateIncomingAllocations(recipients, allocations, _totalAllocation);
             return;
         }
 
         if (totalAllocation != _totalAllocation) {
-            vm.expectRevert(IRewards.INVALID_TOTAL_ALLOCATION.selector);
+            vm.expectRevert(Rewards.InvalidTotalAllocation.selector);
             rewardsImpl.validateIncomingAllocations(recipients, allocations, _totalAllocation);
             return;
         }
@@ -345,14 +343,14 @@ contract RewardsTest is Test {
 
         if (amount != value) {
             /// fn should revert with any amount / value mismatch
-            vm.expectRevert(IRewards.INVALID_AMOUNT_SENT.selector);
-            rewardsImpl.validateIncomingValue{ value: value }(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, amount);
+            vm.expectRevert(Rewards.InvalidAmountSent.selector);
+            rewardsImpl.validateIncomingValue{ value: value }(NativeTokenLib.NATIVE_TOKEN, amount);
             return;
         }
 
         if (value != 0) {
             /// fn should revert with any value sent alongside an erc20 deposit
-            vm.expectRevert(IRewards.INVALID_AMOUNT_SENT.selector);
+            vm.expectRevert(Rewards.InvalidAmountSent.selector);
             rewardsImpl.validateIncomingValue{ value: value }(address(erc20Token), amount);
             return;
         }
@@ -360,7 +358,7 @@ contract RewardsTest is Test {
         /// fn should not revert with a matching amount / value pair
 
         rewardsImpl.validateIncomingValue(address(erc20Token), amount);
-        rewardsImpl.validateIncomingValue{ value: value }(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE, amount);
+        rewardsImpl.validateIncomingValue{ value: value }(NativeTokenLib.NATIVE_TOKEN, amount);
         vm.stopPrank();
     }
 }

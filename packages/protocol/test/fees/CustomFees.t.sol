@@ -3,17 +3,35 @@ pragma solidity ^0.8.0;
 
 import { CustomFees } from "../../src/fees/CustomFees.sol";
 import { IFees } from "../../src/interfaces/IFees.sol";
-
-import { IRewards } from "../../src/interfaces/IRewards.sol";
+import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { Rewards } from "../../src/rewards/Rewards.sol";
 import { MockERC20 } from "../utils/TokenHelpers.t.sol";
+
+import { WETH } from "../utils/WETH.t.sol";
 import { Test, console } from "forge-std/Test.sol";
+
+contract RewardsHarness is Rewards {
+    constructor(address weth) Rewards(weth) { }
+
+    using NativeTokenLib for address;
+
+    function distributePassThroughSplit(Rewards.Split memory split) external payable {
+        _distributePassThroughSplit(split);
+    }
+}
 
 contract FeesTest is Test {
     address nick = makeAddr("nick");
     address uplinkRewardsAddr = makeAddr("uplink");
     address targetChannel = makeAddr("targetChannel");
     address channelTreasury = makeAddr("channelTreasury");
+
+    address creator = makeAddr("creator");
+    address referral = makeAddr("referral");
+    address sponsor = makeAddr("sponsor");
+
+    address weth = address(new WETH());
+    RewardsHarness rewardsImpl = new RewardsHarness(weth);
 
     IFees customFeesImpl = new CustomFees(uplinkRewardsAddr);
 
@@ -25,7 +43,34 @@ contract FeesTest is Test {
         assertEq(customFeesImpl.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     }
 
-    /*  function test_customFees_bps() public {
+    function _mockBatchedMint(
+        address creator,
+        address referral,
+        address sponsor,
+        uint256 batchSize
+    )
+        internal
+        returns (Rewards.Split memory, Rewards.Split memory)
+    {
+        address[] memory creators = new address[](batchSize);
+        address[] memory sponsors = new address[](batchSize);
+        uint256[] memory amounts = new uint256[](batchSize);
+
+        for (uint256 i = 0; i < batchSize; i++) {
+            creators[i] = creator;
+            sponsors[i] = sponsor;
+            amounts[i] = 1;
+        }
+
+        return (
+            customFeesImpl.requestEthMint(creators, sponsors, amounts, referral),
+            customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral)
+        );
+    }
+
+    function test_customFees_allocations(uint256 batchSize) public {
+        batchSize = bound(batchSize, 1, 100);
+
         bytes memory feeArgs = abi.encode(
             channelTreasury,
             uint16(1000),
@@ -33,7 +78,7 @@ contract FeesTest is Test {
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            777_000_000_000_000,
+            0.000777 ether,
             100_000_000,
             address(erc20Token)
         );
@@ -41,52 +86,38 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
         customFeesImpl.setChannelFees(feeArgs);
 
-        assertEq(customFeesImpl.getEthMintPrice(), 777_000_000_000_000);
+        assertEq(customFeesImpl.getEthMintPrice(), 0.000777 ether);
 
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
-        address sponsor = makeAddr("sponsor");
+        (Rewards.Split memory ethSplit, Rewards.Split memory erc20Split) =
+            _mockBatchedMint(creator, referral, sponsor, batchSize);
 
-        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(creator, referral, sponsor, 1);
+        assertEq(ethSplit.recipients.length, 2 * batchSize + 3);
+        assertEq(ethSplit.allocations.length, 2 * batchSize + 3);
+        assertEq(ethSplit.totalAllocation, 0.000777 ether * batchSize);
+        assertEq(ethSplit.token, NativeTokenLib.NATIVE_TOKEN);
 
-        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(creator, referral, sponsor, 1);
+        vm.deal(targetChannel, 0.000777 ether * batchSize);
+        erc20Token.mint(targetChannel, 100_000_000 * batchSize);
+        erc20Token.approve(address(rewardsImpl), 100_000_000 * batchSize);
 
-        // eth validation
-        assertEq(ethSplit.recipients.length, 5);
-        assertEq(ethSplit.allocations.length, 5);
-        assertEq(ethSplit.totalAllocation, 777_000_000_000_000);
-        assertEq(ethSplit.token, 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+        /// @dev distribute the split
 
-        assertEq(ethSplit.recipients[0], referral);
-        assertEq(ethSplit.recipients[1], sponsor);
-        assertEq(ethSplit.recipients[2], uplinkRewardsAddr);
-        assertEq(ethSplit.recipients[3], channelTreasury);
-        assertEq(ethSplit.recipients[4], creator);
+        rewardsImpl.distributePassThroughSplit{ value: 0.000777 ether * batchSize }(ethSplit);
+        rewardsImpl.distributePassThroughSplit(erc20Split);
 
-        assertEq(ethSplit.allocations[0], 77_700_000_000_000); // 10%
-        assertEq(ethSplit.allocations[1], 77_700_000_000_000); // 10%
-        assertEq(ethSplit.allocations[2], 77_700_000_000_000); // 10%
-        assertEq(ethSplit.allocations[3], 77_700_000_000_000); // 10%
-        assertEq(ethSplit.allocations[4], 466_200_000_000_000); // 60%
+        /// @dev validate the balances of the recipients
 
-        // erc20 validation
+        assertEq(creator.balance, 0.0004662 ether * batchSize);
+        assertEq(sponsor.balance, 0.0000777 ether * batchSize);
+        assertEq(referral.balance, 0.0000777 ether * batchSize);
+        assertEq(uplinkRewardsAddr.balance, 0.0000777 ether * batchSize);
+        assertEq(channelTreasury.balance, 0.0000777 ether * batchSize);
 
-        assertEq(erc20Split.recipients.length, 5);
-        assertEq(erc20Split.allocations.length, 5);
-        assertEq(erc20Split.totalAllocation, 100_000_000);
-        assertEq(erc20Split.token, address(erc20Token));
-
-        assertEq(erc20Split.recipients[0], referral);
-        assertEq(erc20Split.recipients[1], sponsor);
-        assertEq(erc20Split.recipients[2], uplinkRewardsAddr);
-        assertEq(erc20Split.recipients[3], channelTreasury);
-        assertEq(erc20Split.recipients[4], creator);
-
-        assertEq(erc20Split.allocations[0], 10_000_000); // 10%
-        assertEq(erc20Split.allocations[1], 10_000_000); // 10%
-        assertEq(erc20Split.allocations[2], 10_000_000); // 10%
-        assertEq(erc20Split.allocations[3], 10_000_000); // 10%
-        assertEq(erc20Split.allocations[4], 60_000_000); // 60%
+        assertEq(erc20Token.balanceOf(creator), 60_000_000 * batchSize);
+        assertEq(erc20Token.balanceOf(sponsor), 10_000_000 * batchSize);
+        assertEq(erc20Token.balanceOf(referral), 10_000_000 * batchSize);
+        assertEq(erc20Token.balanceOf(uplinkRewardsAddr), 10_000_000 * batchSize);
+        assertEq(erc20Token.balanceOf(channelTreasury), 10_000_000 * batchSize);
 
         vm.stopPrank();
     }
@@ -107,8 +138,8 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
         customFeesImpl.setChannelFees(feeArgs);
 
-        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
-        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+        (Rewards.Split memory ethSplit, Rewards.Split memory erc20Split) =
+            _mockBatchedMint(creator, referral, sponsor, 1);
 
         assertEq(ethSplit.recipients.length, 4);
         assertEq(ethSplit.allocations.length, 4);
@@ -134,8 +165,8 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
         customFeesImpl.setChannelFees(feeArgs);
 
-        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, address(0), nick, 1);
-        IRewards.Split memory erc20Split = customFeesImpl.requestErc20Mint(nick, address(0), nick, 1);
+        (Rewards.Split memory ethSplit, Rewards.Split memory erc20Split) =
+            _mockBatchedMint(creator, address(0), sponsor, 1);
 
         assertEq(ethSplit.recipients.length, 4);
         assertEq(ethSplit.allocations.length, 4);
@@ -147,6 +178,14 @@ contract FeesTest is Test {
     }
 
     function test_customFees_revertOnNullCreator() public {
+        address[] memory creators = new address[](1);
+        address[] memory sponsors = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        creators[0] = address(0);
+        sponsors[0] = sponsor;
+        amounts[0] = 1;
+
         bytes memory feeArgs = abi.encode(
             channelTreasury,
             uint16(1000),
@@ -162,15 +201,23 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
         customFeesImpl.setChannelFees(feeArgs);
 
-        vm.expectRevert();
-        customFeesImpl.requestEthMint(address(0), nick, nick, 1);
-        vm.expectRevert();
-        customFeesImpl.requestErc20Mint(address(0), nick, nick, 1);
+        vm.expectRevert(CustomFees.AddressZero.selector);
+        customFeesImpl.requestEthMint(creators, sponsors, amounts, referral);
+        vm.expectRevert(CustomFees.AddressZero.selector);
+        customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
 
         vm.stopPrank();
     }
 
     function test_customFees_revertOnNullSponsor() public {
+        address[] memory creators = new address[](1);
+        address[] memory sponsors = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        creators[0] = creator;
+        sponsors[0] = address(0);
+        amounts[0] = 1;
+
         bytes memory feeArgs = abi.encode(
             channelTreasury,
             uint16(1000),
@@ -184,37 +231,61 @@ contract FeesTest is Test {
         );
 
         vm.startPrank(targetChannel);
+
         customFeesImpl.setChannelFees(feeArgs);
-        vm.expectRevert();
-        customFeesImpl.requestEthMint(nick, nick, address(0), 1);
-        vm.expectRevert();
-        customFeesImpl.requestErc20Mint(nick, nick, address(0), 1);
+
+        vm.expectRevert(CustomFees.AddressZero.selector);
+        customFeesImpl.requestEthMint(creators, sponsors, amounts, referral);
+
+        vm.expectRevert(CustomFees.AddressZero.selector);
+        customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
+
         vm.stopPrank();
     }
 
     function test_customFees_revertOnFreeMint() public {
+        address[] memory creators = new address[](1);
+        address[] memory sponsors = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        creators[0] = creator;
+        sponsors[0] = sponsor;
+        amounts[0] = 1;
+
         bytes memory feeArgs = abi.encode(
-    channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
+            channelTreasury, uint16(0), uint16(0), uint16(0), uint16(0), uint16(0), 0, 10 * 10e6, address(erc20Token)
         );
 
         vm.startPrank(targetChannel);
-        vm.expectRevert();
+
+        vm.expectRevert(CustomFees.InvalidETHMintPrice.selector);
         customFeesImpl.setChannelFees(feeArgs);
 
-        vm.expectRevert();
-        customFeesImpl.requestEthMint(nick, nick, nick, 1);
-        vm.expectRevert();
-        customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+        vm.expectRevert(CustomFees.InvalidETHMintPrice.selector);
+        customFeesImpl.requestEthMint(creators, sponsors, amounts, referral);
+
+        vm.expectRevert(CustomFees.ERC20MintingDisabled.selector);
+        customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
 
         vm.stopPrank();
     }
 
     function test_customFees_revertOnMissingConfig() public {
+        address[] memory creators = new address[](1);
+        address[] memory sponsors = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        creators[0] = creator;
+        sponsors[0] = sponsor;
+        amounts[0] = 1;
+
         vm.startPrank(targetChannel);
-        vm.expectRevert();
-        customFeesImpl.requestEthMint(nick, nick, nick, 1);
-        vm.expectRevert();
-        customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+
+        vm.expectRevert(CustomFees.InvalidETHMintPrice.selector);
+        customFeesImpl.requestEthMint(creators, sponsors, amounts, referral);
+
+        vm.expectRevert(CustomFees.ERC20MintingDisabled.selector);
+        customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
         vm.stopPrank();
     }
 
@@ -242,7 +313,7 @@ contract FeesTest is Test {
             erc20Address
         );
         uint256 totalBps =
-    uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (totalBps != 1e4 || ethMintPrice == 0) {
             vm.expectRevert();
@@ -264,6 +335,14 @@ contract FeesTest is Test {
     )
         public
     {
+        address[] memory creators = new address[](1);
+        address[] memory sponsors = new address[](1);
+        uint256[] memory amounts = new uint256[](1);
+
+        creators[0] = creator;
+        sponsors[0] = address(0);
+        amounts[0] = 1;
+
         bytes memory feeArgs = abi.encode(
             channelTreasury,
             uplinkBps,
@@ -279,7 +358,7 @@ contract FeesTest is Test {
         vm.startPrank(targetChannel);
 
         uint256 totalBps =
-    uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
+            uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (totalBps != 1e4 || ethMintPrice == 0) {
             vm.expectRevert();
@@ -289,15 +368,15 @@ contract FeesTest is Test {
 
         customFeesImpl.setChannelFees(feeArgs);
 
-        IRewards.Split memory ethSplit = customFeesImpl.requestEthMint(nick, nick, nick, 1);
-        IRewards.Split memory erc20Split;
+        Rewards.Split memory ethSplit = customFeesImpl.requestEthMint(creators, sponsors, amounts, referral);
+        Rewards.Split memory erc20Split;
 
-        // expect revert if erc20 mints not configured
+        /// @dev expect revert if erc20 mints not configured
         if (erc20Address == address(0) || erc20MintPrice == 0 || ethMintPrice == 0) {
             vm.expectRevert();
-            customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+            customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
         } else {
-            erc20Split = customFeesImpl.requestErc20Mint(nick, nick, nick, 1);
+            erc20Split = customFeesImpl.requestErc20Mint(creators, sponsors, amounts, referral);
         }
 
         uint8 ethSplitLength_expected;
@@ -341,5 +420,5 @@ contract FeesTest is Test {
         if (ethSplit.allocations.length > 0) {
             assertEq(ethSplit.totalAllocation, ethMintPrice);
         }
-    } */
+    }
 }

@@ -35,9 +35,38 @@ import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░)))))░░░░░░░ *
  *
  */
+
+/**
+ * @title Channel Factory
+ * @author nick
+ * @notice Factory contract to deploy new channels
+ */
 contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    /* -------------------------------------------------------------------------- */
+    /*                                   ERRORS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    error AddressZero();
+    error InvalidUpgrade();
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+    event FactoryInitialized();
+    event SetupNewContract(
+        address indexed contractAddress, string uri, address defaultAdmin, address[] managers, bytes transportConfig
+    );
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
+
     address public immutable infiniteChannelImpl;
     address public immutable finiteChannelImpl;
+
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
+    /* -------------------------------------------------------------------------- */
 
     constructor(address _infiniteChannelImpl, address _finiteChannelImpl) initializer {
         if (_infiniteChannelImpl == address(0) || _finiteChannelImpl == address(0)) {
@@ -46,10 +75,6 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         infiniteChannelImpl = _infiniteChannelImpl;
         finiteChannelImpl = _finiteChannelImpl;
     }
-
-    /* -------------------------------------------------------------------------- */
-    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
-    /* -------------------------------------------------------------------------- */
 
     /**
      * @notice Factory initializer
@@ -61,6 +86,9 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         emit FactoryInitialized();
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
     /**
      * @notice Create a new infinite channel
      * @param uri string URI for the channel

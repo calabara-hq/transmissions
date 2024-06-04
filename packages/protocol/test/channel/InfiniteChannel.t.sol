@@ -6,7 +6,7 @@ import { Test, console } from "forge-std/Test.sol";
 import { InfiniteChannel } from "../../src/channel/transport/InfiniteChannel.sol";
 
 import { CustomFees } from "../../src/fees/CustomFees.sol";
-import { Logic } from "../../src/logic/Logic.sol";
+import { DynamicLogic } from "../../src/logic/DynamicLogic.sol";
 
 import { IFees } from "../../src/interfaces/IFees.sol";
 import { ILogic } from "../../src/interfaces/ILogic.sol";
@@ -47,7 +47,7 @@ contract InfiniteChannelTest is Test {
         upgradePath.initialize(admin);
 
         customFeesImpl = new CustomFees(uplinkRewardsAddr);
-        logicImpl = new Logic(address(this));
+        logicImpl = new DynamicLogic(address(this));
 
         logicImpl.approveLogic(IERC20.balanceOf.selector, 0);
 

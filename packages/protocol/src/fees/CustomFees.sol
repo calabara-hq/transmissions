@@ -3,10 +3,39 @@ pragma solidity ^0.8.0;
 
 import { IFees } from "../interfaces/IFees.sol";
 
-import { IRewards } from "../rewards/Rewards.sol";
-import { Test, console } from "forge-std/Test.sol";
+import { NativeTokenLib } from "../libraries/NativeTokenLib.sol";
+import { Rewards } from "../rewards/Rewards.sol";
 
+/**
+ * @title Custom Fees
+ * @author nick
+ * @notice This contract allows for the configuration of custom fees for minting.
+ * @dev for free eth mints, calling contracts should short circuit and not call this contract.
+ */
 contract CustomFees is IFees {
+    using NativeTokenLib for address;
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   ERRORS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    error InvalidBps();
+    error InvalidSplit();
+    error AddressZero();
+    error ERC20MintingDisabled();
+    error InvalidETHMintPrice();
+    error TotalValueMismatch();
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    event FeeConfigSet(address indexed channel, FeeConfig feeconfig);
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STRUCTS                                  */
+    /* -------------------------------------------------------------------------- */
+
     struct FeeConfig {
         address channelTreasury;
         uint16 uplinkBps;
@@ -19,13 +48,19 @@ contract CustomFees is IFees {
         address erc20Contract;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
+
     mapping(address => FeeConfig) public channelFees;
     address internal immutable uplinkRewardsAddress;
 
-    address NATIVE_TOKEN = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
+    /* -------------------------------------------------------------------------- */
 
     constructor(address _uplinkRewardsAddress) {
-        if (_uplinkRewardsAddress == address(0)) revert ADDRESS_ZERO();
+        if (_uplinkRewardsAddress == address(0)) revert AddressZero();
         uplinkRewardsAddress = _uplinkRewardsAddress;
     }
 
@@ -78,7 +113,7 @@ contract CustomFees is IFees {
         ) = abi.decode(data, (address, uint16, uint16, uint16, uint16, uint16, uint256, uint256, address));
 
         // free mints are not handled by this contract. If the eth price is zero, always revert.
-        if (ethMintPrice == 0) revert INVALID_ETH_MINT_PRICE();
+        if (ethMintPrice == 0) revert InvalidETHMintPrice();
 
         _verifyTotalBps(uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
         _verifySplits(ethMintPrice, uplinkBps, channelBps, creatorBps, mintReferralBps, sponsorBps);
@@ -104,35 +139,35 @@ contract CustomFees is IFees {
 
     function requestEthMint(
         address[] memory creators,
-        address[] memory referrals,
         address[] memory sponsors,
-        uint256[] memory amounts
+        uint256[] memory amounts,
+        address mintReferral
     )
         external
         view
-        returns (IRewards.Split memory)
+        returns (Rewards.Split memory)
     {
         FeeConfig memory feeConfig = channelFees[msg.sender];
-        if (feeConfig.ethMintPrice == 0) revert INVALID_ETH_MINT_PRICE();
-        return _requestMint(NATIVE_TOKEN, feeConfig, creators, referrals, sponsors, amounts);
+        if (feeConfig.ethMintPrice == 0) revert InvalidETHMintPrice();
+        return _requestMint(NativeTokenLib.NATIVE_TOKEN, feeConfig, creators, sponsors, amounts, mintReferral);
     }
 
     function requestErc20Mint(
         address[] memory creators,
-        address[] memory referrals,
         address[] memory sponsors,
-        uint256[] memory amounts
+        uint256[] memory amounts,
+        address mintReferral
     )
         external
         view
-        returns (IRewards.Split memory)
+        returns (Rewards.Split memory)
     {
         FeeConfig memory feeConfig = channelFees[msg.sender];
         if (feeConfig.erc20Contract == address(0) || feeConfig.erc20MintPrice == 0) {
-            revert ERC20_MINTING_DISABLED();
+            revert ERC20MintingDisabled();
         }
 
-        return _requestMint(feeConfig.erc20Contract, feeConfig, creators, referrals, sponsors, amounts);
+        return _requestMint(feeConfig.erc20Contract, feeConfig, creators, sponsors, amounts, mintReferral);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -143,96 +178,114 @@ contract CustomFees is IFees {
         address token,
         FeeConfig memory feeConfig,
         address[] memory creators,
-        address[] memory referrals,
         address[] memory sponsors,
-        uint256[] memory amounts
+        uint256[] memory amounts,
+        address mintReferral
     )
         internal
         view
-        returns (IRewards.Split memory)
+        returns (Rewards.Split memory)
     {
-        uint256 creatorsLength = creators.length;
-        address[] memory _recipients = new address[](creatorsLength * 5);
-        uint256[] memory _allocations = new uint256[](creatorsLength * 5);
+        bool isNative = token.isNativeToken();
+        uint256 mintPrice = isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice;
 
         uint256 totalValue = 0;
-        uint256 commandCount = 0;
         uint256 totalAmount = 0;
 
-        bool isNative = _isNativeToken(token);
-        uint256 mintPrice = isNative ? feeConfig.ethMintPrice : feeConfig.erc20MintPrice;
+        /// @dev take care of mint referral, channel treasury, and uplink rewards outside of the loop to save gas
+
+        address[] memory _staticRecipients = new address[](3);
+        uint256[] memory _staticAllocations = new uint256[](3);
+        uint8 _staticCommandCount = 0;
+
+        if (feeConfig.mintReferralBps > 0) {
+            if (mintReferral == address(0)) {
+                /// @dev if mint referral is not set, forward rewards to the channel treasury
+                feeConfig.channelBps += feeConfig.mintReferralBps;
+            } else {
+                _staticRecipients[_staticCommandCount] = mintReferral;
+                _staticAllocations[_staticCommandCount] = _calculateSplitFromBps(mintPrice, feeConfig.mintReferralBps);
+                _staticCommandCount++;
+            }
+        }
+
+        if (feeConfig.uplinkBps > 0) {
+            _staticRecipients[_staticCommandCount] = uplinkRewardsAddress;
+            _staticAllocations[_staticCommandCount] = _calculateSplitFromBps(mintPrice, feeConfig.uplinkBps);
+            _staticCommandCount++;
+        }
+
+        if (feeConfig.channelBps > 0) {
+            address channelTreasury = feeConfig.channelTreasury;
+            if (channelTreasury == address(0)) {
+                /// @dev if channel treasury is not set, forward rewards to the creator
+                feeConfig.creatorBps += feeConfig.channelBps;
+            } else {
+                _staticRecipients[_staticCommandCount] = channelTreasury;
+                _staticAllocations[_staticCommandCount] = _calculateSplitFromBps(mintPrice, feeConfig.channelBps);
+                _staticCommandCount++;
+            }
+        }
+
+        uint256 creatorsLength = creators.length;
+        address[] memory _runtimeRecipients = new address[](creatorsLength * 2);
+        uint256[] memory _runtimeAllocations = new uint256[](creatorsLength * 2);
+
+        uint256 _runtimeCommandCount = 0;
+
+        /// @dev loop throgh creators and sponsors to calculate the runtime portion of the split
 
         for (uint256 i = 0; i < creatorsLength; i++) {
             address creator = creators[i];
             address sponsor = sponsors[i];
             uint256 amount = amounts[i];
 
-            if (creator == address(0) || sponsor == address(0)) revert ADDRESS_ZERO();
+            if (creator == address(0) || sponsor == address(0)) revert AddressZero();
 
             totalAmount += amount;
 
-            if (feeConfig.mintReferralBps > 0) {
-                address referral = referrals[i];
-                if (referral == address(0)) {
-                    feeConfig.channelBps += feeConfig.mintReferralBps;
-                } else {
-                    _recipients[commandCount] = referral;
-                    _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.mintReferralBps);
-                    commandCount++;
-                }
-            }
-
             if (feeConfig.sponsorBps > 0) {
-                _recipients[commandCount] = sponsor;
-                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.sponsorBps);
-                commandCount++;
-            }
-
-            if (feeConfig.uplinkBps > 0) {
-                _recipients[commandCount] = uplinkRewardsAddress;
-                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.uplinkBps);
-                commandCount++;
-            }
-
-            if (feeConfig.channelBps > 0) {
-                address channelTreasury = feeConfig.channelTreasury;
-                if (channelTreasury == address(0)) {
-                    feeConfig.creatorBps += feeConfig.channelBps;
-                } else {
-                    _recipients[commandCount] = channelTreasury;
-                    _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.channelBps);
-                    commandCount++;
-                }
+                _runtimeRecipients[_runtimeCommandCount] = sponsor;
+                _runtimeAllocations[_runtimeCommandCount] =
+                    amount * _calculateSplitFromBps(mintPrice, feeConfig.sponsorBps);
+                _runtimeCommandCount++;
             }
 
             if (feeConfig.creatorBps > 0) {
-                _recipients[commandCount] = creator;
-                _allocations[commandCount] = amount * _calculateSplitFromBps(mintPrice, feeConfig.creatorBps);
-                commandCount++;
+                _runtimeRecipients[_runtimeCommandCount] = creator;
+                _runtimeAllocations[_runtimeCommandCount] =
+                    amount * _calculateSplitFromBps(mintPrice, feeConfig.creatorBps);
+                _runtimeCommandCount++;
             }
         }
 
-        address[] memory recipients = new address[](commandCount);
-        uint256[] memory allocations = new uint256[](commandCount);
+        address[] memory recipients = new address[](_runtimeCommandCount + _staticCommandCount);
+        uint256[] memory allocations = new uint256[](_runtimeCommandCount + _staticCommandCount);
 
-        for (uint256 i = 0; i < commandCount; i++) {
-            recipients[i] = _recipients[i];
-            uint256 allocation = _allocations[i];
+        for (uint256 i = 0; i < _staticCommandCount; i++) {
+            recipients[i] = _staticRecipients[i];
+
+            /// @dev multiply by total amount
+            uint256 allocation = _staticAllocations[i] * totalAmount;
+
             allocations[i] = allocation;
             totalValue += allocation;
         }
 
-        if (commandCount > 0) {
+        for (uint256 i = _staticCommandCount; i < _runtimeCommandCount + _staticCommandCount; i++) {
+            recipients[i] = _runtimeRecipients[i - _staticCommandCount];
+            uint256 allocation = _runtimeAllocations[i - _staticCommandCount];
+            allocations[i] = allocation;
+            totalValue += allocation;
+        }
+
+        if (_runtimeCommandCount > 0) {
             if (totalValue != totalAmount * mintPrice) {
-                revert TOTAL_VALUE_MISMATCH();
+                revert TotalValueMismatch();
             }
         }
 
-        return IRewards.Split(recipients, allocations, totalValue, token);
-    }
-
-    function _isNativeToken(address token) internal view returns (bool) {
-        return token == NATIVE_TOKEN;
+        return Rewards.Split(recipients, allocations, totalValue, token);
     }
 
     function _verifyTotalBps(
@@ -249,7 +302,7 @@ contract CustomFees is IFees {
             uint80(uplinkBps) + uint80(channelBps) + uint80(creatorBps) + uint80(mintReferralBps) + uint80(sponsorBps);
 
         if (totalBps != 1e4) {
-            revert INVAlID_BPS();
+            revert InvalidBps();
         }
     }
 
@@ -265,19 +318,19 @@ contract CustomFees is IFees {
         pure
     {
         if ((mintPrice * uplinkBps) % 1e4 != 0) {
-            revert INVALID_SPLIT();
+            revert InvalidSplit();
         }
         if ((mintPrice * channelBps) % 1e4 != 0) {
-            revert INVALID_SPLIT();
+            revert InvalidSplit();
         }
         if ((mintPrice * creatorBps) % 1e4 != 0) {
-            revert INVALID_SPLIT();
+            revert InvalidSplit();
         }
         if ((mintPrice * mintReferralBps) % 1e4 != 0) {
-            revert INVALID_SPLIT();
+            revert InvalidSplit();
         }
         if ((mintPrice * sponsorBps) % 1e4 != 0) {
-            revert INVALID_SPLIT();
+            revert InvalidSplit();
         }
     }
 

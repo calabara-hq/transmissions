@@ -16,12 +16,12 @@ import { ERC1967Utils } from "openzeppelin-contracts/proxy/ERC1967/ERC1967Utils.
  * @title ManagedChannel
  * @author nick
  * @notice Contract module which provides access control, reentrancy, and upgradeability mechanisms.
- * @notice Access is governed by an admin role and a manager role.
+ * Access is governed by an admin role and a manager role.
  * @dev The manager role is a sub-authority of the admin role, which can only be set by the admin.
- * @dev The admin role is the default role, and has the highest authority.
- * @dev The manager role has the authority to manage the contract, but cannot grant/manage other managers.
- * @dev Granting / Revoking roles directly is not allowed. Use `setManagers` to set the new managers for the contract.
- * @dev Use `transferAdmin` to transfer the admin role to a new address.
+ * The admin role is the default role, and has the highest authority.
+ * The manager role has the authority to manage the contract, but cannot grant/manage other managers.
+ * Granting / Revoking roles directly is not allowed. Use `setManagers` to set the new managers for the contract.
+ * Use `transferAdmin` to transfer the admin role to a new address.
  */
 
 contract ManagedChannel is
@@ -31,12 +31,23 @@ contract ManagedChannel is
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable
 {
-    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
-    IUpgradePath internal immutable upgradePath;
+    /* -------------------------------------------------------------------------- */
+    /*                                   ERRORS                                   */
+    /* -------------------------------------------------------------------------- */
+    error Unauthorized();
+    error InvalidUpgrade();
 
-    constructor(address _upgradePath) {
-        upgradePath = IUpgradePath(_upgradePath);
-    }
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    event ManagersUpdated(address[] managers);
+    event ManagerRenounced(address indexed manager);
+    event AdminTransferred(address indexed previousAdmin, address indexed newAdmin);
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   MODIFIERS                                */
+    /* -------------------------------------------------------------------------- */
 
     modifier onlyAdminOrManager() {
         _requireAdminOrManager(msg.sender);
@@ -46,6 +57,21 @@ contract ManagedChannel is
     modifier onlyAdmin() {
         _requireAdmin(msg.sender);
         _;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
+
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
+    IUpgradePath internal immutable upgradePath;
+
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
+    /* -------------------------------------------------------------------------- */
+
+    constructor(address _upgradePath) {
+        upgradePath = IUpgradePath(_upgradePath);
     }
 
     /* -------------------------------------------------------------------------- */

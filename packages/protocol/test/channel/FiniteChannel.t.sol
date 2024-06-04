@@ -5,9 +5,9 @@ import { Channel } from "../../src/channel/Channel.sol";
 import { FiniteChannel } from "../../src/channel/transport/FiniteChannel.sol";
 import { IUpgradePath } from "../../src/interfaces/IUpgradePath.sol";
 
+import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { FiniteUplink1155 } from "../../src/proxies/FiniteUplink1155.sol";
 import { UpgradePath } from "../../src/utils/UpgradePath.sol";
-
 import { WETH } from "../utils/WETH.t.sol";
 import { Test, console } from "forge-std/Test.sol";
 
@@ -120,8 +120,6 @@ contract FiniteChannelTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 1),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: _ranks,
                         allocations: _allocations,
@@ -147,7 +145,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_sortWinners(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         createChannelTestCase(inputs, rewardToken);
 
@@ -167,7 +165,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_settleDistributeRewards(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
             createChannelTestCase(inputs, rewardToken);
@@ -208,7 +206,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_settleRevertConditions(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         createChannelTestCase(inputs, rewardToken);
 
@@ -226,7 +224,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_transportCannotBeModifiedAfterInitialization(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         createChannelTestCase(inputs, rewardToken);
 
@@ -237,13 +235,11 @@ contract FiniteChannelTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 1),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: new uint40[](1),
                         allocations: new uint256[](1),
                         totalAllocation: 1,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+                        token: NativeTokenLib.NATIVE_TOKEN
                     })
                 })
             )
@@ -290,13 +286,11 @@ contract FiniteChannelTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 1),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: _ranks,
                         allocations: _allocations,
                         totalAllocation: _totalAllocation,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+                        token: NativeTokenLib.NATIVE_TOKEN
                     })
                 })
             )
@@ -351,44 +345,11 @@ contract FiniteChannelTest is Test {
                     createStart: createStart,
                     mintStart: mintStart,
                     mintEnd: mintEnd,
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: ranks,
                         allocations: allocations,
                         totalAllocation: 1,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
-                    })
-                })
-            )
-        );
-    }
-
-    function test_finiteChannel_timingValidationOnSetParams(uint256 userCreateLimit, uint256 userMintLimit) public {
-        uint40[] memory ranks = new uint40[](1);
-        ranks[0] = 1;
-
-        uint256[] memory allocations = new uint256[](1);
-        allocations[0] = 1;
-
-        if (userCreateLimit == 0 || userMintLimit == 0) vm.expectRevert();
-        targetChannel.initialize{ value: 1 }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp + 10),
-                    mintStart: uint80(block.timestamp + 20),
-                    mintEnd: uint80(block.timestamp + 30),
-                    userCreateLimit: userCreateLimit,
-                    userMintLimit: userMintLimit,
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: ranks,
-                        allocations: allocations,
-                        totalAllocation: 1,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+                        token: NativeTokenLib.NATIVE_TOKEN
                     })
                 })
             )
@@ -396,7 +357,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_timingValidationOnCreateToken(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         uint40[] memory _ranks = new uint40[](1);
         _ranks[0] = 1;
@@ -413,8 +374,6 @@ contract FiniteChannelTest is Test {
                     createStart: uint80(block.timestamp + 10),
                     mintStart: uint80(block.timestamp + 20),
                     mintEnd: uint80(block.timestamp + 30),
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: _ranks,
                         allocations: _allocations,
@@ -437,7 +396,7 @@ contract FiniteChannelTest is Test {
     }
 
     function test_finiteChannel_timingValidationOnMintToken(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
 
         uint40[] memory _ranks = new uint40[](1);
         _ranks[0] = 1;
@@ -454,8 +413,6 @@ contract FiniteChannelTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 10),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: UINT256_MAX,
-                    userMintLimit: UINT256_MAX,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: _ranks,
                         allocations: _allocations,
@@ -476,48 +433,6 @@ contract FiniteChannelTest is Test {
 
         vm.warp(block.timestamp + 30);
         vm.expectRevert(FiniteChannel.NotAcceptingMints.selector);
-        targetChannel.mint(nick, 1, 1, nick, "");
-    }
-
-    function test_finiteChannel_revertOnExceedInteractionLimit(FuzzedInputs memory inputs) public {
-        address rewardToken = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-
-        uint40[] memory _ranks = new uint40[](1);
-        _ranks[0] = 1;
-        uint256[] memory _allocations = new uint256[](1);
-        _allocations[0] = 1 ether;
-
-        targetChannel.initialize{ value: 1 ether }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 10),
-                    mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: 1,
-                    userMintLimit: 1,
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: _ranks,
-                        allocations: _allocations,
-                        totalAllocation: 1 ether,
-                        token: rewardToken
-                    })
-                })
-            )
-        );
-
-        targetChannel.createToken("test", nick, 1000);
-
-        vm.expectRevert(FiniteChannel.InteractionLimitReached.selector);
-        targetChannel.createToken("test", nick, 1000);
-
-        vm.warp(block.timestamp + 10);
-        targetChannel.mint(nick, 1, 1, nick, "");
-
-        vm.expectRevert(FiniteChannel.InteractionLimitReached.selector);
         targetChannel.mint(nick, 1, 1, nick, "");
     }
 

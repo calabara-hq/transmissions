@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import { IFees } from "../fees/CustomFees.sol";
 import { IChannel } from "../interfaces/IChannel.sol";
-import { ILogic } from "../logic/Logic.sol";
+import { ILogic } from "../interfaces/ILogic.sol";
 import { Rewards } from "../rewards/Rewards.sol";
 import { ManagedChannel } from "../utils/ManagedChannel.sol";
 
@@ -11,26 +11,49 @@ import { Multicall } from "../utils/Multicall.sol";
 import { ChannelStorage } from "./ChannelStorage.sol";
 import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
 
+/**
+ * @title Channel
+ * @author nick
+ * @notice Channel contract for managing tokens. This contract is the base for all transport channels.
+ */
 abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, Multicall, ManagedChannel {
     /* -------------------------------------------------------------------------- */
-    /*                                CONSTRUCTOR                                 */
+    /*                                   ERRORS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    error InsufficientInteractionPower();
+    error NotMintable();
+    error SoldOut();
+    error AmountZero();
+    error AmountExceedsMaxSupply();
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    enum ConfigUpdate {
+        FEE_CONTRACT,
+        LOGIC_CONTRACT
+    }
+
+    event TokenCreated(uint256 indexed tokenId, ChannelStorage.TokenConfig token);
+    event TokenMinted(
+        address indexed minter, address indexed mintReferral, uint256[] tokenIds, uint256[] amounts, bytes data
+    );
+
+    event TokenURIUpdated(uint256 indexed tokenId, string uri);
+    event ConfigUpdated(
+        address indexed updater, ConfigUpdate indexed updateType, address feeContract, address logicContract
+    );
+
+    event LogicUpdated(address indexed updater, address logicContract, bytes data);
+    event FeesUpdated(address indexed updater, address feeContract, bytes data);
+
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
     /* -------------------------------------------------------------------------- */
 
     constructor(address _upgradePath, address weth) Rewards(weth) ManagedChannel(_upgradePath) { }
-
-    /* -------------------------------------------------------------------------- */
-    /*                              VIRTUAL FUNCTIONS                             */
-    /* -------------------------------------------------------------------------- */
-
-    function _transportProcessNewToken(uint256 tokenId) internal virtual;
-
-    function _transportProcessMint(uint256 tokenId) internal virtual;
-
-    function setTransportConfig(bytes calldata data) public payable virtual;
-
-    /* -------------------------------------------------------------------------- */
-    /*                                INITIALIZER                                 */
-    /* -------------------------------------------------------------------------- */
 
     function initialize(
         string calldata uri,
@@ -72,12 +95,22 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     }
 
     /* -------------------------------------------------------------------------- */
+    /*                              VIRTUAL FUNCTIONS                             */
+    /* -------------------------------------------------------------------------- */
+
+    function _transportProcessNewToken(uint256 tokenId) internal virtual;
+
+    function _transportProcessMint(uint256 tokenId) internal virtual;
+
+    function setTransportConfig(bytes calldata data) public payable virtual;
+
+    /* -------------------------------------------------------------------------- */
     /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
     /* -------------------------------------------------------------------------- */
 
     /**
      * @notice Get the ETH mint price for tokens in the channel
-     * @return uint256 ETH price in wei
+     * @return uint256 ETH price
      */
     function ethMintPrice() public view returns (uint256) {
         return feeContract.getEthMintPrice();
@@ -85,7 +118,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
     /**
      * @notice Get the ERC20 mint price for tokens in the channel
-     * @return uint256 ERC20 price in wei
+     * @return uint256 ERC20 price
      */
     function erc20MintPrice() public view returns (uint256) {
         return feeContract.getErc20MintPrice();
@@ -141,8 +174,8 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
     /**
      * @notice Set the fee structure for the channel
-     * @dev Address 0 is acceptable, and is treated as a no-op on logic validation todo
-     * @dev Only call into the logic contract if the address is not 0
+     * @dev Address 0 is acceptable, and is treated as a no-op on fee computation
+     * @dev Only call into the fee contract if the address is not 0
      * @param fees Address of the fee contract
      * @param data Fee contract initialization data
      */
@@ -176,12 +209,12 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         tokenId = _setupNewToken(uri, maxSupply, author);
 
         /// @dev increment the sponsor's numCreations
-        userStats[msg.sender].numCreations += 1;
+        uint256 numUserCreations = _getAndUpdateUserCreations(msg.sender);
 
         _transportProcessNewToken(tokenId);
 
         /// @dev msg.sender used instead of author to allow for onchain sponsorships
-        _validateCreatorLogic(msg.sender);
+        _validateCreatorLogic(msg.sender, numUserCreations);
     }
 
     /**
@@ -277,6 +310,18 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     /*                             INTERNAL FUNCTIONS                             */
     /* -------------------------------------------------------------------------- */
 
+    function _getAndUpdateUserCreations(address user) internal returns (uint256) {
+        uint256 currentNumCreations = userStats[user].numCreations;
+        userStats[user].numCreations = currentNumCreations + 1;
+        return currentNumCreations + 1;
+    }
+
+    function _getAndUpdateUserMints(address user, uint256 amount) internal returns (uint256) {
+        uint256 currentNumMints = userStats[user].numMints;
+        userStats[user].numMints = currentNumMints + amount;
+        return currentNumMints + amount;
+    }
+
     function _getAndUpdateNextTokenId() internal returns (uint256) {
         unchecked {
             return nextTokenId++;
@@ -296,10 +341,10 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     }
 
     function _checkMintRequirements(TokenConfig memory token, uint256 amount) internal pure {
-        require(token.maxSupply > 0, "Token is not mintable");
-        require(token.totalMinted < token.maxSupply, "Token is sold out");
-        require(amount > 0, "Amount must be greater than 0");
-        require(amount <= token.maxSupply - token.totalMinted, "Amount exceeds max supply");
+        if (token.maxSupply == 0) revert NotMintable();
+        if (token.totalMinted >= token.maxSupply) revert SoldOut();
+        if (amount == 0) revert AmountZero();
+        if (amount > token.maxSupply - token.totalMinted) revert AmountExceedsMaxSupply();
     }
 
     /**
@@ -307,11 +352,17 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
      * @dev let execution continue or revert based on the logic contract.
      * @param creator address of the creator.
      */
-    function _validateCreatorLogic(address creator) internal view {
-        // return true if no logic contract set
+    function _validateCreatorLogic(address creator, uint256 updatedNumUserCreations) internal view {
+        /// @dev pass if no logic contract set
         if (address(logicContract) == address(0)) return;
-        if (logicContract.isCreatorApproved(creator)) return;
-        revert FALSY_LOGIC();
+
+        uint256 maxTheoreticalCreatorPower = logicContract.calculateCreatorInteractionPower(creator);
+
+        /// @dev pass if the maxTheoreticalCreatorPower is max uint256
+        if (maxTheoreticalCreatorPower == type(uint256).max) return;
+
+        /// @dev revert if the updatedNumUserCreations is greater than the maxTheoreticalCreatorPower
+        if (updatedNumUserCreations > maxTheoreticalCreatorPower) revert InsufficientInteractionPower();
     }
 
     /**
@@ -319,11 +370,17 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
      * @dev let execution continue or revert based on the logic contract.
      * @param minter address of the minter.
      */
-    function _validateMinterLogic(address minter) internal view {
-        // return true if no logic contract set
+    function _validateMinterLogic(address minter, uint256 updateNumUserMints) internal view {
+        /// @dev pass if no logic contract set
         if (address(logicContract) == address(0)) return;
-        if (logicContract.isMinterApproved(minter)) return;
-        revert FALSY_LOGIC();
+
+        uint256 maxTheoreticalMinterPower = logicContract.calculateMinterInteractionPower(minter);
+
+        /// @dev pass if the maxTheoreticalMinterPower is max uint256
+        if (maxTheoreticalMinterPower == type(uint256).max) return;
+
+        /// @dev revert if the updateNumUserMints is greater than the maxTheoreticalMinterPower
+        if (updateNumUserMints > maxTheoreticalMinterPower) revert InsufficientInteractionPower();
     }
 
     function _mintBatchWithETH(
@@ -335,34 +392,14 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     )
         internal
     {
-        address[] memory creators = new address[](ids.length);
-        address[] memory referrals = new address[](ids.length);
-        address[] memory sponsors = new address[](ids.length);
-        uint256 totalMints = 0;
+        (address[] memory creators, address[] memory sponsors, uint256 totalAmount) =
+            _processBatchMint(to, ids, amounts, data);
 
-        for (uint256 i = 0; i < ids.length; i++) {
-            TokenConfig memory token = tokens[ids[i]];
-            _checkMintRequirements(token, amounts[i]);
+        uint256 updatedNumUserMints = _getAndUpdateUserMints(msg.sender, totalAmount);
 
-            tokens[ids[i]].totalMinted += amounts[i];
+        _handleETHSplit(creators, sponsors, amounts, mintReferral);
 
-            /// @dev increment the minter's numMints
-            userStats[msg.sender].numMints += amounts[i];
-
-            _transportProcessMint(ids[i]);
-
-            creators[i] = token.author;
-            referrals[i] = mintReferral;
-            sponsors[i] = token.sponsor;
-        }
-
-        // /// @dev increment the minter's numMints
-        // userStats[msg.sender].numMints += totalMints;
-
-        _handleETHSplit(creators, referrals, sponsors, amounts, mintReferral);
-
-        _mintBatch(to, ids, amounts, data);
-        _validateMinterLogic(msg.sender);
+        _validateMinterLogic(msg.sender, updatedNumUserMints);
         emit TokenMinted(to, mintReferral, ids, amounts, data);
     }
 
@@ -375,35 +412,49 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     )
         internal
     {
-        address[] memory creators = new address[](ids.length);
-        address[] memory referrals = new address[](ids.length);
-        address[] memory sponsors = new address[](ids.length);
+        (address[] memory creators, address[] memory sponsors, uint256 totalAmount) =
+            _processBatchMint(to, ids, amounts, data);
+
+        uint256 updatedNumUserMints = _getAndUpdateUserMints(msg.sender, totalAmount);
+
+        _handleERC20Split(creators, sponsors, amounts, mintReferral);
+
+        _validateMinterLogic(msg.sender, updatedNumUserMints);
+        emit TokenMinted(to, mintReferral, ids, amounts, data);
+    }
+
+    function _processBatchMint(
+        address to,
+        uint256[] memory ids,
+        uint256[] memory amounts,
+        bytes memory data
+    )
+        internal
+        returns (address[] memory creators, address[] memory sponsors, uint256 totalAmount)
+    {
+        creators = new address[](ids.length);
+        sponsors = new address[](ids.length);
+        totalAmount = 0;
 
         for (uint256 i = 0; i < ids.length; i++) {
             TokenConfig memory token = tokens[ids[i]];
             _checkMintRequirements(token, amounts[i]);
 
             tokens[ids[i]].totalMinted += amounts[i];
-            userStats[msg.sender].numMints += amounts[i];
+
+            totalAmount += amounts[i];
 
             _transportProcessMint(ids[i]);
 
             creators[i] = token.author;
-            referrals[i] = mintReferral;
             sponsors[i] = token.sponsor;
         }
 
-        // generate fee commands with batched data and get one large split
-        _handleERC20Split(creators, referrals, sponsors, amounts, mintReferral);
-
         _mintBatch(to, ids, amounts, data);
-        _validateMinterLogic(msg.sender);
-        emit TokenMinted(to, mintReferral, ids, amounts, data);
     }
 
     function _handleETHSplit(
         address[] memory creators,
-        address[] memory referrals,
         address[] memory sponsors,
         uint256[] memory amounts,
         address mintReferral
@@ -411,13 +462,12 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         internal
     {
         if (address(feeContract) != address(0)) {
-            _distributePassThroughSplit(feeContract.requestEthMint(creators, referrals, sponsors, amounts));
+            _distributePassThroughSplit(feeContract.requestEthMint(creators, sponsors, amounts, mintReferral));
         }
     }
 
     function _handleERC20Split(
         address[] memory creators,
-        address[] memory referrals,
         address[] memory sponsors,
         uint256[] memory amounts,
         address mintReferral
@@ -425,7 +475,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         internal
     {
         if (address(feeContract) != address(0)) {
-            _distributePassThroughSplit(feeContract.requestErc20Mint(creators, referrals, sponsors, amounts));
+            _distributePassThroughSplit(feeContract.requestErc20Mint(creators, sponsors, amounts, mintReferral));
         }
     }
 

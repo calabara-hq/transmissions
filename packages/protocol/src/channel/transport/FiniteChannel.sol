@@ -1,25 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IRewards } from "../../interfaces/IRewards.sol";
-import { IVersionedContract } from "../../interfaces/IVersionedContract.sol";
-import { Channel } from "../Channel.sol";
-import { console } from "forge-std/Test.sol";
+import { IFiniteChannel } from "../../interfaces/IFiniteChannel.sol";
 
+import { IVersionedContract } from "../../interfaces/IVersionedContract.sol";
+
+import { Rewards } from "../../rewards/Rewards.sol";
+import { Channel } from "../Channel.sol";
 /**
- * @title FiniteChannel
- * @dev Finite channels allow token creation and minting for a fixed period.
+ * @title Finite Channel
+ * @author nick
+ * @notice Finite channels allow token creation and minting for a fixed period.
  * @dev Rewards are defined on initialization, and distributed after the minting period ends.
  */
-contract FiniteChannel is Channel, IVersionedContract {
+
+contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
+    /* -------------------------------------------------------------------------- */
+    /*                                   ERRORS                                   */
+    /* -------------------------------------------------------------------------- */
+
     error NotAcceptingCreations();
     error NotAcceptingMints();
     error InvalidTiming();
     error OngoingSale();
     error AlreadySettled();
     error StillActive();
-    error InteractionLimitZero();
-    error InteractionLimitReached();
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    event Settled(address indexed caller);
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STRUCTS                                  */
+    /* -------------------------------------------------------------------------- */
 
     struct Node {
         bytes32 next;
@@ -38,10 +53,12 @@ contract FiniteChannel is Channel, IVersionedContract {
         uint80 createStart;
         uint80 mintStart;
         uint80 mintEnd;
-        uint256 userCreateLimit;
-        uint256 userMintLimit;
         FiniteRewards rewards;
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
 
     bytes32 public head;
     bytes32 public tail;
@@ -52,6 +69,10 @@ contract FiniteChannel is Channel, IVersionedContract {
     mapping(bytes32 => Node) public nodes;
 
     FiniteParams public finiteChannelParams;
+
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
+    /* -------------------------------------------------------------------------- */
 
     constructor(address _upgradePath, address _weth) initializer Channel(_upgradePath, _weth) { }
 
@@ -70,7 +91,7 @@ contract FiniteChannel is Channel, IVersionedContract {
         }
 
         address[] memory winners = _getWinners();
-        IRewards.Split memory split = IRewards.Split({
+        Rewards.Split memory split = Rewards.Split({
             recipients: winners,
             allocations: finiteChannelParams.rewards.allocations,
             totalAllocation: finiteChannelParams.rewards.totalAllocation,
@@ -80,6 +101,8 @@ contract FiniteChannel is Channel, IVersionedContract {
         isSettled = true;
 
         _distributeEscrowSplit(split);
+
+        emit Settled(msg.sender);
     }
 
     /**
@@ -92,12 +115,16 @@ contract FiniteChannel is Channel, IVersionedContract {
         _withdrawFromEscrow(token, to, amount);
     }
 
+    /**
+     * @notice Set the transport configuration for the finite channel
+     * @param data encoded FiniteParams
+     * @dev only callable during initialization
+     */
     function setTransportConfig(bytes calldata data) public payable override onlyAdminOrManager onlyInitializing {
         FiniteParams memory _params = abi.decode(data, (FiniteParams));
 
         _validateTimingParameters(_params.createStart, _params.mintStart, _params.mintEnd);
         _validateRewardParameters(_params.rewards);
-        _validateInteractionLimitParameters(_params.userCreateLimit, _params.userMintLimit);
 
         finiteChannelParams = _params;
         _depositToEscrow(_params.rewards.token, _params.rewards.totalAllocation);
@@ -107,7 +134,7 @@ contract FiniteChannel is Channel, IVersionedContract {
     /*                             INTERNAL FUNCTIONS                             */
     /* -------------------------------------------------------------------------- */
 
-    function processIncoming(uint256 tokenId) internal {
+    function _processIncoming(uint256 tokenId) internal {
         TokenConfig memory incomingToken = tokens[tokenId];
         bytes32 id = keccak256(abi.encode(tokenId));
 
@@ -140,10 +167,6 @@ contract FiniteChannel is Channel, IVersionedContract {
             }
             currentId = currentNode.next;
         }
-    }
-
-    function _setDLLStorage(bytes32 key, Node memory toInsert) internal {
-        nodes[key] = toInsert;
     }
 
     function _insertBeginning(uint256 tokenId, bytes32 id) internal {
@@ -229,6 +252,10 @@ contract FiniteChannel is Channel, IVersionedContract {
         length--;
     }
 
+    function _setDLLStorage(bytes32 key, Node memory toInsert) internal {
+        nodes[key] = toInsert;
+    }
+
     function _getWinners() internal view returns (address[] memory) {
         address[] memory winners = new address[](finiteChannelParams.rewards.ranks.length);
 
@@ -254,10 +281,6 @@ contract FiniteChannel is Channel, IVersionedContract {
             revert AlreadySettled();
         }
 
-        if (getUserStats(msg.sender).numCreations > finiteChannelParams.userCreateLimit) {
-            revert InteractionLimitReached();
-        }
-
         if (block.timestamp < finiteChannelParams.createStart || block.timestamp > finiteChannelParams.mintStart) {
             revert NotAcceptingCreations();
         }
@@ -268,17 +291,13 @@ contract FiniteChannel is Channel, IVersionedContract {
             revert AlreadySettled();
         }
 
-        if (getUserStats(msg.sender).numMints > finiteChannelParams.userMintLimit) {
-            revert InteractionLimitReached();
-        }
-
         if (block.timestamp < finiteChannelParams.mintStart || block.timestamp > finiteChannelParams.mintEnd) {
             revert NotAcceptingMints();
         }
 
         if (finiteChannelParams.rewards.ranks.length == 0) return;
 
-        processIncoming(tokenId);
+        _processIncoming(tokenId);
     }
 
     function _validateTimingParameters(uint80 _createStart, uint80 _mintStart, uint80 _mintEnd) internal pure {
@@ -308,12 +327,6 @@ contract FiniteChannel is Channel, IVersionedContract {
 
         if (rewards.totalAllocation != _totalAllocation) {
             revert("invalid total allocation");
-        }
-    }
-
-    function _validateInteractionLimitParameters(uint256 _userCreateLimit, uint256 _userMintLimit) internal pure {
-        if (_userCreateLimit == 0 || _userMintLimit == 0) {
-            revert InteractionLimitZero();
         }
     }
 

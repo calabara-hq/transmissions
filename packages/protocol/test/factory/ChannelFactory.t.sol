@@ -8,7 +8,7 @@ import { IChannel } from "../../src/interfaces/IChannel.sol";
 
 import { FiniteChannel } from "../../src/channel/transport/FiniteChannel.sol";
 import { InfiniteChannel } from "../../src/channel/transport/InfiniteChannel.sol";
-
+import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { Uplink1155Factory } from "../../src/proxies/Uplink1155Factory.sol";
 import { ProxyShim } from "../../src/utils/ProxyShim.sol";
 import { UpgradePath } from "../../src/utils/UpgradePath.sol";
@@ -102,13 +102,11 @@ contract ChannelFactoryTest is Test {
                     createStart: uint80(block.timestamp),
                     mintStart: uint80(block.timestamp + 1),
                     mintEnd: uint80(block.timestamp + 20),
-                    userCreateLimit: 100,
-                    userMintLimit: 100,
                     rewards: FiniteChannel.FiniteRewards({
                         ranks: ranks,
                         allocations: allocations,
                         totalAllocation: 100 ether,
-                        token: 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE
+                        token: NativeTokenLib.NATIVE_TOKEN
                     })
                 })
             )

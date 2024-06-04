@@ -7,16 +7,30 @@ import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/Ow
 import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
- * used to manage allowed upgrade paths
+ * @title Upgrade Path
+ * @author nick
+ * @notice used to manage allowed channel upgrade paths
  */
 contract UpgradePath is IUpgradePath, OwnableUpgradeable {
+    /* -------------------------------------------------------------------------- */
+    /*                                   EVENTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    event UpgradePathContractInitialized();
+    event UpgradeRegistered(address indexed baseImpl, address indexed upgradeImpl);
+    event UpgradeRemoved(address indexed baseImpl, address indexed upgradeImpl);
+
+    /* -------------------------------------------------------------------------- */
+    /*                                   STORAGE                                  */
+    /* -------------------------------------------------------------------------- */
+
     mapping(address => mapping(address => bool)) public isAllowedUpgrade;
 
-    constructor() { }
+    /* -------------------------------------------------------------------------- */
+    /*                          CONSTRUCTOR & INITIALIZER                         */
+    /* -------------------------------------------------------------------------- */
 
-    /* -------------------------------------------------------------------------- */
-    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
-    /* -------------------------------------------------------------------------- */
+    constructor() { }
 
     /**
      * @notice Factory initializer
@@ -26,6 +40,10 @@ contract UpgradePath is IUpgradePath, OwnableUpgradeable {
         __Ownable_init(_initOwner);
         emit UpgradePathContractInitialized();
     }
+
+    /* -------------------------------------------------------------------------- */
+    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+    /* -------------------------------------------------------------------------- */
 
     /**
      * @notice If an implementation is registered as an optional upgrade
