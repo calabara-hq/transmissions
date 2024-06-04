@@ -212,7 +212,7 @@ contract Rewards {
         uint256 totalAllocation
     )
         internal
-        view
+        pure
     {
         uint256 allocationSum;
 
