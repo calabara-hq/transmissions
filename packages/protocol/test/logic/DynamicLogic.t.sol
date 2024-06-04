@@ -59,20 +59,20 @@ contract ChannelTest is Test {
         bytes[] memory datas = new bytes[](1);
         DynamicLogic.Operator[] memory operators = new DynamicLogic.Operator[](1);
         bytes[] memory literalOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory interactionPowerType = new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory interactionPower = new uint256[](1);
+        DynamicLogic.InteractionPowerType[] memory interactionPowerTypes = new DynamicLogic.InteractionPowerType[](1);
+        uint256[] memory interactionPowers = new uint256[](1);
 
         targets[0] = address(erc20Token);
         signatures[0] = IERC20.balanceOf.selector;
         datas[0] = abi.encode("");
         operators[0] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[0] = abi.encode(uint256(1 * 10 ** 18));
-        interactionPowerType[0] = DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[0] = 100;
+        interactionPowerTypes[0] = DynamicLogic.InteractionPowerType.UNIFORM;
+        interactionPowers[0] = 100;
 
         vm.startPrank(targetChannel);
         logicImpl.setCreatorLogic(
-            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower)
+            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers)
         );
 
         uint256 creationPowerBeforeMint = logicImpl.calculateCreatorInteractionPower(creator);
@@ -93,20 +93,20 @@ contract ChannelTest is Test {
         bytes[] memory datas = new bytes[](1);
         DynamicLogic.Operator[] memory operators = new DynamicLogic.Operator[](1);
         bytes[] memory literalOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory interactionPowerType = new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory interactionPower = new uint256[](1);
+        DynamicLogic.InteractionPowerType[] memory interactionPowerTypes = new DynamicLogic.InteractionPowerType[](1);
+        uint256[] memory interactionPowers = new uint256[](1);
 
         targets[0] = address(erc20Token);
         signatures[0] = IERC20.balanceOf.selector;
         datas[0] = abi.encode("");
         operators[0] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[0] = abi.encode(uint256(0));
-        interactionPowerType[0] = DynamicLogic.InteractionPowerType.WEIGHTED;
-        interactionPower[0] = 0;
+        interactionPowerTypes[0] = DynamicLogic.InteractionPowerType.WEIGHTED;
+        interactionPowers[0] = 0;
 
         vm.startPrank(targetChannel);
         logicImpl.setCreatorLogic(
-            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower)
+            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers)
         );
 
         uint256 creationPowerBeforeMint = logicImpl.calculateCreatorInteractionPower(creator);
@@ -135,48 +135,48 @@ contract ChannelTest is Test {
         bytes[] memory datas = new bytes[](4);
         DynamicLogic.Operator[] memory operators = new DynamicLogic.Operator[](4);
         bytes[] memory literalOperands = new bytes[](4);
-        DynamicLogic.InteractionPowerType[] memory interactionPowerType = new DynamicLogic.InteractionPowerType[](4);
-        uint256[] memory interactionPower = new uint256[](4);
+        DynamicLogic.InteractionPowerType[] memory interactionPowerTypes = new DynamicLogic.InteractionPowerType[](4);
+        uint256[] memory interactionPowers = new uint256[](4);
 
         targets[0] = address(erc20Token);
         signatures[0] = IERC20.balanceOf.selector;
         datas[0] = abi.encode("");
         operators[0] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[0] = abi.encode(uint256(0));
-        interactionPowerType[0] =
+        interactionPowerTypes[0] =
             isWeighted ? DynamicLogic.InteractionPowerType.WEIGHTED : DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[0] = ip_1;
+        interactionPowers[0] = ip_1;
 
         targets[1] = address(erc721Token);
         signatures[1] = IERC721.balanceOf.selector;
         datas[1] = abi.encode(address(0));
         operators[1] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[1] = abi.encode(uint256(0));
-        interactionPowerType[1] =
+        interactionPowerTypes[1] =
             isWeighted ? DynamicLogic.InteractionPowerType.WEIGHTED : DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[1] = ip_2;
+        interactionPowers[1] = ip_2;
 
         targets[2] = address(erc1155Token);
         signatures[2] = IERC1155.balanceOf.selector;
         datas[2] = abi.encode(address(0), 1);
         operators[2] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[2] = abi.encode(uint256(0));
-        interactionPowerType[2] =
+        interactionPowerTypes[2] =
             isWeighted ? DynamicLogic.InteractionPowerType.WEIGHTED : DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[2] = ip_3;
+        interactionPowers[2] = ip_3;
 
         targets[3] = address(mockBool);
         signatures[3] = IMockBool.getBool.selector;
         datas[3] = abi.encode(address(0));
         operators[3] = DynamicLogic.Operator.EQUALS;
         literalOperands[3] = abi.encode(uint256(1));
-        interactionPowerType[3] =
+        interactionPowerTypes[3] =
             isWeighted ? DynamicLogic.InteractionPowerType.WEIGHTED : DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[3] = ip_4;
+        interactionPowers[3] = ip_4;
 
         vm.startPrank(targetChannel);
         logicImpl.setCreatorLogic(
-            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower)
+            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers)
         );
 
         uint256 creationPowerBeforeMint = logicImpl.calculateCreatorInteractionPower(creator);
@@ -223,21 +223,21 @@ contract ChannelTest is Test {
         bytes[] memory datas = new bytes[](1);
         DynamicLogic.Operator[] memory operators = new DynamicLogic.Operator[](1);
         bytes[] memory literalOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory interactionPowerType = new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory interactionPower = new uint256[](1);
+        DynamicLogic.InteractionPowerType[] memory interactionPowerTypes = new DynamicLogic.InteractionPowerType[](1);
+        uint256[] memory interactionPowers = new uint256[](1);
 
         targets[0] = address(erc20Token);
         signatures[0] = IERC20.balanceOf.selector;
         datas[0] = abi.encode(address(0));
         operators[0] = DynamicLogic.Operator.GREATERTHAN;
         literalOperands[0] = abi.encode(uint256(3 * 10 ** 18));
-        interactionPowerType[0] = DynamicLogic.InteractionPowerType.UNIFORM;
-        interactionPower[0] = 100;
+        interactionPowerTypes[0] = DynamicLogic.InteractionPowerType.UNIFORM;
+        interactionPowers[0] = 100;
 
         vm.startPrank(targetChannel);
         vm.expectRevert(DynamicLogic.InvalidSignature.selector);
         newImpl.setCreatorLogic(
-            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower)
+            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers)
         );
 
         vm.stopPrank();

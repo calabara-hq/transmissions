@@ -22,5 +22,6 @@ interface IChannelFactory is IVersionedContract {
         bytes calldata transportConfig
     )
         external
+        payable
         returns (address);
 }

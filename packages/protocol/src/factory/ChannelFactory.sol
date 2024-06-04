@@ -130,9 +130,10 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         bytes calldata transportConfig
     )
         external
+        payable
         returns (address)
     {
-        FiniteUplink1155 newContract = new FiniteUplink1155(infiniteChannelImpl);
+        FiniteUplink1155 newContract = new FiniteUplink1155(finiteChannelImpl);
         _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
         return address(newContract);
     }
@@ -175,7 +176,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         private
     {
         emit SetupNewContract(newContract, uri, defaultAdmin, managers, transportConfig);
-        IChannel(newContract).initialize(uri, defaultAdmin, managers, setupActions, transportConfig);
+        IChannel(newContract).initialize{ value: msg.value }(uri, defaultAdmin, managers, setupActions, transportConfig);
     }
 
     /* -------------------------------------------------------------------------- */

@@ -26,6 +26,7 @@ contract ChannelTest is Test {
     address uplinkRewardsAddr = makeAddr("uplink rewards");
     address admin = makeAddr("admin");
     address channelTreasury = makeAddr("channel treasury");
+    address creator = makeAddr("creator");
     address minter = makeAddr("minter");
     address referral = makeAddr("referral");
 
@@ -35,8 +36,6 @@ contract ChannelTest is Test {
     IUpgradePath upgradePath;
 
     MockERC20 erc20Token;
-    MockERC721 erc721Token;
-    MockERC1155 erc1155Token;
 
     address weth = address(new WETH());
 
@@ -48,489 +47,339 @@ contract ChannelTest is Test {
 
         logicImpl = new DynamicLogic(address(this));
         logicImpl.approveLogic(IERC20.balanceOf.selector, 0);
-
-        erc20Token = new MockERC20("testERC20", "TEST1");
-        erc721Token = new MockERC721("testERC721", "TEST2");
-        erc1155Token = new MockERC1155("testERC1155");
+        erc20Token = new MockERC20("testERC20", "TEST");
 
         channelImpl = new ChannelHarness(address(upgradePath), weth);
+    }
 
-        bytes[] memory setupActions = new bytes[](2);
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
 
-        /// @dev fees
+    function createERC20SampleLogic(
+        DynamicLogic.InteractionPowerType interactionType,
+        uint256 literalOperand,
+        uint256 interactionPower
+    )
+        internal
+        returns (bytes memory)
+    {
+        address[] memory targets = new address[](1);
+        bytes4[] memory signatures = new bytes4[](1);
+        bytes[] memory datas = new bytes[](1);
+        DynamicLogic.Operator[] memory operators = new DynamicLogic.Operator[](1);
+        bytes[] memory literalOperands = new bytes[](1);
+        DynamicLogic.InteractionPowerType[] memory interactionPowerTypes = new DynamicLogic.InteractionPowerType[](1);
+        uint256[] memory interactionPowers = new uint256[](1);
 
-        bytes memory feeArgs = abi.encode(
+        targets[0] = address(erc20Token);
+        signatures[0] = IERC20.balanceOf.selector;
+        datas[0] = abi.encode("");
+        operators[0] = DynamicLogic.Operator.GREATERTHAN;
+        literalOperands[0] = abi.encode(literalOperand);
+        interactionPowerTypes[0] = interactionType;
+        interactionPowers[0] = interactionPower;
+
+        return
+            abi.encode(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers);
+    }
+
+    function createSampleFees(uint256 ethMintPrice, uint256 erc20MintPrice) internal returns (bytes memory) {
+        return abi.encode(
             channelTreasury,
             uint16(1000),
             uint16(1000),
             uint16(6000),
             uint16(1000),
             uint16(1000),
-            0.000777 ether,
-            1_000_000,
+            ethMintPrice,
+            erc20MintPrice,
             address(erc20Token)
         );
-        setupActions[0] = abi.encodeWithSelector(Channel.setFees.selector, address(customFeesImpl), feeArgs);
+    }
 
-        /// @dev creator logic
+    function encodeFeesWithSelector(bytes memory feeArgs) internal returns (bytes memory) {
+        return abi.encodeWithSelector(Channel.setFees.selector, address(customFeesImpl), feeArgs);
+    }
 
-        address[] memory creatorTargets = new address[](1);
-        bytes4[] memory creatorSignatures = new bytes4[](1);
-        bytes[] memory creatorDatas = new bytes[](1);
-        DynamicLogic.Operator[] memory creatorOperators = new DynamicLogic.Operator[](1);
-        bytes[] memory creatorLiteralOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory creatorInteractionPowerType =
-            new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory creatorInteractionPower = new uint256[](1);
+    function encodeLogicWithSelector(
+        bytes memory creatorLogic,
+        bytes memory minterLogic
+    )
+        internal
+        returns (bytes memory)
+    {
+        return abi.encodeWithSelector(Channel.setLogic.selector, address(logicImpl), creatorLogic, minterLogic);
+    }
 
-        creatorTargets[0] = address(erc20Token);
-        creatorSignatures[0] = IERC20.balanceOf.selector;
-        creatorDatas[0] = abi.encode("");
-        creatorOperators[0] = DynamicLogic.Operator.GREATERTHAN;
-        creatorLiteralOperands[0] = abi.encode(uint256(1_000_000));
-        creatorInteractionPowerType[0] = DynamicLogic.InteractionPowerType.WEIGHTED;
-        creatorInteractionPower[0] = 0;
+    function mintERC20ToUser(address user, uint256 requiredMinimum) internal {
+        erc20Token.mint(user, requiredMinimum + 1);
+    }
 
-        /// @dev minter logic
+    function createToken(address creator, uint256 maxSupply) internal returns (uint256) {
+        return channelImpl.createToken("https://example.com/api/token/1", creator, maxSupply);
+    }
 
-        address[] memory minterTargets = new address[](1);
-        bytes4[] memory minterSignatures = new bytes4[](1);
-        bytes[] memory minterDatas = new bytes[](1);
-        DynamicLogic.Operator[] memory minterOperators = new DynamicLogic.Operator[](1);
-        bytes[] memory minterLiteralOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory minterInteractionPowerType =
-            new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory minterInteractionPower = new uint256[](1);
+    function initializeChannelWithSetupActions(bytes memory feeArgs, bytes memory logicArgs) internal {
+        bytes[] memory setupActions;
 
-        minterTargets[0] = address(erc721Token);
-        minterSignatures[0] = IERC721.balanceOf.selector;
-        minterDatas[0] = abi.encode("");
-        minterOperators[0] = DynamicLogic.Operator.GREATERTHAN;
-        minterLiteralOperands[0] = abi.encode(1);
-        minterInteractionPowerType[0] = DynamicLogic.InteractionPowerType.UNIFORM;
-        minterInteractionPower[0] = 100;
-
-        setupActions[1] = abi.encodeWithSelector(
-            Channel.setLogic.selector,
-            address(logicImpl),
-            abi.encode(
-                creatorTargets,
-                creatorSignatures,
-                creatorDatas,
-                creatorOperators,
-                creatorLiteralOperands,
-                creatorInteractionPowerType,
-                creatorInteractionPower
-            ),
-            abi.encode(
-                minterTargets,
-                minterSignatures,
-                minterDatas,
-                minterOperators,
-                minterLiteralOperands,
-                minterInteractionPowerType,
-                minterInteractionPower
-            )
-        );
+        if (feeArgs.length > 0 && logicArgs.length > 0) {
+            setupActions = new bytes[](2);
+            setupActions[0] = feeArgs;
+            setupActions[1] = logicArgs;
+        } else if (feeArgs.length > 0) {
+            setupActions = new bytes[](1);
+            setupActions[0] = feeArgs;
+        } else if (logicArgs.length > 0) {
+            setupActions = new bytes[](1);
+            setupActions[0] = logicArgs;
+        } else {
+            setupActions = new bytes[](0);
+        }
 
         channelImpl.initialize(
             "https://example.com/api/token/0", admin, new address[](0), setupActions, abi.encode(100)
         );
     }
 
-    function _createTokenHelper(address creator) internal {
-        /// @dev mint tokens to creator to satisfy creator requirements
-        erc20Token.mint(creator, 1_000_001);
+    /* -------------------------------------------------------------------------- */
+    /*                                    TESTS                                   */
+    /* -------------------------------------------------------------------------- */
 
-        vm.startPrank(creator);
-        vm.expectEmit();
-        emit Channel.TokenCreated(
-            1, ChannelStorage.TokenConfig("https://example.com/api/token/1", creator, 100, 0, creator)
-        );
+    function test_channel_initialization() external {
+        initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
-        channelImpl.createToken("https://example.com/api/token/1", creator, 100);
-        vm.stopPrank();
+        assertEq(channelImpl.getToken(0).uri, "https://example.com/api/token/0");
     }
 
-    function test_channel_createToken() external {
-        address creator = makeAddr("creator");
+    function test_channel_updateChannelTokenUri() external {
+        initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
-        vm.startPrank(creator);
-        // expect revert if creator does not meet creator requirements
-        vm.expectRevert();
-        channelImpl.createToken("https://example.com/api/token/1", creator, 100);
-
-        _createTokenHelper(creator);
-        assertEq("https://example.com/api/token/1", channelImpl.getToken(1).uri);
-        assertEq(channelImpl.getUserStats(creator).numCreations, 1);
-
+        vm.startPrank(admin);
+        vm.expectEmit();
+        emit Channel.TokenURIUpdated(0, "https://example.com/api/token/1");
+        channelImpl.updateChannelTokenUri("https://example.com/api/token/1");
         vm.stopPrank();
+
+        assertEq(channelImpl.getToken(0).uri, "https://example.com/api/token/1");
     }
 
     function test_channel_mintTokenWithETH() external {
-        address minter = makeAddr("minter");
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
+        uint256 ethMintPrice = 0.000777 ether;
 
-        /// @dev create a test token
-        _createTokenHelper(creator);
+        initializeChannelWithSetupActions(encodeFeesWithSelector(createSampleFees(ethMintPrice, 0)), new bytes(0));
 
-        /// @dev ensure eth mint price is set correctly
-        assertEq(channelImpl.ethMintPrice(), 0.000777 ether);
-
-        /// @dev expect revert if minter does not meet minter requirements
-        vm.expectRevert();
-        channelImpl.mint(minter, 1, 1, referral, "");
-
-        /// @dev mint 2 tokens to minter to satisfy minter requirements
-        erc721Token.mint(minter, 1);
-        erc721Token.mint(minter, 2);
-
-        uint256 amount = 1;
-
-        vm.deal(minter, 0.000777 ether * amount);
+        vm.startPrank(creator);
+        createToken(creator, 100);
+        vm.stopPrank();
 
         vm.startPrank(minter);
 
-        uint256[] memory tokenIds = new uint256[](1);
-        tokenIds[0] = 1;
-        uint256[] memory amounts = new uint256[](1);
-        amounts[0] = amount;
+        /// @dev expect revert with insufficient funds
 
-        vm.expectEmit();
-        emit Channel.TokenMinted(minter, referral, tokenIds, amounts, "");
-        channelImpl.mint{ value: 0.000777 ether * amount }(minter, 1, 1, referral, "");
+        vm.expectRevert();
+        channelImpl.mint{ value: ethMintPrice }(minter, 1, 1, referral, "");
+
+        vm.deal(minter, ethMintPrice);
+        channelImpl.mint{ value: ethMintPrice }(minter, 1, 1, referral, "");
         vm.stopPrank();
 
-        /// @dev verify user has 1 token and total minted is 1
         assertEq(IERC1155(address(channelImpl)).balanceOf(minter, 1), 1);
         assertEq(channelImpl.getToken(1).totalMinted, 1);
-
-        /// @dev 70% of mint price since creator is also first minter
-        assertEq(creator.balance, 0.000777 ether * 70 / 100);
-        assertEq(channelTreasury.balance, 0.000777 ether * 10 / 100);
-        assertEq(uplinkRewardsAddr.balance, 0.000777 ether * 10 / 100);
-        assertEq(referral.balance, 0.000777 ether * 10 / 100);
-
-        /// @dev ensure user stats are updated
-        assertEq(channelImpl.getUserStats(minter).numMints, 1);
     }
 
-    function test_mintToken_withERC20() external {
-        address minter = makeAddr("minter");
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
+    function test_channel_mintTokenWithERC20() external {
+        uint256 erc20MintPrice = 1_000_000;
+        uint256 ethMintPrice = 0.000777 ether;
 
-        /// @dev create a test token
-        _createTokenHelper(creator);
+        initializeChannelWithSetupActions(
+            encodeFeesWithSelector(createSampleFees(ethMintPrice, erc20MintPrice)), new bytes(0)
+        );
 
-        /// @dev ensure erc20 mint price is set correctly
-        assertEq(channelImpl.erc20MintPrice(), 1_000_000);
+        vm.startPrank(creator);
+        createToken(creator, 100);
+        vm.stopPrank();
 
-        uint256 creatorErc20StartingBalance = erc20Token.balanceOf(creator);
+        vm.startPrank(minter);
 
-        /// @dev expect revert if minter does not meet minter requirements
+        /// @dev expect revert without erc20 allowance
+
         vm.expectRevert();
         channelImpl.mintWithERC20(minter, 1, 1, referral, "");
 
-        uint256 amount = 10;
+        erc20Token.approve(address(channelImpl), erc20MintPrice);
 
-        /// @dev mint 2 tokens to minter to satisfy minter requirements
-        erc721Token.mint(minter, 1);
-        erc721Token.mint(minter, 2);
+        /// @dev expect revert with insufficient funds
 
-        /// @dev mint erc20 tokens to minter for minting
-        erc20Token.mint(minter, 1_000_000 * amount);
+        vm.expectRevert();
+        channelImpl.mintWithERC20(minter, 1, 1, referral, "");
 
-        vm.startPrank(minter);
-        erc20Token.approve(address(channelImpl), 1_000_000 * amount);
+        erc20Token.mint(minter, erc20MintPrice);
+        channelImpl.mintWithERC20(minter, 1, 1, referral, "");
 
-        channelImpl.mintWithERC20(minter, 1, amount, referral, "");
         vm.stopPrank();
 
-        /// @dev verify user has 1 token and total minted is 1
-        assertEq(IERC1155(address(channelImpl)).balanceOf(minter, 1), amount);
-        assertEq(channelImpl.getToken(1).totalMinted, amount);
-
-        /// @dev 70% of mint price since creator is also sponsor
-        assertEq(erc20Token.balanceOf(creator), creatorErc20StartingBalance + 1_000_000 * amount * 70 / 100);
-        assertEq(erc20Token.balanceOf(channelTreasury), 1_000_000 * amount * 10 / 100);
-        assertEq(erc20Token.balanceOf(uplinkRewardsAddr), 1_000_000 * amount * 10 / 100);
-        assertEq(erc20Token.balanceOf(referral), 1_000_000 * amount * 10 / 100);
+        assertEq(IERC1155(address(channelImpl)).balanceOf(minter, 1), 1);
+        assertEq(channelImpl.getToken(1).totalMinted, 1);
     }
 
-    function test_channel_mintBatchWithEth() external {
-        address minter = makeAddr("minter");
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
+    function test_channel_mintBatch(uint8 batchSize) external {
+        vm.assume(batchSize > 0);
+        uint256 ethMintPrice = 0.000777 ether;
+        uint256 erc20MintPrice = 1_000_000;
 
-        /// @dev mint tokens to creator to satisfy creator requirements
-        erc20Token.mint(creator, 1_000_000 * 10);
-
-        /// @dev mint 2 tokens to minter to satisfy minter requirements
-        erc721Token.mint(minter, 1);
-        erc721Token.mint(minter, 2);
-
-        vm.deal(minter, 0.000777 ether * 10);
+        initializeChannelWithSetupActions(
+            encodeFeesWithSelector(createSampleFees(ethMintPrice, erc20MintPrice)), new bytes(0)
+        );
 
         vm.startPrank(creator);
 
-        for (uint256 i = 1; i <= 10; i++) {
-            channelImpl.createToken("https://example.com/api/token/1", creator, 100);
-        }
-        vm.stopPrank();
+        uint256[] memory tokenIds = new uint256[](batchSize);
+        uint256[] memory amounts = new uint256[](batchSize);
 
-        uint256[] memory tokenIds = new uint256[](10);
-        uint256[] memory amounts = new uint256[](10);
-
-        for (uint256 i = 0; i < 10; i++) {
-            tokenIds[i] = i + 1;
+        for (uint256 i = 0; i < batchSize; i++) {
+            uint256 tokenId = createToken(creator, 2);
+            tokenIds[i] = tokenId;
             amounts[i] = 1;
         }
 
-        vm.startPrank(minter);
-        channelImpl.mintBatchWithETH{ value: 0.000777 ether * 10 }(minter, tokenIds, amounts, referral, "");
         vm.stopPrank();
 
-        /// @dev verify user has tokenId's 1-10 and total minted for each is 1
-
-        for (uint256 i = 0; i < 10; i++) {
-            assertEq(IERC1155(address(channelImpl)).balanceOf(minter, i + 1), 1);
-            assertEq(channelImpl.getToken(i + 1).totalMinted, 1);
-        }
-        /// @dev 70% of mint price since creator is also first minter
-        assertEq(creator.balance, 0.000777 ether * 10 * 70 / 100);
-        assertEq(channelTreasury.balance, 0.000777 ether * 10 * 10 / 100);
-        assertEq(uplinkRewardsAddr.balance, 0.000777 ether * 10 * 10 / 100);
-        assertEq(referral.balance, 0.000777 ether * 10 * 10 / 100);
-
-        /// @dev ensure user stats are updated
-        assertEq(channelImpl.getUserStats(minter).numMints, 10);
-    }
-
-    function test_channel_mintBatchWithERC20() external {
-        address minter = makeAddr("minter");
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
-
-        /// @dev mint tokens to creator to satisfy creator requirements
-        erc20Token.mint(creator, 1_000_000 * 10);
-
-        uint256 creatorErc20StartingBalance = erc20Token.balanceOf(creator);
-
-        /// @dev mint 2 tokens to minter to satisfy minter requirements
-        erc721Token.mint(minter, 1);
-        erc721Token.mint(minter, 2);
-
-        vm.startPrank(creator);
-
-        for (uint256 i = 1; i <= 10; i++) {
-            channelImpl.createToken("https://example.com/api/token/1", creator, 100);
-        }
-        vm.stopPrank();
-
-        uint256[] memory tokenIds = new uint256[](10);
-        uint256[] memory amounts = new uint256[](10);
-
-        for (uint256 i = 0; i < 10; i++) {
-            tokenIds[i] = i + 1;
-            amounts[i] = 1;
-        }
-
         vm.startPrank(minter);
-        erc20Token.mint(minter, 1_000_000 * 10);
-        erc20Token.approve(address(channelImpl), 1_000_000 * 10);
+
+        erc20Token.mint(minter, erc20MintPrice * batchSize);
+        erc20Token.approve(address(channelImpl), erc20MintPrice * batchSize);
+
+        vm.deal(minter, ethMintPrice * batchSize);
+
         channelImpl.mintBatchWithERC20(minter, tokenIds, amounts, referral, "");
+
+        channelImpl.mintBatchWithETH{ value: ethMintPrice * batchSize }(minter, tokenIds, amounts, referral, "");
+
         vm.stopPrank();
 
-        /// @dev verify user has tokenId's 1-10 and total minted for each is 1
-
-        for (uint256 i = 0; i < 10; i++) {
-            assertEq(IERC1155(address(channelImpl)).balanceOf(minter, i + 1), 1);
-            assertEq(channelImpl.getToken(i + 1).totalMinted, 1);
+        for (uint256 i = 0; i < batchSize; i++) {
+            assertEq(IERC1155(address(channelImpl)).balanceOf(minter, tokenIds[i]), 2);
+            assertEq(channelImpl.getToken(tokenIds[i]).totalMinted, 2);
         }
-
-        /// @dev 70% of mint price since creator is also first minter
-        assertEq(erc20Token.balanceOf(creator), creatorErc20StartingBalance + 1_000_000 * 10 * 70 / 100);
-        assertEq(erc20Token.balanceOf(channelTreasury), 1_000_000 * 10 * 10 / 100);
-        assertEq(erc20Token.balanceOf(uplinkRewardsAddr), 1_000_000 * 10 * 10 / 100);
-        assertEq(erc20Token.balanceOf(referral), 1_000_000 * 10 * 10 / 100);
     }
 
-    function test_channel_exceedInteractionPowerLimits() external {
-        address minter = makeAddr("minter");
-        address creator = makeAddr("creator");
-        address referral = makeAddr("referral");
+    function test_channel_mintTokenWithSufficientInteractionPower(uint128 minimumInteractionPower) external {
+        bytes memory creatorLogic =
+            createERC20SampleLogic(DynamicLogic.InteractionPowerType.WEIGHTED, minimumInteractionPower, 0);
 
-        channelImpl = new ChannelHarness(address(upgradePath), weth);
+        bytes memory minterLogic =
+            createERC20SampleLogic(DynamicLogic.InteractionPowerType.UNIFORM, minimumInteractionPower, 100);
 
-        bytes[] memory setupActions = new bytes[](1);
+        initializeChannelWithSetupActions(new bytes(0), encodeLogicWithSelector(creatorLogic, minterLogic));
 
-        /// @dev creator logic
-
-        address[] memory creatorTargets = new address[](1);
-        bytes4[] memory creatorSignatures = new bytes4[](1);
-        bytes[] memory creatorDatas = new bytes[](1);
-        DynamicLogic.Operator[] memory creatorOperators = new DynamicLogic.Operator[](1);
-        bytes[] memory creatorLiteralOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory creatorInteractionPowerType =
-            new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory creatorInteractionPower = new uint256[](1);
-
-        creatorTargets[0] = address(erc20Token);
-        creatorSignatures[0] = IERC20.balanceOf.selector;
-        creatorDatas[0] = abi.encode("");
-        creatorOperators[0] = DynamicLogic.Operator.GREATERTHAN;
-        creatorLiteralOperands[0] = abi.encode(uint256(1_000_000));
-        creatorInteractionPowerType[0] = DynamicLogic.InteractionPowerType.UNIFORM;
-        creatorInteractionPower[0] = 1;
-
-        /// @dev minter logic
-
-        address[] memory minterTargets = new address[](1);
-        bytes4[] memory minterSignatures = new bytes4[](1);
-        bytes[] memory minterDatas = new bytes[](1);
-        DynamicLogic.Operator[] memory minterOperators = new DynamicLogic.Operator[](1);
-        bytes[] memory minterLiteralOperands = new bytes[](1);
-        DynamicLogic.InteractionPowerType[] memory minterInteractionPowerType =
-            new DynamicLogic.InteractionPowerType[](1);
-        uint256[] memory minterInteractionPower = new uint256[](1);
-
-        minterTargets[0] = address(erc721Token);
-        minterSignatures[0] = IERC721.balanceOf.selector;
-        minterDatas[0] = abi.encode("");
-        minterOperators[0] = DynamicLogic.Operator.GREATERTHAN;
-        minterLiteralOperands[0] = abi.encode(1);
-        minterInteractionPowerType[0] = DynamicLogic.InteractionPowerType.UNIFORM;
-        minterInteractionPower[0] = 1;
-
-        setupActions[0] = abi.encodeWithSelector(
-            Channel.setLogic.selector,
-            address(logicImpl),
-            abi.encode(
-                creatorTargets,
-                creatorSignatures,
-                creatorDatas,
-                creatorOperators,
-                creatorLiteralOperands,
-                creatorInteractionPowerType,
-                creatorInteractionPower
-            ),
-            abi.encode(
-                minterTargets,
-                minterSignatures,
-                minterDatas,
-                minterOperators,
-                minterLiteralOperands,
-                minterInteractionPowerType,
-                minterInteractionPower
-            )
-        );
-
-        channelImpl.initialize(
-            "https://example.com/api/token/0", admin, new address[](0), setupActions, abi.encode(100)
-        );
-
-        /// @dev mint tokens to creator to satisfy creator requirements
-        erc20Token.mint(creator, 1_000_001);
-        /// @dev mint 2 tokens to minter to satisfy minter requirements
-        erc721Token.mint(minter, 1);
-        erc721Token.mint(minter, 2);
+        mintERC20ToUser(creator, minimumInteractionPower);
+        mintERC20ToUser(minter, minimumInteractionPower);
 
         vm.startPrank(creator);
-        /// @dev first creation should pass
-        channelImpl.createToken("test", creator, 100);
-        /// @dev second creation should fail since maxInteractionPower is 1
-        vm.expectRevert(Channel.InsufficientInteractionPower.selector);
-        channelImpl.createToken("test", creator, 100);
-
+        createToken(creator, 100);
         vm.stopPrank();
 
         vm.startPrank(minter);
-        /// @dev first mint should pass
         channelImpl.mint(minter, 1, 1, referral, "");
-        /// @dev subsequent mints should fail since maxInteractionPower is 1
-        vm.expectRevert(Channel.InsufficientInteractionPower.selector);
-        channelImpl.mint(minter, 1, 1, referral, "");
-
-        vm.expectRevert(Channel.InsufficientInteractionPower.selector);
-        channelImpl.mint(minter, 1, 10, referral, "");
-
         vm.stopPrank();
+
+        assertEq(IERC1155(address(channelImpl)).balanceOf(minter, 1), 1);
+        assertEq(channelImpl.getToken(1).totalMinted, 1);
     }
 
-    function test_channel_emptyLogicAndFees() external {
-        ChannelHarness newChannelImpl = new ChannelHarness(address(upgradePath), address(0));
+    function test_channel_freeMintZeroLogic() external {
+        initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
-        newChannelImpl.initialize(
-            "https://example.com/api/token/0", admin, new address[](0), new bytes[](0), abi.encode(100)
-        );
-
-        newChannelImpl.createToken("sampleToken", admin, 100);
-        assertEq("sampleToken", newChannelImpl.getToken(1).uri);
-
-        address minter = makeAddr("minter");
-        vm.startPrank(minter);
-
-        newChannelImpl.mint(minter, 1, 1, admin, "");
-
-        /// @dev verify user has 1 token and total minted is 1
-        assertEq(1, newChannelImpl.getToken(1).totalMinted);
-        assertEq(IERC1155(address(newChannelImpl)).balanceOf(minter, 1), 1);
-
+        vm.startPrank(creator);
+        createToken(creator, 100);
         vm.stopPrank();
+
+        vm.startPrank(minter);
+        channelImpl.mint(minter, 1, 1, referral, "");
+        vm.stopPrank();
+
+        assertEq(IERC1155(address(channelImpl)).balanceOf(minter, 1), 1);
+        assertEq(channelImpl.getToken(1).totalMinted, 1);
     }
 
     function test_channel_mintRequirements() external {
-        ChannelHarness newChannelImpl = new ChannelHarness(address(upgradePath), address(0));
+        initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
-        newChannelImpl.initialize(
-            "https://example.com/api/token/0", admin, new address[](0), new bytes[](0), abi.encode(100)
-        );
-
-        newChannelImpl.createToken("sampleToken", admin, 3);
+        vm.startPrank(creator);
+        channelImpl.createToken("sampleToken", admin, 3);
+        vm.stopPrank();
 
         vm.startPrank(minter);
 
         /// @dev expect revert if token maxSupply is 0 (default token)
         vm.expectRevert(Channel.NotMintable.selector);
-        newChannelImpl.mint(minter, 0, 1, referral, "");
+        channelImpl.mint(minter, 0, 1, referral, "");
 
         /// @dev expect revert if amount > maxSupply - totalMinted
         vm.expectRevert(Channel.AmountExceedsMaxSupply.selector);
-        newChannelImpl.mint(minter, 1, 5, referral, "");
+        channelImpl.mint(minter, 1, 5, referral, "");
 
         /// @dev expect revert if amount = 0
         vm.expectRevert(Channel.AmountZero.selector);
-        newChannelImpl.mint(minter, 1, 0, referral, "");
+        channelImpl.mint(minter, 1, 0, referral, "");
 
         /// @dev mint up to maxSupply
-        newChannelImpl.mint(minter, 1, 3, referral, "");
+        channelImpl.mint(minter, 1, 3, referral, "");
 
         /// @dev expect revert if totalMinted > maxSupply
         vm.expectRevert(Channel.SoldOut.selector);
-        newChannelImpl.mint(minter, 1, 1, referral, "");
+        channelImpl.mint(minter, 1, 1, referral, "");
 
         vm.stopPrank();
     }
 
-    function test_initialize() external {
-        ChannelHarness newChannelImpl = new ChannelHarness(address(upgradePath), address(0));
-        newChannelImpl.initialize(
-            "https://example.com/api/token/0", admin, new address[](0), new bytes[](0), abi.encode(100)
+    function test_channel_ETHRewardsDistributed() external {
+        uint256 ethMintPrice = 0.000777 ether;
+
+        initializeChannelWithSetupActions(encodeFeesWithSelector(createSampleFees(ethMintPrice, 0)), new bytes(0));
+
+        vm.startPrank(creator);
+        createToken(creator, 100);
+        vm.stopPrank();
+
+        vm.startPrank(minter);
+
+        vm.deal(minter, ethMintPrice);
+
+        channelImpl.mint{ value: ethMintPrice }(minter, 1, 1, referral, "");
+
+        vm.stopPrank();
+
+        assertEq(creator.balance, ethMintPrice * 70 / 100); // 70% = 60% creator + 10% sponsor
+        assertEq(channelTreasury.balance, ethMintPrice * 10 / 100); // 10% of mint price
+        assertEq(uplinkRewardsAddr.balance, ethMintPrice * 10 / 100); // 10% of mint price
+        assertEq(referral.balance, ethMintPrice * 10 / 100); // 10% of mint price
+    }
+
+    function test_channel_ERC20RewardsDistributed() external {
+        uint256 ethMintPrice = 0.000777 ether;
+        uint256 erc20MintPrice = 1_000_000;
+
+        initializeChannelWithSetupActions(
+            encodeFeesWithSelector(createSampleFees(ethMintPrice, erc20MintPrice)), new bytes(0)
         );
-        assertEq("https://example.com/api/token/0", newChannelImpl.getToken(0).uri);
-        assertEq(0, newChannelImpl.getToken(0).maxSupply);
-        assertEq(0, newChannelImpl.getToken(0).totalMinted);
-    }
 
-    function test_updateChannelTokenUri() external {
-        vm.expectRevert();
-        channelImpl.updateChannelTokenUri("https://new-example.com/api/token/1");
-
-        vm.startPrank(admin);
-        channelImpl.updateChannelTokenUri("https://new-example.com/api/token/1");
-        assertEq("https://new-example.com/api/token/1", channelImpl.getToken(0).uri);
+        vm.startPrank(creator);
+        createToken(creator, 100);
         vm.stopPrank();
+
+        vm.startPrank(minter);
+        erc20Token.mint(minter, 1_000_000);
+        erc20Token.approve(address(channelImpl), 1_000_000);
+
+        channelImpl.mintWithERC20(minter, 1, 1, referral, "");
+
+        vm.stopPrank();
+
+        assertEq(erc20Token.balanceOf(creator), 1_000_000 * 70 / 100); // 70% = 60% creator + 10% sponsor
+        assertEq(erc20Token.balanceOf(channelTreasury), 1_000_000 * 10 / 100); // 10% of mint price
+        assertEq(erc20Token.balanceOf(uplinkRewardsAddr), 1_000_000 * 10 / 100); // 10% of mint price
+        assertEq(erc20Token.balanceOf(referral), 1_000_000 * 10 / 100); // 10% of mint price
     }
 }

@@ -92,7 +92,7 @@ contract ChannelFactoryTest is Test {
         ranks[0] = 1;
         allocations[0] = 100 ether;
 
-        address newFiniteChannel = channelFactory.createFiniteChannel(
+        address newFiniteChannel = channelFactory.createFiniteChannel{ value: 100 ether }(
             "https://example.com/api/token/0",
             address(this),
             new address[](0),

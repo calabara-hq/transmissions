@@ -46,8 +46,8 @@ contract DynamicLogic is ILogic, Ownable {
         bytes[] datas;
         Operator[] operators;
         bytes[] literalOperands;
-        InteractionPowerType[] interactionPowerType;
-        uint256[] interactionPower;
+        InteractionPowerType[] interactionPowerTypes;
+        uint256[] interactionPowers;
     }
 
     struct ApprovedSignature {
@@ -144,15 +144,15 @@ contract DynamicLogic is ILogic, Ownable {
             bytes[] memory datas,
             Operator[] memory operators,
             bytes[] memory literalOperands,
-            InteractionPowerType[] memory interactionPowerType,
-            uint256[] memory interactionPower
+            InteractionPowerType[] memory interactionPowerTypes,
+            uint256[] memory interactionPowers
         ) = abi.decode(data, (address[], bytes4[], bytes[], Operator[], bytes[], InteractionPowerType[], uint256[]));
 
         _validateSignatures(signatures);
-        _validateLogic(targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower);
+        _validateLogic(targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers);
 
         return InteractionLogic(
-            targets, signatures, datas, operators, literalOperands, interactionPowerType, interactionPower
+            targets, signatures, datas, operators, literalOperands, interactionPowerTypes, interactionPowers
         );
     }
 
@@ -181,16 +181,16 @@ contract DynamicLogic is ILogic, Ownable {
         bytes[] memory datas,
         Operator[] memory operators,
         bytes[] memory literalOperands,
-        InteractionPowerType[] memory interactionPowerType,
-        uint256[] memory interactionPower
+        InteractionPowerType[] memory interactionPowerTypes,
+        uint256[] memory interactionPowers
     )
         internal
         pure
     {
         require(
             targets.length == signatures.length && signatures.length == datas.length && datas.length == operators.length
-                && operators.length == literalOperands.length && literalOperands.length == interactionPowerType.length
-                && interactionPowerType.length == interactionPower.length,
+                && operators.length == literalOperands.length && literalOperands.length == interactionPowerTypes.length
+                && interactionPowerTypes.length == interactionPowers.length,
             "Logic field lengths do not match"
         );
     }
@@ -246,9 +246,9 @@ contract DynamicLogic is ILogic, Ownable {
 
             bool result = _applyOperator(logic.operators[i], executionResult, logic.literalOperands[i]);
             if (result) {
-                if (logic.interactionPowerType[i] == InteractionPowerType.UNIFORM) {
+                if (logic.interactionPowerTypes[i] == InteractionPowerType.UNIFORM) {
                     /// @dev If uniform, interaction power is a constant from the logic parameters
-                    results[i] = logic.interactionPower[i];
+                    results[i] = logic.interactionPowers[i];
                 } else {
                     /// @dev If weighted, interaction power is the result of the staticcall
                     /// @dev For rules returning booleans, this will be 1 / 0.

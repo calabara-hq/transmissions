@@ -22,7 +22,6 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     error NotAcceptingCreations();
     error NotAcceptingMints();
     error InvalidTiming();
-    error OngoingSale();
     error AlreadySettled();
     error StillActive();
 

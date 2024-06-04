@@ -7,6 +7,7 @@ optimizer_runs = 50
 via_ir = true
 fs_permissions = [{ access = "read-write", path = "./deploy"}]
 
+
 [fmt]
 bracket_spacing = true
 int_types = "long"

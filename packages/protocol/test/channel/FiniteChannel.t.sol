@@ -11,6 +11,10 @@ import { UpgradePath } from "../../src/utils/UpgradePath.sol";
 import { WETH } from "../utils/WETH.t.sol";
 import { Test, console } from "forge-std/Test.sol";
 
+import { MockERC20 } from "../utils/TokenHelpers.t.sol";
+
+import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
+
 struct FuzzedInputs {
     uint40 startRank;
     uint40 endRank;
@@ -58,12 +62,18 @@ contract FiniteChannelHarness is FiniteChannel {
 }
 
 contract FiniteChannelTest is Test {
-    address nick = makeAddr("nick");
     address admin = makeAddr("admin");
+
+    address creator = makeAddr("creator");
+    address minter = makeAddr("minter");
+    address referral = makeAddr("referral");
+
     address channelTreasury = makeAddr("channel treasury");
     IUpgradePath upgradePath;
     FiniteChannelHarness channelImpl;
     FiniteChannelHarness targetChannel;
+
+    MockERC20 erc20Token = new MockERC20("testERC20", "TEST");
 
     error Unauthorized();
 
@@ -74,10 +84,107 @@ contract FiniteChannelTest is Test {
         targetChannel = FiniteChannelHarness(payable(address(new FiniteUplink1155(address(channelImpl)))));
     }
 
-    function createChannelTestCase(
-        FuzzedInputs memory inputs,
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
+
+    function createEncodedFiniteParams(
+        uint80 createStart,
+        uint80 mintStart,
+        uint80 mintEnd,
+        uint40[] memory ranks,
+        uint256[] memory allocations,
+        uint256 totalAllocation,
         address rewardToken
     )
+        internal
+        returns (bytes memory)
+    {
+        return abi.encode(
+            FiniteChannel.FiniteParams({
+                createStart: createStart,
+                mintStart: mintStart,
+                mintEnd: mintEnd,
+                rewards: FiniteChannel.FiniteRewards({
+                    ranks: ranks,
+                    allocations: allocations,
+                    totalAllocation: totalAllocation,
+                    token: rewardToken
+                })
+            })
+        );
+    }
+
+    function initializeChannelWithTimingScenario(uint80 createStart, uint80 mintStart, uint80 mintEnd) internal {
+        uint40[] memory ranks = new uint40[](1);
+        ranks[0] = 1;
+
+        uint256[] memory allocations = new uint256[](1);
+        allocations[0] = 1;
+
+        targetChannel.initialize{ value: 1 }(
+            "https://example.com/api/token/0",
+            admin,
+            new address[](0),
+            new bytes[](0),
+            createEncodedFiniteParams(
+                createStart, mintStart, mintEnd, ranks, allocations, 1, NativeTokenLib.NATIVE_TOKEN
+            )
+        );
+    }
+
+    function initializeChannelWithETHRewards(
+        uint40[] memory ranks,
+        uint256[] memory allocations,
+        uint256 totalAllocation
+    )
+        internal
+    {
+        targetChannel.initialize{ value: totalAllocation }(
+            "https://example.com/api/token/0",
+            admin,
+            new address[](0),
+            new bytes[](0),
+            createEncodedFiniteParams(
+                uint80(block.timestamp),
+                uint80(block.timestamp + 1),
+                uint80(block.timestamp + 20),
+                ranks,
+                allocations,
+                totalAllocation,
+                NativeTokenLib.NATIVE_TOKEN
+            )
+        );
+    }
+
+    function initializeChannelWithERC20Rewards(
+        uint40[] memory ranks,
+        uint256[] memory allocations,
+        uint256 totalAllocation
+    )
+        internal
+    {
+        erc20Token.mint(address(this), totalAllocation);
+        erc20Token.approve(address(targetChannel), totalAllocation);
+
+        targetChannel.initialize(
+            "https://example.com/api/token/0",
+            admin,
+            new address[](0),
+            new bytes[](0),
+            createEncodedFiniteParams(
+                uint80(block.timestamp),
+                uint80(block.timestamp + 1),
+                uint80(block.timestamp + 20),
+                ranks,
+                allocations,
+                totalAllocation,
+                address(erc20Token)
+            )
+        );
+    }
+
+    function createParamsFromFuzzedInputs(FuzzedInputs memory inputs)
         internal
         returns (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation)
     {
@@ -109,52 +216,23 @@ contract FiniteChannelTest is Test {
             _totalAllocation += 1;
             counter++;
         }
-
-        targetChannel.initialize{ value: _totalAllocation }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 1),
-                    mintEnd: uint80(block.timestamp + 20),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: _ranks,
-                        allocations: _allocations,
-                        totalAllocation: _totalAllocation,
-                        token: rewardToken
-                    })
-                })
-            )
-        );
-
-        for (uint8 i = 0; i < numSubmissions; i++) {
-            address sampleCreator = vm.addr(i + 1);
-            targetChannel.createToken("test", sampleCreator, 1000);
-        }
-
-        vm.warp(block.timestamp + 10);
-
-        targetChannel.mint(nick, target_sub_a, vote_a, nick, "");
-        targetChannel.mint(nick, target_sub_b, vote_b, nick, "");
-        targetChannel.mint(nick, target_sub_c, vote_c, nick, "");
-        targetChannel.mint(nick, target_sub_d, vote_d, nick, "");
-        targetChannel.mint(nick, target_sub_e, vote_e, nick, "");
     }
 
-    function test_finiteChannel_sortWinners(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
+    /* -------------------------------------------------------------------------- */
+    /*                                    TESTS                                   */
+    /* -------------------------------------------------------------------------- */
 
-        createChannelTestCase(inputs, rewardToken);
+    function test_finiteChannel_sortWinners(FuzzedInputs memory inputs) public {
+        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
+            createParamsFromFuzzedInputs(inputs);
+
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
 
         uint256[] memory winningTokenIds = targetChannel.getRankedTokenIds();
 
         /// @dev ensure the winningTokenIds are in order from highest to lowest totalMinted
 
         for (uint8 i = 0; i < winningTokenIds.length; i++) {
-            console.log(winningTokenIds[i]);
             if (i != winningTokenIds.length - 1) {
                 assertTrue(
                     targetChannel.getToken(winningTokenIds[i]).totalMinted
@@ -162,88 +240,6 @@ contract FiniteChannelTest is Test {
                 );
             }
         }
-    }
-
-    function test_finiteChannel_settleDistributeRewards(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
-
-        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
-            createChannelTestCase(inputs, rewardToken);
-
-        vm.warp(block.timestamp + 20);
-        targetChannel.settle();
-
-        address[] memory winningAuthors = targetChannel.getRankedAuthors();
-
-        uint256 totalDistributed = 0;
-        bool isLeftovers = false;
-
-        /// @dev ensure rewards were distributed correctly
-        for (uint8 i = 0; i < winningAuthors.length; i++) {
-            if (winningAuthors[i] != address(0)) {
-                assertEq(winningAuthors[i].balance, _allocations[i]);
-                totalDistributed += _allocations[i];
-            } else {
-                isLeftovers = true;
-            }
-        }
-
-        if (isLeftovers) {
-            /// @dev ensure the leftovers are in the contract and claimable by the admin
-            assertEq(address(targetChannel).balance, _totalAllocation - totalDistributed);
-
-            /// @dev attempt to withdraw the leftovers
-
-            /// @dev ensure non admin / manager cannot initiate a withdrawal
-            vm.expectRevert(Unauthorized.selector);
-            targetChannel.withdrawRewards(nick, rewardToken, address(targetChannel).balance);
-
-            vm.startPrank(admin);
-            targetChannel.withdrawRewards(rewardToken, nick, address(targetChannel).balance);
-            assertEq(nick.balance, _totalAllocation - totalDistributed);
-            vm.stopPrank();
-        }
-    }
-
-    function test_finiteChannel_settleRevertConditions(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
-
-        createChannelTestCase(inputs, rewardToken);
-
-        /// @dev ensure the settle function reverts if called before the mintEnd time
-        vm.expectRevert(FiniteChannel.StillActive.selector);
-        targetChannel.settle();
-
-        /// @dev ensure the settle function reverts if it has already been called succesfully
-        vm.warp(block.timestamp + 20);
-
-        targetChannel.settle();
-
-        vm.expectRevert(FiniteChannel.AlreadySettled.selector);
-        targetChannel.settle();
-    }
-
-    function test_finiteChannel_transportCannotBeModifiedAfterInitialization(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
-
-        createChannelTestCase(inputs, rewardToken);
-
-        vm.expectRevert();
-        targetChannel.setTransportConfig{ value: 1 }(
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 1),
-                    mintEnd: uint80(block.timestamp + 20),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: new uint40[](1),
-                        allocations: new uint256[](1),
-                        totalAllocation: 1,
-                        token: NativeTokenLib.NATIVE_TOKEN
-                    })
-                })
-            )
-        );
     }
 
     function test_finiteChannel_sortWinnersGappedRanks() public {
@@ -276,25 +272,7 @@ contract FiniteChannelTest is Test {
             _totalAllocation += 1;
         }
 
-        targetChannel.initialize{ value: _totalAllocation }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 1),
-                    mintEnd: uint80(block.timestamp + 20),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: _ranks,
-                        allocations: _allocations,
-                        totalAllocation: _totalAllocation,
-                        token: NativeTokenLib.NATIVE_TOKEN
-                    })
-                })
-            )
-        );
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
 
         address sampleCreator = makeAddr("sampleCreator");
 
@@ -304,11 +282,11 @@ contract FiniteChannelTest is Test {
 
         vm.warp(block.timestamp + 10);
 
-        targetChannel.mint(nick, target_sub_a, vote_a, nick, "");
-        targetChannel.mint(nick, target_sub_b, vote_b, nick, "");
-        targetChannel.mint(nick, target_sub_c, vote_c, nick, "");
-        targetChannel.mint(nick, target_sub_d, vote_d, nick, "");
-        targetChannel.mint(nick, target_sub_e, vote_e, nick, "");
+        targetChannel.mint(minter, target_sub_a, vote_a, referral, "");
+        targetChannel.mint(minter, target_sub_b, vote_b, referral, "");
+        targetChannel.mint(minter, target_sub_c, vote_c, referral, "");
+        targetChannel.mint(minter, target_sub_d, vote_d, referral, "");
+        targetChannel.mint(minter, target_sub_e, vote_e, referral, "");
 
         uint256[] memory winningTokenIds = targetChannel.getRankedTokenIds();
 
@@ -319,6 +297,118 @@ contract FiniteChannelTest is Test {
         assertEq(winningTokenIds[2], 0);
         assertEq(winningTokenIds[3], 0);
         assertEq(winningTokenIds[4], 0);
+    }
+
+    function test_finiteChannel_settleDistributeETHRewards(FuzzedInputs memory inputs) public {
+        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
+            createParamsFromFuzzedInputs(inputs);
+
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
+
+        vm.warp(block.timestamp + 20);
+        targetChannel.settle();
+
+        address[] memory winningAuthors = targetChannel.getRankedAuthors();
+
+        uint256 totalDistributed = 0;
+        bool isLeftovers = false;
+
+        /// @dev ensure rewards were distributed correctly
+        for (uint8 i = 0; i < winningAuthors.length; i++) {
+            if (winningAuthors[i] != address(0)) {
+                assertEq(winningAuthors[i].balance, _allocations[i]);
+                totalDistributed += _allocations[i];
+            } else {
+                isLeftovers = true;
+            }
+        }
+
+        if (isLeftovers) {
+            /// @dev ensure the leftovers are in the contract and claimable by the admin
+            assertEq(address(targetChannel).balance, _totalAllocation - totalDistributed);
+
+            /// @dev attempt to withdraw the leftovers
+
+            vm.startPrank(admin);
+            targetChannel.withdrawRewards(NativeTokenLib.NATIVE_TOKEN, admin, address(targetChannel).balance);
+            assertEq(admin.balance, _totalAllocation - totalDistributed);
+            vm.stopPrank();
+        }
+    }
+
+    function test_finiteChannel_settleDistributeERC20Rewards(FuzzedInputs memory inputs) public {
+        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
+            createParamsFromFuzzedInputs(inputs);
+
+        initializeChannelWithERC20Rewards(_ranks, _allocations, _totalAllocation);
+
+        vm.warp(block.timestamp + 20);
+        targetChannel.settle();
+
+        address[] memory winningAuthors = targetChannel.getRankedAuthors();
+
+        uint256 totalDistributed = 0;
+        bool isLeftovers = false;
+
+        /// @dev ensure rewards were distributed correctly
+
+        for (uint8 i = 0; i < winningAuthors.length; i++) {
+            if (winningAuthors[i] != address(0)) {
+                assertEq(erc20Token.balanceOf(winningAuthors[i]), _allocations[i]);
+                totalDistributed += _allocations[i];
+            } else {
+                isLeftovers = true;
+            }
+        }
+
+        if (isLeftovers) {
+            /// @dev ensure the leftovers are in the contract and claimable by the admin
+            assertEq(erc20Token.balanceOf(address(targetChannel)), _totalAllocation - totalDistributed);
+
+            vm.startPrank(admin);
+            targetChannel.withdrawRewards(address(erc20Token), admin, erc20Token.balanceOf(address(targetChannel)));
+            assertEq(erc20Token.balanceOf(admin), _totalAllocation - totalDistributed);
+            vm.stopPrank();
+        }
+    }
+
+    function test_finiteChannel_settleRevertConditions(FuzzedInputs memory inputs) public {
+        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
+            createParamsFromFuzzedInputs(inputs);
+
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
+
+        /// @dev ensure the settle function reverts if called before the mintEnd time
+        vm.expectRevert(FiniteChannel.StillActive.selector);
+        targetChannel.settle();
+
+        /// @dev ensure the settle function reverts if it has already been called succesfully
+        vm.warp(block.timestamp + 20);
+
+        targetChannel.settle();
+
+        vm.expectRevert(FiniteChannel.AlreadySettled.selector);
+        targetChannel.settle();
+    }
+
+    function test_finiteChannel_transportCannotBeModifiedAfterInitialization(FuzzedInputs memory inputs) public {
+        (uint40[] memory _ranks, uint256[] memory _allocations, uint256 _totalAllocation) =
+            createParamsFromFuzzedInputs(inputs);
+
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
+
+        vm.expectRevert();
+        targetChannel.setTransportConfig{ value: 1 }(
+            createEncodedFiniteParams(
+                uint80(block.timestamp),
+                uint80(block.timestamp + 1),
+                uint80(block.timestamp + 20),
+                new uint40[](1),
+                new uint256[](1),
+                1,
+                NativeTokenLib.NATIVE_TOKEN
+            )
+        );
     }
 
     function test_finiteChannel_timingValidationOnSetParams(
@@ -335,105 +425,81 @@ contract FiniteChannelTest is Test {
         allocations[0] = 1;
 
         if (createStart >= mintStart || mintStart >= mintEnd) vm.expectRevert();
-        targetChannel.initialize{ value: 1 }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: createStart,
-                    mintStart: mintStart,
-                    mintEnd: mintEnd,
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: ranks,
-                        allocations: allocations,
-                        totalAllocation: 1,
-                        token: NativeTokenLib.NATIVE_TOKEN
-                    })
-                })
-            )
-        );
+        initializeChannelWithTimingScenario(createStart, mintStart, mintEnd);
     }
 
-    function test_finiteChannel_timingValidationOnCreateToken(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
-
-        uint40[] memory _ranks = new uint40[](1);
-        _ranks[0] = 1;
-        uint256[] memory _allocations = new uint256[](1);
-        _allocations[0] = 1 ether;
-
-        targetChannel.initialize{ value: 1 ether }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp + 10),
-                    mintStart: uint80(block.timestamp + 20),
-                    mintEnd: uint80(block.timestamp + 30),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: _ranks,
-                        allocations: _allocations,
-                        totalAllocation: 1 ether,
-                        token: rewardToken
-                    })
-                })
-            )
+    function test_finiteChannel_timingValidationOnCreateToken() public {
+        initializeChannelWithTimingScenario(
+            uint80(block.timestamp + 10), uint80(block.timestamp + 20), uint80(block.timestamp + 30)
         );
 
         vm.expectRevert(FiniteChannel.NotAcceptingCreations.selector);
-        targetChannel.createToken("test", nick, 1000);
+        targetChannel.createToken("test", creator, 1000);
 
         vm.warp(block.timestamp + 10);
-        targetChannel.createToken("test", nick, 1000);
+        targetChannel.createToken("test", creator, 1000);
 
         vm.warp(block.timestamp + 100);
         vm.expectRevert(FiniteChannel.NotAcceptingCreations.selector);
-        targetChannel.createToken("test", nick, 1000);
+        targetChannel.createToken("test", creator, 1000);
     }
 
-    function test_finiteChannel_timingValidationOnMintToken(FuzzedInputs memory inputs) public {
-        address rewardToken = NativeTokenLib.NATIVE_TOKEN;
-
-        uint40[] memory _ranks = new uint40[](1);
-        _ranks[0] = 1;
-        uint256[] memory _allocations = new uint256[](1);
-        _allocations[0] = 1 ether;
-
-        targetChannel.initialize{ value: 1 ether }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 10),
-                    mintEnd: uint80(block.timestamp + 20),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: _ranks,
-                        allocations: _allocations,
-                        totalAllocation: 1 ether,
-                        token: rewardToken
-                    })
-                })
-            )
+    function test_finiteChannel_timingValidationOnMintToken() public {
+        initializeChannelWithTimingScenario(
+            uint80(block.timestamp), uint80(block.timestamp + 10), uint80(block.timestamp + 20)
         );
 
-        targetChannel.createToken("test", nick, 1000);
+        targetChannel.createToken("test", creator, 1000);
 
         vm.expectRevert(FiniteChannel.NotAcceptingMints.selector);
-        targetChannel.mint(nick, 1, 1, nick, "");
+        targetChannel.mint(minter, 1, 1, referral, "");
 
         vm.warp(block.timestamp + 10);
-        targetChannel.mint(nick, 1, 1, nick, "");
+        targetChannel.mint(minter, 1, 1, referral, "");
 
         vm.warp(block.timestamp + 30);
         vm.expectRevert(FiniteChannel.NotAcceptingMints.selector);
-        targetChannel.mint(nick, 1, 1, nick, "");
+        targetChannel.mint(minter, 1, 1, referral, "");
+    }
+
+    function test_finiteChannel_revertOnNonAdminWithdraw() public {
+        initializeChannelWithTimingScenario(
+            uint80(block.timestamp), uint80(block.timestamp + 10), uint80(block.timestamp + 20)
+        );
+
+        vm.expectRevert();
+        targetChannel.withdrawRewards(NativeTokenLib.NATIVE_TOKEN, admin, 1);
+    }
+
+    function test_finiteChannel_noInteractionsAllowedAfterSettle() public {
+        initializeChannelWithTimingScenario(
+            uint80(block.timestamp), uint80(block.timestamp + 10), uint80(block.timestamp + 20)
+        );
+
+        vm.warp(block.timestamp + 20);
+        targetChannel.settle();
+
+        vm.expectRevert();
+        targetChannel.createToken("test", creator, 1000);
+
+        vm.expectRevert();
+        targetChannel.mint(minter, 1, 1, referral, "");
+    }
+
+    function test_finiteChannel_noInteractionsAllowedAfterWithdraw() public {
+        initializeChannelWithTimingScenario(
+            uint80(block.timestamp), uint80(block.timestamp + 10), uint80(block.timestamp + 20)
+        );
+
+        vm.startPrank(admin);
+        targetChannel.withdrawRewards(NativeTokenLib.NATIVE_TOKEN, admin, 1);
+        vm.stopPrank();
+
+        vm.expectRevert();
+        targetChannel.createToken("test", creator, 1000);
+
+        vm.expectRevert();
+        targetChannel.mint(minter, 1, 1, referral, "");
     }
 
     function test_finiteChannel_versioning() public {

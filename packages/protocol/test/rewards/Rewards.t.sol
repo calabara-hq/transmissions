@@ -46,154 +46,149 @@ contract RewardsHarness is Rewards {
 }
 
 contract RewardsTest is Test {
-    address nick = makeAddr("nick");
+    address admin = makeAddr("admin");
     address weth = address(new WETH());
     RewardsHarness rewardsImpl = new RewardsHarness(weth);
     MockERC20 erc20Token = new MockERC20("testERC20", "TEST1");
 
-    function test_rewards_distributePassThroughETH() public {
+    /* -------------------------------------------------------------------------- */
+    /*                                   HELPERS                                  */
+    /* -------------------------------------------------------------------------- */
+
+    function createSampleERC20Split(address recipient1, address recipient2) internal returns (Rewards.Split memory) {
         address[] memory recipients = new address[](2);
         uint256[] memory allocations = new uint256[](2);
         uint256 totalAllocation = 0;
 
-        recipients[0] = makeAddr("recipient1");
+        recipients[0] = recipient1;
         allocations[0] = 100;
         totalAllocation += 100;
-        recipients[1] = makeAddr("recipient2");
+        recipients[1] = recipient2;
         allocations[1] = 200;
         totalAllocation += 200;
 
-        Rewards.Split memory split = Rewards.Split({
-            recipients: recipients,
-            allocations: allocations,
-            totalAllocation: totalAllocation,
-            token: NativeTokenLib.NATIVE_TOKEN
-        });
+        return Rewards.Split(recipients, allocations, totalAllocation, address(erc20Token));
+    }
 
-        vm.deal(nick, totalAllocation);
-        vm.startPrank(nick);
+    function createSampleETHSplit(address recipient1, address recipient2) internal returns (Rewards.Split memory) {
+        address[] memory recipients = new address[](2);
+        uint256[] memory allocations = new uint256[](2);
+        uint256 totalAllocation = 0;
 
-        rewardsImpl.distributePassThroughSplit{ value: totalAllocation }(split);
+        recipients[0] = recipient1;
+        allocations[0] = 100;
+        totalAllocation += 100;
+        recipients[1] = recipient2;
+        allocations[1] = 200;
+        totalAllocation += 200;
 
-        assertEq(recipients[0].balance, 100);
-        assertEq(recipients[1].balance, 200);
-        assertEq(nick.balance, 0);
+        return Rewards.Split(recipients, allocations, totalAllocation, NativeTokenLib.NATIVE_TOKEN);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                    TESTS                                   */
+    /* -------------------------------------------------------------------------- */
+
+    function test_rewards_distributePassThroughETH() public {
+        address recipient1 = makeAddr("recipient1");
+        address recipient2 = makeAddr("recipient2");
+
+        Rewards.Split memory split = createSampleETHSplit(recipient1, recipient2);
+
+        vm.deal(admin, split.totalAllocation);
+        vm.startPrank(admin);
+
+        rewardsImpl.distributePassThroughSplit{ value: split.totalAllocation }(split);
+
+        assertEq(split.recipients[0].balance, split.allocations[0]);
+        assertEq(split.recipients[1].balance, split.allocations[1]);
+        assertEq(admin.balance, 0);
 
         vm.stopPrank();
     }
 
     function test_rewards_distributePassThroughERC20() public {
-        address[] memory recipients = new address[](2);
-        uint256[] memory allocations = new uint256[](2);
-        uint256 totalAllocation = 0;
+        address recipient1 = makeAddr("recipient1");
+        address recipient2 = makeAddr("recipient2");
 
-        recipients[0] = makeAddr("recipient1");
-        allocations[0] = 100_000;
-        totalAllocation += 100_000;
-        recipients[1] = makeAddr("recipient2");
-        allocations[1] = 200_000;
-        totalAllocation += 200_000;
+        Rewards.Split memory split = createSampleERC20Split(recipient1, recipient2);
 
-        Rewards.Split memory split = Rewards.Split({
-            recipients: recipients,
-            allocations: allocations,
-            totalAllocation: totalAllocation,
-            token: address(erc20Token)
-        });
-
-        erc20Token.mint(nick, 1_000_000);
-        vm.startPrank(nick);
-        erc20Token.approve(address(rewardsImpl), 1_000_000);
+        erc20Token.mint(admin, split.totalAllocation);
+        vm.startPrank(admin);
+        erc20Token.approve(address(rewardsImpl), split.totalAllocation);
 
         rewardsImpl.distributePassThroughSplit(split);
 
-        assertEq(erc20Token.balanceOf(recipients[0]), 100_000);
-        assertEq(erc20Token.balanceOf(recipients[1]), 200_000);
+        assertEq(erc20Token.balanceOf(split.recipients[0]), split.allocations[0]);
+        assertEq(erc20Token.balanceOf(split.recipients[1]), split.allocations[1]);
+        assertEq(admin.balance, 0);
 
         vm.stopPrank();
     }
 
     function test_rewards_distributePassThroughForceWETHFallback() public {
-        address[] memory recipients = new address[](2);
-        uint256[] memory allocations = new uint256[](2);
-        uint256 totalAllocation = 0;
+        address recipient1 = address(this);
+        address recipient2 = makeAddr("recipient2");
 
-        recipients[0] = address(this);
-        allocations[0] = 100;
-        totalAllocation += 100;
-        recipients[1] = makeAddr("recipient2");
-        allocations[1] = 200;
-        totalAllocation += 200;
+        Rewards.Split memory split = createSampleETHSplit(recipient1, recipient2);
 
-        Rewards.Split memory split = Rewards.Split({
-            recipients: recipients,
-            allocations: allocations,
-            totalAllocation: totalAllocation,
-            token: NativeTokenLib.NATIVE_TOKEN
-        });
+        erc20Token.mint(admin, split.totalAllocation);
+        vm.startPrank(admin);
+        erc20Token.approve(address(rewardsImpl), split.totalAllocation);
 
-        vm.deal(nick, totalAllocation);
-        vm.startPrank(nick);
+        vm.deal(admin, split.totalAllocation);
+        vm.startPrank(admin);
 
-        rewardsImpl.distributePassThroughSplit{ value: 300 }(split);
+        rewardsImpl.distributePassThroughSplit{ value: split.totalAllocation }(split);
 
         // tx1 should fail the ether transfer because recipient one is a contract that does not have
         // a fallback or receive function. As such, the eth should be wrapped first and sent.
         // tx2 should successfully send the ether to recipient two
-        assertEq(IERC20(weth).balanceOf(address(this)), 100);
-        assertEq(recipients[1].balance, 200);
-        assertEq(nick.balance, 0);
+        assertEq(IERC20(weth).balanceOf(address(this)), split.allocations[0]);
+        assertEq(split.recipients[1].balance, split.allocations[1]);
+        assertEq(admin.balance, 0);
 
         vm.stopPrank();
     }
 
     function test_rewards_distributeEscrowForceWETHFallback() public {
-        address[] memory recipients = new address[](2);
-        uint256[] memory allocations = new uint256[](2);
-        uint256 totalAllocation = 0;
+        address recipient1 = address(this);
+        address recipient2 = makeAddr("recipient2");
 
-        recipients[0] = address(this);
-        allocations[0] = 100;
-        totalAllocation += 100;
-        recipients[1] = makeAddr("recipient2");
-        allocations[1] = 200;
-        totalAllocation += 200;
+        Rewards.Split memory split = createSampleETHSplit(recipient1, recipient2);
 
-        Rewards.Split memory split = Rewards.Split({
-            recipients: recipients,
-            allocations: allocations,
-            totalAllocation: totalAllocation,
-            token: NativeTokenLib.NATIVE_TOKEN
-        });
+        erc20Token.mint(admin, split.totalAllocation);
+        vm.startPrank(admin);
+        erc20Token.approve(address(rewardsImpl), split.totalAllocation);
 
-        vm.deal(nick, totalAllocation);
-        vm.startPrank(nick);
+        vm.deal(admin, split.totalAllocation);
+        vm.startPrank(admin);
 
-        rewardsImpl.depositToEscrow{ value: totalAllocation }(NativeTokenLib.NATIVE_TOKEN, totalAllocation);
+        rewardsImpl.depositToEscrow{ value: split.totalAllocation }(NativeTokenLib.NATIVE_TOKEN, split.totalAllocation);
 
         rewardsImpl.distributeEscrowSplit(split);
 
         // tx1 should fail the ether transfer because recipient one is a contract that does not have
         // a fallback or receive function. As such, the eth should be wrapped first and sent.
         // tx2 should successfully send the ether to recipient two
-        assertEq(IERC20(weth).balanceOf(address(this)), 100);
-        assertEq(recipients[1].balance, 200);
-        assertEq(nick.balance, 0);
+        assertEq(IERC20(weth).balanceOf(address(this)), split.allocations[0]);
+        assertEq(split.recipients[1].balance, split.allocations[1]);
+        assertEq(admin.balance, 0);
 
         vm.stopPrank();
     }
 
     function test_rewards_depositEscrowETH(uint256 amount) public {
-        vm.deal(nick, amount);
-        vm.startPrank(nick);
+        vm.deal(admin, amount);
+        vm.startPrank(admin);
         rewardsImpl.depositToEscrow{ value: amount }(NativeTokenLib.NATIVE_TOKEN, amount);
         assertEq(address(rewardsImpl).balance, amount);
         vm.stopPrank();
     }
 
     function test_rewards_depositEscrowERC20(uint256 amount) public {
-        erc20Token.mint(nick, amount);
-        vm.startPrank(nick);
+        erc20Token.mint(admin, amount);
+        vm.startPrank(admin);
         erc20Token.approve(address(rewardsImpl), amount);
         rewardsImpl.depositToEscrow(address(erc20Token), amount);
         assertEq(erc20Token.balanceOf(address(rewardsImpl)), amount);
@@ -201,23 +196,23 @@ contract RewardsTest is Test {
     }
 
     function test_rewards_withdrawETHFromEscrow(uint256 amount) public {
-        vm.deal(nick, amount);
-        vm.startPrank(nick);
+        vm.deal(admin, amount);
+        vm.startPrank(admin);
         rewardsImpl.depositToEscrow{ value: amount }(NativeTokenLib.NATIVE_TOKEN, amount);
-        rewardsImpl.withdrawFromEscrow(NativeTokenLib.NATIVE_TOKEN, nick, amount);
+        rewardsImpl.withdrawFromEscrow(NativeTokenLib.NATIVE_TOKEN, admin, amount);
         assertEq(address(rewardsImpl).balance, 0);
-        assertEq(nick.balance, amount);
+        assertEq(admin.balance, amount);
         vm.stopPrank();
     }
 
     function test_rewards_withdrawERC20FromEscrow(uint256 amount) public {
-        erc20Token.mint(nick, amount);
-        vm.startPrank(nick);
+        erc20Token.mint(admin, amount);
+        vm.startPrank(admin);
         erc20Token.approve(address(rewardsImpl), amount);
         rewardsImpl.depositToEscrow(address(erc20Token), amount);
-        rewardsImpl.withdrawFromEscrow(address(erc20Token), nick, amount);
+        rewardsImpl.withdrawFromEscrow(address(erc20Token), admin, amount);
         assertEq(erc20Token.balanceOf(address(rewardsImpl)), 0);
-        assertEq(erc20Token.balanceOf(nick), amount);
+        assertEq(erc20Token.balanceOf(admin), amount);
         vm.stopPrank();
     }
 
@@ -242,8 +237,8 @@ contract RewardsTest is Test {
             token: NativeTokenLib.NATIVE_TOKEN
         });
 
-        vm.deal(nick, totalAllocation);
-        vm.startPrank(nick);
+        vm.deal(admin, totalAllocation);
+        vm.startPrank(admin);
 
         rewardsImpl.depositToEscrow{ value: totalAllocation }(NativeTokenLib.NATIVE_TOKEN, totalAllocation);
         vm.stopPrank();
@@ -280,8 +275,8 @@ contract RewardsTest is Test {
             token: address(erc20Token)
         });
 
-        erc20Token.mint(nick, totalAllocation);
-        vm.startPrank(nick);
+        erc20Token.mint(admin, totalAllocation);
+        vm.startPrank(admin);
         erc20Token.approve(address(rewardsImpl), totalAllocation);
         rewardsImpl.depositToEscrow(address(erc20Token), totalAllocation);
         vm.stopPrank();
@@ -337,8 +332,8 @@ contract RewardsTest is Test {
     }
 
     function test_rewards_validateIncomingValue(uint256 amount, uint256 value) public {
-        vm.startPrank(nick);
-        vm.deal(nick, UINT256_MAX);
+        vm.startPrank(admin);
+        vm.deal(admin, UINT256_MAX);
         erc20Token.approve(address(rewardsImpl), UINT256_MAX);
 
         if (amount != value) {

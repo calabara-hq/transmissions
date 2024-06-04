@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import { IWETH } from "../interfaces/IWETH.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 import { NativeTokenLib } from "../libraries/NativeTokenLib.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { SafeTransferLib } from "solady/utils/SafeTransferLib.sol";
 /**
  * @title Rewards.sol
@@ -197,6 +197,7 @@ contract Rewards {
     function _validateIncomingValue(address token, uint256 expectedValue) internal view {
         if (token.isNativeToken()) {
             // If the token is ETH, the total allocation must match the value sent
+
             if (msg.value != expectedValue) {
                 revert InvalidAmountSent();
             }
