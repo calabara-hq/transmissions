@@ -280,7 +280,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
             revert AlreadySettled();
         }
 
-        if (block.timestamp < finiteChannelParams.createStart || block.timestamp > finiteChannelParams.mintStart) {
+        if (block.timestamp < finiteChannelParams.createStart || block.timestamp >= finiteChannelParams.mintStart) {
             revert NotAcceptingCreations();
         }
     }
@@ -290,7 +290,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
             revert AlreadySettled();
         }
 
-        if (block.timestamp < finiteChannelParams.mintStart || block.timestamp > finiteChannelParams.mintEnd) {
+        if (block.timestamp < finiteChannelParams.mintStart || block.timestamp >= finiteChannelParams.mintEnd) {
             revert NotAcceptingMints();
         }
 
