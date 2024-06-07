@@ -321,6 +321,12 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
 
         for (uint256 i = 0; i < rewards.allocations.length; i++) {
             _totalAllocation += rewards.allocations[i];
+
+            /// @dev ensure ranks are in ascending order without duplicates
+
+            if (i < rewards.allocations.length - 1) {
+                require(rewards.ranks[i + 1] > rewards.ranks[i], "invalid ranks");
+            }
         }
 
         if (_totalAllocation == 0) {

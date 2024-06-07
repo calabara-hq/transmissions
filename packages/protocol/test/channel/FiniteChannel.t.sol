@@ -530,4 +530,21 @@ contract FiniteChannelTest is Test {
 
         assertEq(winningTokenIds[0], 1);
     }
+
+    function test_finiteChannel_revertWithUnsortedRewards() public {
+        uint40[] memory _ranks = new uint40[](3);
+        uint256[] memory _allocations = new uint256[](3);
+
+        _ranks[0] = 2;
+        _ranks[1] = 3;
+        _ranks[2] = 1;
+        _allocations[0] = 1;
+        _allocations[1] = 1;
+        _allocations[2] = 1;
+
+        uint256 _totalAllocation = 3;
+
+        vm.expectRevert();
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
+    }
 }
