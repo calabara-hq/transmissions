@@ -47,188 +47,183 @@ import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
  * @notice Factory contract to deploy new channels
  */
 contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
-    using SafeERC20 for IERC20;
-    using NativeTokenLib for address;
+  using SafeERC20 for IERC20;
+  using NativeTokenLib for address;
 
-    /* -------------------------------------------------------------------------- */
-    /*                                   ERRORS                                   */
-    /* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                                   ERRORS                                   */
+  /* -------------------------------------------------------------------------- */
 
-    error AddressZero();
-    error InvalidUpgrade();
-    error ERC20TransferFailed();
+  error AddressZero();
+  error InvalidUpgrade();
+  error ERC20TransferFailed();
 
-    /* -------------------------------------------------------------------------- */
-    /*                                   EVENTS                                   */
-    /* -------------------------------------------------------------------------- */
-    event FactoryInitialized();
-    event SetupNewContract(
-        address indexed contractAddress, string uri, address defaultAdmin, address[] managers, bytes transportConfig
-    );
+  /* -------------------------------------------------------------------------- */
+  /*                                   EVENTS                                   */
+  /* -------------------------------------------------------------------------- */
+  event FactoryInitialized();
+  event SetupNewContract(
+    address indexed contractAddress,
+    string uri,
+    address defaultAdmin,
+    address[] managers,
+    bytes transportConfig
+  );
 
-    /* -------------------------------------------------------------------------- */
-    /*                                   STORAGE                                  */
-    /* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                                   STORAGE                                  */
+  /* -------------------------------------------------------------------------- */
 
-    address public immutable infiniteChannelImpl;
-    address public immutable finiteChannelImpl;
+  address public immutable infiniteChannelImpl;
+  address public immutable finiteChannelImpl;
 
-    /* -------------------------------------------------------------------------- */
-    /*                          CONSTRUCTOR & INITIALIZER                         */
-    /* -------------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------------- */
+  /*                          CONSTRUCTOR & INITIALIZER                         */
+  /* -------------------------------------------------------------------------- */
 
-    constructor(address _infiniteChannelImpl, address _finiteChannelImpl) initializer {
-        if (_infiniteChannelImpl == address(0) || _finiteChannelImpl == address(0)) {
-            revert AddressZero();
-        }
-        infiniteChannelImpl = _infiniteChannelImpl;
-        finiteChannelImpl = _finiteChannelImpl;
+  constructor(address _infiniteChannelImpl, address _finiteChannelImpl) initializer {
+    if (_infiniteChannelImpl == address(0) || _finiteChannelImpl == address(0)) {
+      revert AddressZero();
+    }
+    infiniteChannelImpl = _infiniteChannelImpl;
+    finiteChannelImpl = _finiteChannelImpl;
+  }
+
+  /**
+   * @notice Factory initializer
+   * @param _initOwner address of the owner
+   */
+  function initialize(address _initOwner) public initializer {
+    __Ownable_init(_initOwner);
+    __UUPSUpgradeable_init();
+    emit FactoryInitialized();
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
+  /* -------------------------------------------------------------------------- */
+  /**
+   * @notice Create a new infinite channel
+   * @param uri string URI for the channel
+   * @param defaultAdmin address of default admin
+   * @param managers address[] channel managers
+   * @param setupActions bytes[] setup actions
+   * @param transportConfig bytes transport config
+   * @return address deployed contract address
+   */
+  function createInfiniteChannel(
+    string calldata uri,
+    address defaultAdmin,
+    address[] calldata managers,
+    bytes[] calldata setupActions,
+    bytes calldata transportConfig
+  ) external returns (address) {
+    InfiniteUplink1155 newContract = new InfiniteUplink1155(infiniteChannelImpl);
+    _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
+    return address(newContract);
+  }
+
+  /**
+   * @notice Create a new finite channel
+   * @param uri string URI for the channel
+   * @param defaultAdmin address of default admin
+   * @param managers address[] channel managers
+   * @param setupActions bytes[] setup actions
+   * @param transportConfig bytes transport config
+   * @return address deployed contract address
+   */
+  function createFiniteChannel(
+    string calldata uri,
+    address defaultAdmin,
+    address[] calldata managers,
+    bytes[] calldata setupActions,
+    bytes calldata transportConfig
+  ) external payable returns (address) {
+    address newContract = address(new FiniteUplink1155(finiteChannelImpl));
+
+    FiniteChannel.FiniteParams memory params = abi.decode(transportConfig, (FiniteChannel.FiniteParams));
+
+    if (!params.rewards.token.isNativeToken()) {
+      uint256 beforeBalance = IERC20(params.rewards.token).balanceOf(address(this));
+      IERC20(params.rewards.token).safeTransferFrom(msg.sender, address(this), params.rewards.totalAllocation);
+      uint256 afterBalance = IERC20(params.rewards.token).balanceOf(address(this));
+
+      if (beforeBalance + params.rewards.totalAllocation != afterBalance) {
+        revert ERC20TransferFailed();
+      }
+
+      IERC20(params.rewards.token).approve(newContract, params.rewards.totalAllocation);
     }
 
-    /**
-     * @notice Factory initializer
-     * @param _initOwner address of the owner
-     */
-    function initialize(address _initOwner) public initializer {
-        __Ownable_init(_initOwner);
-        __UUPSUpgradeable_init();
-        emit FactoryInitialized();
+    _initializeContract(newContract, uri, defaultAdmin, managers, setupActions, transportConfig);
+
+    return newContract;
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                             INTERNAL FUNCTIONS                             */
+  /* -------------------------------------------------------------------------- */
+  /**
+   * @notice Authorize factory upgrade
+   * @param newImplementation address of the new implementation
+   */
+  function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+    string memory newName = IChannelFactory(newImplementation).contractName();
+    string memory oldName = IChannelFactory(address(this)).contractName();
+    if (keccak256(abi.encodePacked(newName)) != keccak256(abi.encodePacked(oldName))) {
+      revert InvalidUpgrade();
     }
+  }
 
-    /* -------------------------------------------------------------------------- */
-    /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Create a new infinite channel
-     * @param uri string URI for the channel
-     * @param defaultAdmin address of default admin
-     * @param managers address[] channel managers
-     * @param setupActions bytes[] setup actions
-     * @param transportConfig bytes transport config
-     * @return address deployed contract address
-     */
-    function createInfiniteChannel(
-        string calldata uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        bytes calldata transportConfig
-    )
-        external
-        returns (address)
-    {
-        InfiniteUplink1155 newContract = new InfiniteUplink1155(infiniteChannelImpl);
-        _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
-        return address(newContract);
-    }
+  /* -------------------------------------------------------------------------- */
+  /*                              PRIVATE FUNCTIONS                             */
+  /* -------------------------------------------------------------------------- */
+  /**
+   * @notice Internal helper to deploy a new channel
+   * @param newContract address of the new contract
+   * @param uri string URI for the channel
+   * @param defaultAdmin address default admin
+   * @param managers address[] channel managers
+   * @param setupActions bytes[] setup actions
+   * @param transportConfig bytes transportConfig
+   */
+  function _initializeContract(
+    address newContract,
+    string calldata uri,
+    address defaultAdmin,
+    address[] calldata managers,
+    bytes[] calldata setupActions,
+    bytes calldata transportConfig
+  ) private {
+    emit SetupNewContract(newContract, uri, defaultAdmin, managers, transportConfig);
+    IChannel(newContract).initialize{ value: msg.value }(uri, defaultAdmin, managers, setupActions, transportConfig);
+  }
 
-    /**
-     * @notice Create a new finite channel
-     * @param uri string URI for the channel
-     * @param defaultAdmin address of default admin
-     * @param managers address[] channel managers
-     * @param setupActions bytes[] setup actions
-     * @param transportConfig bytes transport config
-     * @return address deployed contract address
-     */
-    function createFiniteChannel(
-        string calldata uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        bytes calldata transportConfig
-    )
-        external
-        payable
-        returns (address)
-    {
-        address newContract = address(new FiniteUplink1155(finiteChannelImpl));
+  /* -------------------------------------------------------------------------- */
+  /*                                  VERSIONING                                */
+  /* -------------------------------------------------------------------------- */
 
-        FiniteChannel.FiniteParams memory params = abi.decode(transportConfig, (FiniteChannel.FiniteParams));
+  /**
+   * @notice Returns the contract version
+   * @return string contract version
+   */
+  function contractVersion() external pure returns (string memory) {
+    return "1.0.0";
+  }
 
-        if (!params.rewards.token.isNativeToken()) {
-            uint256 beforeBalance = IERC20(params.rewards.token).balanceOf(address(this));
-            IERC20(params.rewards.token).safeTransferFrom(msg.sender, address(this), params.rewards.totalAllocation);
-            uint256 afterBalance = IERC20(params.rewards.token).balanceOf(address(this));
+  /**
+   * @notice Returns the contract uri
+   * @return string contract uri
+   */
+  function contractURI() external pure returns (string memory) {
+    return "https://github.com/calabara-hq/transmissions/packages/protocol";
+  }
 
-            if (beforeBalance + params.rewards.totalAllocation != afterBalance) {
-                revert ERC20TransferFailed();
-            }
-
-            IERC20(params.rewards.token).approve(newContract, params.rewards.totalAllocation);
-        }
-
-        _initializeContract(newContract, uri, defaultAdmin, managers, setupActions, transportConfig);
-
-        return newContract;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                             INTERNAL FUNCTIONS                             */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Authorize factory upgrade
-     * @param newImplementation address of the new implementation
-     */
-    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
-        string memory newName = IChannelFactory(newImplementation).contractName();
-        string memory oldName = IChannelFactory(address(this)).contractName();
-        if (keccak256(abi.encodePacked(newName)) != keccak256(abi.encodePacked(oldName))) {
-            revert InvalidUpgrade();
-        }
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                              PRIVATE FUNCTIONS                             */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Internal helper to deploy a new channel
-     * @param newContract address of the new contract
-     * @param uri string URI for the channel
-     * @param defaultAdmin address default admin
-     * @param managers address[] channel managers
-     * @param setupActions bytes[] setup actions
-     * @param transportConfig bytes transportConfig
-     */
-    function _initializeContract(
-        address newContract,
-        string calldata uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        bytes calldata transportConfig
-    )
-        private
-    {
-        emit SetupNewContract(newContract, uri, defaultAdmin, managers, transportConfig);
-        IChannel(newContract).initialize{ value: msg.value }(uri, defaultAdmin, managers, setupActions, transportConfig);
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                                  VERSIONING                                */
-    /* -------------------------------------------------------------------------- */
-
-    /**
-     * @notice Returns the contract version
-     * @return string contract version
-     */
-    function contractVersion() external pure returns (string memory) {
-        return "1.0.0";
-    }
-
-    /**
-     * @notice Returns the contract uri
-     * @return string contract uri
-     */
-    function contractURI() external pure returns (string memory) {
-        return "https://github.com/calabara-hq/transmissions/packages/protocol";
-    }
-
-    /**
-     * @notice Returns the contract name
-     * @return string contract name
-     */
-    function contractName() external pure returns (string memory) {
-        return "Uplink Channel Factory";
-    }
+  /**
+   * @notice Returns the contract name
+   * @return string contract name
+   */
+  function contractName() external pure returns (string memory) {
+    return "Uplink Channel Factory";
+  }
 }

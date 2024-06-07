@@ -3,8 +3,13 @@
     "type": "constructor",
     "inputs": [
       {
-        "name": "_channelImpl",
-        "internalType": "contract IChannel",
+        "name": "_infiniteChannelImpl",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "_finiteChannelImpl",
+        "internalType": "address",
         "type": "address"
       }
     ],
@@ -19,19 +24,6 @@
         "name": "",
         "internalType": "string",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [],
-    "name": "channelImpl",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "contract IChannel",
-        "type": "address"
       }
     ],
     "stateMutability": "view"
@@ -97,9 +89,53 @@
         "name": "setupActions",
         "internalType": "bytes[]",
         "type": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "internalType": "bytes",
+        "type": "bytes"
       }
     ],
-    "name": "createChannel",
+    "name": "createFiniteChannel",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "uri",
+        "internalType": "string",
+        "type": "string"
+      },
+      {
+        "name": "defaultAdmin",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "managers",
+        "internalType": "address[]",
+        "type": "address[]"
+      },
+      {
+        "name": "setupActions",
+        "internalType": "bytes[]",
+        "type": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "internalType": "bytes",
+        "type": "bytes"
+      }
+    ],
+    "name": "createInfiniteChannel",
     "outputs": [
       {
         "name": "",
@@ -108,6 +144,32 @@
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "finiteChannelImpl",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "infiniteChannelImpl",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -250,6 +312,12 @@
         "name": "managers",
         "internalType": "address[]",
         "type": "address[]",
+        "indexed": false
+      },
+      {
+        "name": "transportConfig",
+        "internalType": "bytes",
+        "type": "bytes",
         "indexed": false
       }
     ],

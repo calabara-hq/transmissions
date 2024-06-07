@@ -7,17 +7,24 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "extract-abis": "yarn tsx script/extract-abis.ts"
-  },
-  "dependencies": {
-    "transmissions-protocol": "*"
+    "prepare:base-sepolia": "mustache config/base-sepolia.json subgraph.template.yaml > subgraph.yaml",
+    "extract-abis": "yarn tsx script/extract-abis.ts",
+    "create-local": "graph create --node http://localhost:8020 ndodson/transmissions",
+    "deploy-local": "graph deploy --node http://localhost:8020 --ipfs http://localhost:5001 ndodson/transmissions",
+    "codegen": "graph codegen --output-dir src/generated",
+    "build": "graph build",
+    "test": "graph test"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.71.1",
+    "@graphprotocol/graph-cli": "^0.73.0",
+    "@graphprotocol/graph-ts": "^0.35.1",
     "@types/node": "^20.12.10",
+    "matchstick-as": "^0.6.0",
     "mustache": "^4.2.0",
+    "protocol": "*",
     "tsx": "^4.9.3",
     "typescript": "^5.4.5",
-    "yaml2json": "^1.0.2"
+    "viem": "^2.13.7",
+    "yamljs": "^0.3.0"
   }
 }

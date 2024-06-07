@@ -1,16 +1,5 @@
 [
   {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "_upgradePath",
-        "internalType": "address",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
     "type": "function",
     "inputs": [],
     "name": "DEFAULT_ADMIN_ROLE",
@@ -48,19 +37,6 @@
       }
     ],
     "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [
-      {
-        "name": "managers",
-        "internalType": "address[]",
-        "type": "address[]"
-      }
-    ],
-    "name": "_setManagers",
-    "outputs": [],
-    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -132,12 +108,31 @@
     "name": "createToken",
     "outputs": [
       {
-        "name": "",
+        "name": "tokenId",
         "internalType": "uint256",
         "type": "uint256"
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "erc20Balances",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "uint256",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -201,6 +196,49 @@
     "type": "function",
     "inputs": [
       {
+        "name": "role",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      },
+      {
+        "name": "index",
+        "internalType": "uint256",
+        "type": "uint256"
+      }
+    ],
+    "name": "getRoleMember",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "role",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getRoleMemberCount",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "uint256",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
         "name": "tokenId",
         "internalType": "uint256",
         "type": "uint256"
@@ -210,7 +248,7 @@
     "outputs": [
       {
         "name": "",
-        "internalType": "struct ChannelStorageV1.TokenConfig",
+        "internalType": "struct ChannelStorage.TokenConfig",
         "type": "tuple",
         "components": [
           {
@@ -237,6 +275,37 @@
             "name": "sponsor",
             "internalType": "address",
             "type": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "user",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "getUserStats",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "struct ChannelStorage.UserStats",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "numCreations",
+            "internalType": "uint256",
+            "type": "uint256"
+          },
+          {
+            "name": "numMints",
+            "internalType": "uint256",
+            "type": "uint256"
           }
         ]
       }
@@ -307,11 +376,16 @@
         "name": "setupActions",
         "internalType": "bytes[]",
         "type": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "internalType": "bytes",
+        "type": "bytes"
       }
     ],
     "name": "initialize",
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "payable"
   },
   {
     "type": "function",
@@ -440,14 +514,14 @@
         "type": "uint256[]"
       },
       {
-        "name": "data",
-        "internalType": "bytes",
-        "type": "bytes"
-      },
-      {
         "name": "mintReferral",
         "internalType": "address",
         "type": "address"
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes"
       }
     ],
     "name": "mintBatchWithERC20",
@@ -473,14 +547,14 @@
         "type": "uint256[]"
       },
       {
-        "name": "data",
-        "internalType": "bytes",
-        "type": "bytes"
-      },
-      {
         "name": "mintReferral",
         "internalType": "address",
         "type": "address"
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes"
       }
     ],
     "name": "mintBatchWithETH",
@@ -580,19 +654,6 @@
       }
     ],
     "name": "renounceRole",
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "inputs": [
-      {
-        "name": "addr",
-        "internalType": "address",
-        "type": "address"
-      }
-    ],
-    "name": "revokeManager",
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -702,7 +763,7 @@
     "type": "function",
     "inputs": [
       {
-        "name": "_feeContract",
+        "name": "fees",
         "internalType": "address",
         "type": "address"
       },
@@ -712,7 +773,7 @@
         "type": "bytes"
       }
     ],
-    "name": "setChannelFeeConfig",
+    "name": "setFees",
     "outputs": [],
     "stateMutability": "nonpayable"
   },
@@ -720,7 +781,7 @@
     "type": "function",
     "inputs": [
       {
-        "name": "_logicContract",
+        "name": "logic",
         "internalType": "address",
         "type": "address"
       },
@@ -743,19 +804,27 @@
     "type": "function",
     "inputs": [
       {
-        "name": "_timingContract",
-        "internalType": "address",
-        "type": "address"
-      },
+        "name": "managers",
+        "internalType": "address[]",
+        "type": "address[]"
+      }
+    ],
+    "name": "setManagers",
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
       {
         "name": "data",
         "internalType": "bytes",
         "type": "bytes"
       }
     ],
-    "name": "setTimingConfig",
+    "name": "setTransportConfig",
     "outputs": [],
-    "stateMutability": "nonpayable"
+    "stateMutability": "payable"
   },
   {
     "type": "function",
@@ -772,19 +841,6 @@
         "name": "",
         "internalType": "bool",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [],
-    "name": "timingContract",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "contract ITiming",
-        "type": "address"
       }
     ],
     "stateMutability": "view"
@@ -827,6 +883,19 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "newAdmin",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "transferAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -879,6 +948,49 @@
     "stateMutability": "view"
   },
   {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "userStats",
+    "outputs": [
+      {
+        "name": "numCreations",
+        "internalType": "uint256",
+        "type": "uint256"
+      },
+      {
+        "name": "numMints",
+        "internalType": "uint256",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "previousAdmin",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "newAdmin",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "name": "AdminTransferred"
+  },
+  {
     "type": "event",
     "anonymous": false,
     "inputs": [
@@ -908,8 +1020,14 @@
     "anonymous": false,
     "inputs": [
       {
+        "name": "updater",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
         "name": "updateType",
-        "internalType": "enum IChannel.ConfigUpdate",
+        "internalType": "enum Channel.ConfigUpdate",
         "type": "uint8",
         "indexed": true
       },
@@ -921,12 +1039,6 @@
       },
       {
         "name": "logicContract",
-        "internalType": "address",
-        "type": "address",
-        "indexed": false
-      },
-      {
-        "name": "timingContract",
         "internalType": "address",
         "type": "address",
         "indexed": false
@@ -945,10 +1057,22 @@
         "indexed": true
       },
       {
+        "name": "recipient",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
         "name": "amount",
         "internalType": "uint256",
         "type": "uint256",
         "indexed": false
+      },
+      {
+        "name": "token",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
       }
     ],
     "name": "ERC20Transferred"
@@ -959,6 +1083,12 @@
     "inputs": [
       {
         "name": "spender",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "recipient",
         "internalType": "address",
         "type": "address",
         "indexed": true
@@ -977,6 +1107,31 @@
     "anonymous": false,
     "inputs": [
       {
+        "name": "updater",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "feeContract",
+        "internalType": "address",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes",
+        "indexed": false
+      }
+    ],
+    "name": "FeesUpdated"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
         "name": "version",
         "internalType": "uint64",
         "type": "uint64",
@@ -984,6 +1139,57 @@
       }
     ],
     "name": "Initialized"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "updater",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "logicContract",
+        "internalType": "address",
+        "type": "address",
+        "indexed": false
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes",
+        "indexed": false
+      }
+    ],
+    "name": "LogicUpdated"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "manager",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      }
+    ],
+    "name": "ManagerRenounced"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "managers",
+        "internalType": "address[]",
+        "type": "address[]",
+        "indexed": false
+      }
+    ],
+    "name": "ManagersUpdated"
   },
   {
     "type": "event",
@@ -1072,7 +1278,7 @@
       },
       {
         "name": "token",
-        "internalType": "struct ChannelStorageV1.TokenConfig",
+        "internalType": "struct ChannelStorage.TokenConfig",
         "type": "tuple",
         "components": [
           {
@@ -1132,6 +1338,12 @@
         "name": "amounts",
         "internalType": "uint256[]",
         "type": "uint256[]",
+        "indexed": false
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes",
         "indexed": false
       }
     ],
@@ -1308,12 +1520,12 @@
   {
     "type": "error",
     "inputs": [],
-    "name": "AddressZero"
+    "name": "AmountExceedsMaxSupply"
   },
   {
     "type": "error",
     "inputs": [],
-    "name": "DepositMismatch"
+    "name": "AmountZero"
   },
   {
     "type": "error",
@@ -1436,22 +1648,27 @@
   {
     "type": "error",
     "inputs": [],
+    "name": "ERC20TransferFailed"
+  },
+  {
+    "type": "error",
+    "inputs": [],
     "name": "FailedInnerCall"
   },
   {
     "type": "error",
     "inputs": [],
-    "name": "FalsyLogic"
+    "name": "InsufficientBalance"
   },
   {
     "type": "error",
     "inputs": [],
-    "name": "InvalidAmount"
+    "name": "InsufficientInteractionPower"
   },
   {
     "type": "error",
     "inputs": [],
-    "name": "InvalidChannelState"
+    "name": "InvalidAmountSent"
   },
   {
     "type": "error",
@@ -1461,12 +1678,12 @@
   {
     "type": "error",
     "inputs": [],
-    "name": "InvalidUpgrade"
+    "name": "InvalidTotalAllocation"
   },
   {
     "type": "error",
     "inputs": [],
-    "name": "InvalidValueSent"
+    "name": "InvalidUpgrade"
   },
   {
     "type": "error",
@@ -1502,7 +1719,7 @@
   {
     "type": "error",
     "inputs": [],
-    "name": "TransferFailed"
+    "name": "SplitLengthMismatch"
   },
   {
     "type": "error",

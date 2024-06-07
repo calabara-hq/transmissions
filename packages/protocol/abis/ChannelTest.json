@@ -187,38 +187,104 @@
   },
   {
     "type": "function",
-    "name": "test_createToken",
+    "name": "test_channel_ERC20RewardsDistributed",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_initialize",
+    "name": "test_channel_ETHRewardsDistributed",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_mintToken_withERC20",
+    "name": "test_channel_freeMintZeroLogic",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_mintToken_withETH",
+    "name": "test_channel_initialization",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_updateChannelTokenUri",
+    "name": "test_channel_mintBatch",
+    "inputs": [
+      {
+        "name": "batchSize",
+        "type": "uint8",
+        "internalType": "uint8"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_channel_mintRequirements",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_channel_mintTokenWithERC20",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_channel_mintTokenWithETH",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_channel_mintTokenWithSufficientInteractionPower",
+    "inputs": [
+      {
+        "name": "minimumInteractionPower",
+        "type": "uint128",
+        "internalType": "uint128"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_channel_updateChannelTokenUri",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "TokenURIUpdated",
+    "inputs": [
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
   },
   {
     "type": "event",
@@ -584,14 +650,17 @@
     ],
     "anonymous": false
   }
-]": "bytes",
+]lse
+  },
+  {
+    "type": "event",
+    "name": "log_string",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string",
         "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  }
-]internalType": "string"
+        "internalType": "string"
       }
     ],
     "anonymous": false

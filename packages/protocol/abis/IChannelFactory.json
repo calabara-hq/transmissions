@@ -26,50 +26,94 @@
     "stateMutability": "pure"
   },
   {
-    "type": "event",
-    "name": "FactoryInitialized",
+    "type": "function",
+    "name": "contractVersion",
     "inputs": [],
-    "anonymous": false
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
-    "type": "event",
-    "name": "SetupNewContract",
+    "type": "function",
+    "name": "createFiniteChannel",
     "inputs": [
-      {
-        "name": "contractAddress",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
       {
         "name": "uri",
         "type": "string",
-        "indexed": false,
         "internalType": "string"
       },
       {
         "name": "defaultAdmin",
         "type": "address",
-        "indexed": false,
         "internalType": "address"
       },
       {
         "name": "managers",
         "type": "address[]",
-        "indexed": false,
         "internalType": "address[]"
+      },
+      {
+        "name": "setupActions",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
-    "anonymous": false
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "payable"
   },
   {
-    "type": "error",
-    "name": "AddressZero",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidUpgrade",
-    "inputs": []
+    "type": "function",
+    "name": "createInfiniteChannel",
+    "inputs": [
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "defaultAdmin",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "managers",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "setupActions",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
   }
 ]

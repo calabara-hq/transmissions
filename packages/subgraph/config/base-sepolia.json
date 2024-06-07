@@ -1,0 +1,9 @@
+{
+  "chainid": "84532",
+  "network": "base-sepolia",
+  "channelFactory": {
+    "address": "0x61B7c7982C666AF882851DE04a05565369007bEc",
+    "startBlock": "10883135",
+    "version": "1"
+  }
+}

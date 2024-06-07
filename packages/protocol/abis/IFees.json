@@ -1,6 +1,45 @@
 [
   {
     "type": "function",
+    "name": "contractName",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "contractURI",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "contractVersion",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "getErc20MintPrice",
     "inputs": [],
     "outputs": [
@@ -27,53 +66,25 @@
   },
   {
     "type": "function",
-    "name": "getSplits",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      },
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      },
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      },
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      },
-      {
-        "name": "",
-        "type": "uint16",
-        "internalType": "uint16"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "requestErc20Mint",
     "inputs": [
       {
-        "name": "creator",
-        "type": "address",
-        "internalType": "address"
+        "name": "creators",
+        "type": "address[]",
+        "internalType": "address[]"
       },
       {
-        "name": "referral",
-        "type": "address",
-        "internalType": "address"
+        "name": "sponsors",
+        "type": "address[]",
+        "internalType": "address[]"
       },
       {
-        "name": "sponsor",
+        "name": "amounts",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "mintReferral",
         "type": "address",
         "internalType": "address"
       }
@@ -81,28 +92,28 @@
     "outputs": [
       {
         "name": "",
-        "type": "tuple[]",
-        "internalType": "struct IFees.Erc20MintCommands[]",
+        "type": "tuple",
+        "internalType": "struct Rewards.Split",
         "components": [
           {
-            "name": "method",
-            "type": "uint8",
-            "internalType": "enum IFees.Erc20FeeActions"
+            "name": "recipients",
+            "type": "address[]",
+            "internalType": "address[]"
           },
           {
-            "name": "erc20Contract",
-            "type": "address",
-            "internalType": "address"
+            "name": "allocations",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
           },
           {
-            "name": "recipient",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "amount",
+            "name": "totalAllocation",
             "type": "uint256",
             "internalType": "uint256"
+          },
+          {
+            "name": "token",
+            "type": "address",
+            "internalType": "address"
           }
         ]
       }
@@ -111,20 +122,25 @@
   },
   {
     "type": "function",
-    "name": "requestNativeMint",
+    "name": "requestEthMint",
     "inputs": [
       {
-        "name": "creator",
-        "type": "address",
-        "internalType": "address"
+        "name": "creators",
+        "type": "address[]",
+        "internalType": "address[]"
       },
       {
-        "name": "referral",
-        "type": "address",
-        "internalType": "address"
+        "name": "sponsors",
+        "type": "address[]",
+        "internalType": "address[]"
       },
       {
-        "name": "sponsor",
+        "name": "amounts",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "mintReferral",
         "type": "address",
         "internalType": "address"
       }
@@ -132,23 +148,28 @@
     "outputs": [
       {
         "name": "",
-        "type": "tuple[]",
-        "internalType": "struct IFees.NativeMintCommands[]",
+        "type": "tuple",
+        "internalType": "struct Rewards.Split",
         "components": [
           {
-            "name": "method",
-            "type": "uint8",
-            "internalType": "enum IFees.NativeFeeActions"
+            "name": "recipients",
+            "type": "address[]",
+            "internalType": "address[]"
           },
           {
-            "name": "recipient",
-            "type": "address",
-            "internalType": "address"
+            "name": "allocations",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
           },
           {
-            "name": "amount",
+            "name": "totalAllocation",
             "type": "uint256",
             "internalType": "uint256"
+          },
+          {
+            "name": "token",
+            "type": "address",
+            "internalType": "address"
           }
         ]
       }
@@ -157,7 +178,7 @@
   },
   {
     "type": "function",
-    "name": "setChannelFeeConfig",
+    "name": "setChannelFees",
     "inputs": [
       {
         "name": "data",
@@ -167,95 +188,5 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "FeeConfigSet",
-    "inputs": [
-      {
-        "name": "channel",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "feeconfig",
-        "type": "tuple",
-        "indexed": false,
-        "internalType": "struct IFees.FeeConfig",
-        "components": [
-          {
-            "name": "ethMintPrice",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "channelTreasury",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "splits",
-            "type": "tuple",
-            "internalType": "struct IFees.Splits",
-            "components": [
-              {
-                "name": "uplinkBps",
-                "type": "uint16",
-                "internalType": "uint16"
-              },
-              {
-                "name": "channelBps",
-                "type": "uint16",
-                "internalType": "uint16"
-              },
-              {
-                "name": "creatorBps",
-                "type": "uint16",
-                "internalType": "uint16"
-              },
-              {
-                "name": "mintReferralBps",
-                "type": "uint16",
-                "internalType": "uint16"
-              },
-              {
-                "name": "sponsorBps",
-                "type": "uint16",
-                "internalType": "uint16"
-              }
-            ]
-          },
-          {
-            "name": "tokenMintConfig",
-            "type": "tuple",
-            "internalType": "struct IFees.Erc20MintConfig",
-            "components": [
-              {
-                "name": "erc20MintPrice",
-                "type": "uint256",
-                "internalType": "uint256"
-              },
-              {
-                "name": "erc20Contract",
-                "type": "address",
-                "internalType": "address"
-              }
-            ]
-          }
-        ]
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "InvalidBPS",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidSplit",
-    "inputs": []
   }
 ]

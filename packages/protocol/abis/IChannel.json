@@ -1,7 +1,7 @@
 [
   {
     "type": "function",
-    "name": "initialize",
+    "name": "createToken",
     "inputs": [
       {
         "name": "uri",
@@ -9,167 +9,40 @@
         "internalType": "string"
       },
       {
-        "name": "defaultAdmin",
+        "name": "author",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "managers",
-        "type": "address[]",
-        "internalType": "address[]"
-      },
-      {
-        "name": "setupActions",
-        "type": "bytes[]",
-        "internalType": "bytes[]"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setChannelFeeConfig",
-    "inputs": [
-      {
-        "name": "feeContract",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setLogic",
-    "inputs": [
-      {
-        "name": "_logicContract",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "creatorLogic",
-        "type": "bytes",
-        "internalType": "bytes"
-      },
-      {
-        "name": "minterLogic",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setTimingConfig",
-    "inputs": [
-      {
-        "name": "saleContract",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "ConfigUpdated",
-    "inputs": [
-      {
-        "name": "updateType",
-        "type": "uint8",
-        "indexed": true,
-        "internalType": "enum IChannel.ConfigUpdate"
-      },
-      {
-        "name": "feeContract",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "logicContract",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "timingContract",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "ERC20Transferred",
-    "inputs": [
-      {
-        "name": "spender",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
+        "name": "maxSupply",
         "type": "uint256",
-        "indexed": false,
         "internalType": "uint256"
       }
     ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "ETHTransferred",
-    "inputs": [
+    "outputs": [
       {
-        "name": "spender",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
+        "name": "tokenId",
         "type": "uint256",
-        "indexed": false,
         "internalType": "uint256"
       }
     ],
-    "anonymous": false
+    "stateMutability": "nonpayable"
   },
   {
-    "type": "event",
-    "name": "TokenCreated",
+    "type": "function",
+    "name": "getToken",
     "inputs": [
       {
         "name": "tokenId",
         "type": "uint256",
-        "indexed": true,
         "internalType": "uint256"
-      },
+      }
+    ],
+    "outputs": [
       {
-        "name": "token",
+        "name": "",
         "type": "tuple",
-        "indexed": false,
-        "internalType": "struct ChannelStorageV1.TokenConfig",
+        "internalType": "struct ChannelStorage.TokenConfig",
         "components": [
           {
             "name": "uri",
@@ -199,111 +72,225 @@
         ]
       }
     ],
-    "anonymous": false
+    "stateMutability": "view"
   },
   {
-    "type": "event",
-    "name": "TokenMinted",
+    "type": "function",
+    "name": "initialize",
     "inputs": [
       {
-        "name": "minter",
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "defaultAdmin",
         "type": "address",
-        "indexed": true,
         "internalType": "address"
+      },
+      {
+        "name": "managers",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "setupActions",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "transportConfig",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "mint",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
         "name": "mintReferral",
         "type": "address",
-        "indexed": true,
         "internalType": "address"
       },
       {
-        "name": "tokenIds",
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "mintBatchWithERC20",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "ids",
         "type": "uint256[]",
-        "indexed": false,
         "internalType": "uint256[]"
       },
       {
         "name": "amounts",
         "type": "uint256[]",
-        "indexed": false,
         "internalType": "uint256[]"
+      },
+      {
+        "name": "mintReferral",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
       }
     ],
-    "anonymous": false
+    "outputs": [],
+    "stateMutability": "payable"
   },
   {
-    "type": "event",
-    "name": "TokenURIUpdated",
+    "type": "function",
+    "name": "mintBatchWithETH",
     "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "ids",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "amounts",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "mintReferral",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "mintWithERC20",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
       {
         "name": "tokenId",
         "type": "uint256",
-        "indexed": true,
         "internalType": "uint256"
       },
       {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "mintReferral",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "setFees",
+    "inputs": [
+      {
+        "name": "fees",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setLogic",
+    "inputs": [
+      {
+        "name": "logic",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "creatorLogic",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "minterLogic",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateChannelTokenUri",
+    "inputs": [
+      {
         "name": "uri",
         "type": "string",
-        "indexed": false,
         "internalType": "string"
       }
     ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "AddressZero",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "DepositMismatch",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "FalsyLogic",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidAmount",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidChannelState",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidUpgrade",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidValueSent",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotMintable",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "SoldOut",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "TransferFailed",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "Unauthorized",
-    "inputs": []
+    "outputs": [],
+    "stateMutability": "nonpayable"
   }
 ]

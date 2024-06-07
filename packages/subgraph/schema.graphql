@@ -1,0 +1,55 @@
+
+
+type Channel @entity {
+    "The channel address"
+    id: ID!
+
+    "The channel default token URI"
+
+    uri: String!
+
+    "The channel default admin address"
+    
+    admin: Bytes!
+
+    "The channel managers"
+
+    managers: [Bytes!]!
+
+    "The channel transport configuration"
+
+    transportLayer: TransportLayer!
+}
+
+type TransportLayer @entity {
+  id: ID!
+  type: String!
+    #transportLayer: TransportLayer!
+  saleDuration: BigInt
+  createStart: BigInt
+  mintStart: BigInt
+  mintEnd: BigInt
+  ranks: [BigInt!]
+  allocations: [BigInt!]
+  totalAllocation: BigInt
+  token: Bytes
+}
+
+# type TransportConfig @entity {
+#   id: ID!
+#   transportLayer: TransportLayer!
+#   saleDuration: BigInt
+#   createStart: BigInt
+#   mintStart: BigInt
+#   mintEnd: BigInt
+#   ranks: [BigInt!]!
+#   allocations: [BigInt!]!
+#   totalAllocation: BigInt!
+#   token: Bytes!
+# }
+
+
+type Token @entity {
+    id: ID!
+    saleEnd: BigInt!
+}
