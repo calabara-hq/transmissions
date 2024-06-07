@@ -25,7 +25,7 @@ Finite Channels accept new tokens, and mints of those tokens, for a fixed period
 
 Infinite Channels are much simpler. They accept new tokens indefinitely and don't escrow any rewards.
 
-At a high level, admins and managers are assumed to be trusted parties which define the rules of engagement for the channel. Users visit the channel and either create or mint tokens.
+In general, admins and managers are assumed to be trusted parties which define the rules of engagement for the channel. Users visit the channel and either create or mint tokens.
 
 ![image](https://hackmd.io/_uploads/ry6eBkn4A.png)
 
