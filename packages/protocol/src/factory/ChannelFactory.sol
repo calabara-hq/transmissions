@@ -5,11 +5,16 @@ import { IChannel } from "../channel/Channel.sol";
 import { IChannelFactory } from "../interfaces/IChannelFactory.sol";
 import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 
+import { FiniteChannel } from "../channel/transport/FiniteChannel.sol";
+
+import { NativeTokenLib } from "../libraries/NativeTokenLib.sol";
 import { FiniteUplink1155 } from "../proxies/FiniteUplink1155.sol";
 import { InfiniteUplink1155 } from "../proxies/InfiniteUplink1155.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
 import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
 
 /**
  *
@@ -42,12 +47,16 @@ import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/
  * @notice Factory contract to deploy new channels
  */
 contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
+    using SafeERC20 for IERC20;
+    using NativeTokenLib for address;
+
     /* -------------------------------------------------------------------------- */
     /*                                   ERRORS                                   */
     /* -------------------------------------------------------------------------- */
 
     error AddressZero();
     error InvalidUpgrade();
+    error ERC20TransferFailed();
 
     /* -------------------------------------------------------------------------- */
     /*                                   EVENTS                                   */
@@ -133,9 +142,25 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
         payable
         returns (address)
     {
-        FiniteUplink1155 newContract = new FiniteUplink1155(finiteChannelImpl);
-        _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
-        return address(newContract);
+        address newContract = address(new FiniteUplink1155(finiteChannelImpl));
+
+        FiniteChannel.FiniteParams memory params = abi.decode(transportConfig, (FiniteChannel.FiniteParams));
+
+        if (!params.rewards.token.isNativeToken()) {
+            uint256 beforeBalance = IERC20(params.rewards.token).balanceOf(address(this));
+            IERC20(params.rewards.token).safeTransferFrom(msg.sender, address(this), params.rewards.totalAllocation);
+            uint256 afterBalance = IERC20(params.rewards.token).balanceOf(address(this));
+
+            if (beforeBalance + params.rewards.totalAllocation != afterBalance) {
+                revert ERC20TransferFailed();
+            }
+
+            IERC20(params.rewards.token).approve(newContract, params.rewards.totalAllocation);
+        }
+
+        _initializeContract(newContract, uri, defaultAdmin, managers, setupActions, transportConfig);
+
+        return newContract;
     }
 
     /* -------------------------------------------------------------------------- */

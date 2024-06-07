@@ -12,13 +12,17 @@ import { NativeTokenLib } from "../../src/libraries/NativeTokenLib.sol";
 import { Uplink1155Factory } from "../../src/proxies/Uplink1155Factory.sol";
 import { ProxyShim } from "../../src/utils/ProxyShim.sol";
 import { UpgradePath } from "../../src/utils/UpgradePath.sol";
+
+import { MockERC20 } from "../utils/TokenHelpers.t.sol";
 import { Test, console } from "forge-std/Test.sol";
 import { ERC1155 } from "openzeppelin-contracts/token/ERC1155/ERC1155.sol";
+import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
 
 contract ChannelFactoryTest is Test {
     address internal uplink = makeAddr("uplink");
     ChannelFactory internal channelFactoryImpl;
     ChannelFactory internal channelFactory;
+    MockERC20 erc20Token = new MockERC20("TEST", "TEST");
 
     function setUp() public {
         // set up proxy
@@ -114,5 +118,35 @@ contract ChannelFactoryTest is Test {
 
         assertEq("https://example.com/api/token/0", IChannel(newInfiniteChannel).getToken(0).uri);
         assertEq("https://example.com/api/token/0", IChannel(newFiniteChannel).getToken(0).uri);
+    }
+
+    function test_factory_createFiniteChannelWithERC20Deposit() external {
+        uint40[] memory ranks = new uint40[](1);
+        uint256[] memory allocations = new uint256[](1);
+        ranks[0] = 1;
+        allocations[0] = 100_000;
+
+        erc20Token.mint(address(this), 100_000);
+        erc20Token.approve(address(channelFactory), 100_000);
+
+        address newFiniteChannel = channelFactory.createFiniteChannel(
+            "https://example.com/api/token/0",
+            address(this),
+            new address[](0),
+            new bytes[](0),
+            abi.encode(
+                FiniteChannel.FiniteParams({
+                    createStart: uint80(block.timestamp),
+                    mintStart: uint80(block.timestamp + 1),
+                    mintEnd: uint80(block.timestamp + 20),
+                    rewards: FiniteChannel.FiniteRewards({
+                        ranks: ranks,
+                        allocations: allocations,
+                        totalAllocation: 100_000,
+                        token: address(erc20Token)
+                    })
+                })
+            )
+        );
     }
 }
