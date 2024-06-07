@@ -3,6 +3,9 @@
 ### Background
 *Transmissions* is a protocol that provides flexible infrastructure for community publishing under a managed ERC1155 collection ("channel").
 
+### Audit
+
+Contracts audited by [rvierdiiev](https://code4rena.com/@rvierdiiev). Report can be found [here](https://github.com/calabara-hq/transmissions/blob/main/packages/protocol/audits/transmissions_rvierdiiev_06_07_24.md).
 
 ### Terminology
 * Channel - ERC1155 contract
