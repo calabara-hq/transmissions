@@ -1,0 +1,52 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+{{#channelFactory}}
+  - name: ChannelFactoryV{{version}}
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: ChannelFactory
+      address: "{{address}}"
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/channelFactoryMappings.ts
+      entities:
+        - Channel
+        - TransportLayer
+        - TransportConfig
+      abis:
+        - name: ChannelFactory
+          file: ./abis/ChannelFactory.json
+      eventHandlers:
+        - event: SetupNewContract(indexed address,string,address,address[],bytes)
+          handler: handleChannelCreated
+{{/channelFactory}}
+templates:
+  - name: Channel
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Channel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/channelMappings.ts
+      entities:
+        - Channel
+      abis:
+        - name: Channel
+          file: ./abis/Channel.json
+      eventHandlers:
+        - event: ManagersUpdated(address[])
+          handler: handleUpdateManagers
+        - event: ManagerRenounced(indexed address)
+          handler: handleRenounceManager
+        - event: AdminTransferred(indexed address,indexed address)
+          handler: handleTransferAdmin
+

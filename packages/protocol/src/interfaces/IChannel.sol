@@ -4,56 +4,40 @@ pragma solidity ^0.8.0;
 import { ChannelStorage } from "../channel/ChannelStorage.sol";
 
 interface IChannel {
-    function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
+  function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
 
-    function initialize(
-        string memory uri,
-        address defaultAdmin,
-        address[] calldata managers,
-        bytes[] calldata setupActions,
-        bytes calldata transportConfig
-    )
-        external
-        payable;
+  function initialize(
+    string memory uri,
+    address defaultAdmin,
+    address[] calldata managers,
+    bytes[] calldata setupActions,
+    bytes calldata transportConfig
+  ) external payable;
 
-    function setFees(address fees, bytes calldata data) external;
-    function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
-    function updateChannelTokenUri(string calldata uri) external;
-    function createToken(string calldata uri, address author, uint256 maxSupply) external returns (uint256 tokenId);
-    function mint(
-        address to,
-        uint256 tokenId,
-        uint256 amount,
-        address mintReferral,
-        bytes memory data
-    )
-        external
-        payable;
-    function mintWithERC20(
-        address to,
-        uint256 tokenId,
-        uint256 amount,
-        address mintReferral,
-        bytes memory data
-    )
-        external
-        payable;
-    function mintBatchWithETH(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        address mintReferral,
-        bytes memory data
-    )
-        external
-        payable;
-    function mintBatchWithERC20(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        address mintReferral,
-        bytes memory data
-    )
-        external
-        payable;
+  function setFees(address fees, bytes calldata data) external;
+  function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
+  function updateChannelTokenUri(string calldata uri) external;
+  function createToken(string calldata uri, address author, uint256 maxSupply) external returns (uint256 tokenId);
+  function mint(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) external payable;
+  function mintWithERC20(
+    address to,
+    uint256 tokenId,
+    uint256 amount,
+    address mintReferral,
+    bytes memory data
+  ) external payable;
+  function mintBatchWithETH(
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts,
+    address mintReferral,
+    bytes memory data
+  ) external payable;
+  function mintBatchWithERC20(
+    address to,
+    uint256[] memory ids,
+    uint256[] memory amounts,
+    address mintReferral,
+    bytes memory data
+  ) external payable;
 }

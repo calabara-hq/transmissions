@@ -2,12 +2,15 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import {
-    channelAbi,
     channelFactoryAbi,
     customFeesAbi,
-    infiniteRoundAbi,
-    logicAbi
-} from "transmissions-protocol";
+    infiniteChannelAbi,
+    finiteChannelAbi,
+    dynamicLogicAbi,
+    upgradePathAbi,
+    channelAbi
+
+} from "protocol";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,11 +27,13 @@ function output_abi(abiName, abi) {
 }
 
 const main = () => {
-    output_abi("Channel", channelAbi);
     output_abi("ChannelFactory", channelFactoryAbi);
     output_abi("CustomFees", customFeesAbi);
-    output_abi("InfiniteRound", infiniteRoundAbi);
-    output_abi("Logic", logicAbi);
+    output_abi("Channel", channelAbi);
+    output_abi("InfiniteChannel", infiniteChannelAbi);
+    output_abi("FiniteChannel", finiteChannelAbi);
+    output_abi("DynamicLogic", dynamicLogicAbi);
+    output_abi("UpgradePath", upgradePathAbi);
 }
 
 main();

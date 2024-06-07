@@ -180,55 +180,21 @@
   },
   {
     "type": "function",
-    "name": "test_customFees_bps",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_customFees_freeEthMint",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_generateCustomFees_nullChannelTreasury",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_generateCustomFees_nullReferral",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_generateCustomFees_revertOnNullCreator",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_generateCustomFees_revertOnNullSponsor",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_initializeCustomFees_fuzz",
+    "name": "test_customFees_allocations",
     "inputs": [
       {
-        "name": "ethMintPrice",
+        "name": "batchSize",
         "type": "uint256",
         "internalType": "uint256"
-      },
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_fuzz",
+    "inputs": [
       {
         "name": "uplinkBps",
         "type": "uint16",
@@ -253,6 +219,108 @@
         "name": "sponsorBps",
         "type": "uint16",
         "internalType": "uint16"
+      },
+      {
+        "name": "ethMintPrice",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "erc20MintPrice",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "erc20Address",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_nullChannelTreasury",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_nullReferral",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_revertOnFreeMint",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_revertOnMissingConfig",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_revertOnNullCreator",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_revertOnNullSponsor",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_customFees_versioning",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_feeVerification",
+    "inputs": [
+      {
+        "name": "uplinkBps",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "channelBps",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "creatorBps",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "mintReferralBps",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "sponsorBps",
+        "type": "uint16",
+        "internalType": "uint16"
+      },
+      {
+        "name": "ethMintPrice",
+        "type": "uint256",
+        "internalType": "uint256"
       },
       {
         "name": "erc20MintPrice",

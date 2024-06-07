@@ -17,222 +17,226 @@ import { FiniteUplink1155 } from "../../src/proxies/FiniteUplink1155.sol";
 import { InfiniteUplink1155 } from "../../src/proxies/InfiniteUplink1155.sol";
 
 contract ChannelTest is Test {
-    event Upgraded(address indexed implementation);
+  event Upgraded(address indexed implementation);
 
-    address nick = makeAddr("nick");
-    address admin = makeAddr("admin");
+  address nick = makeAddr("nick");
+  address admin = makeAddr("admin");
 
-    InfiniteChannel infChannelImpl;
-    InfiniteChannel proxiedInfChannel;
+  InfiniteChannel infChannelImpl;
+  InfiniteChannel proxiedInfChannel;
 
-    FiniteChannel finChannelImpl;
-    FiniteChannel proxiedFinChannel;
+  FiniteChannel finChannelImpl;
+  FiniteChannel proxiedFinChannel;
 
-    IUpgradePath upgradePath;
+  IUpgradePath upgradePath;
 
-    function setUp() public {
-        upgradePath = new UpgradePath();
-        upgradePath.initialize(admin);
+  function setUp() public {
+    upgradePath = new UpgradePath();
+    upgradePath.initialize(admin);
 
-        infChannelImpl = new InfiniteChannel(address(upgradePath), address(0));
-        proxiedInfChannel = InfiniteChannel(payable(address(new InfiniteUplink1155(address(infChannelImpl)))));
-        proxiedInfChannel.initialize(
-            "https://example.com/api/token/0", admin, new address[](0), new bytes[](0), abi.encode(100)
-        );
+    infChannelImpl = new InfiniteChannel(address(upgradePath), address(0));
+    proxiedInfChannel = InfiniteChannel(payable(address(new InfiniteUplink1155(address(infChannelImpl)))));
+    proxiedInfChannel.initialize(
+      "https://example.com/api/token/0",
+      admin,
+      new address[](0),
+      new bytes[](0),
+      abi.encode(100)
+    );
 
-        finChannelImpl = new FiniteChannel(address(upgradePath), address(0));
-        proxiedFinChannel = FiniteChannel(payable(address(new FiniteUplink1155(address(finChannelImpl)))));
+    finChannelImpl = new FiniteChannel(address(upgradePath), address(0));
+    proxiedFinChannel = FiniteChannel(payable(address(new FiniteUplink1155(address(finChannelImpl)))));
 
-        uint40[] memory ranks = new uint40[](1);
-        uint256[] memory allocations = new uint256[](1);
-        ranks[0] = 1;
-        allocations[0] = 100 ether;
+    uint40[] memory ranks = new uint40[](1);
+    uint256[] memory allocations = new uint256[](1);
+    ranks[0] = 1;
+    allocations[0] = 100 ether;
 
-        vm.deal(address(this), 100 ether);
-        proxiedFinChannel.initialize{ value: 100 ether }(
-            "https://example.com/api/token/0",
-            admin,
-            new address[](0),
-            new bytes[](0),
-            abi.encode(
-                FiniteChannel.FiniteParams({
-                    createStart: uint80(block.timestamp),
-                    mintStart: uint80(block.timestamp + 1),
-                    mintEnd: uint80(block.timestamp + 20),
-                    rewards: FiniteChannel.FiniteRewards({
-                        ranks: ranks,
-                        allocations: allocations,
-                        totalAllocation: 100 ether,
-                        token: NativeTokenLib.NATIVE_TOKEN
-                    })
-                })
-            )
-        );
-    }
+    vm.deal(address(this), 100 ether);
+    proxiedFinChannel.initialize{ value: 100 ether }(
+      "https://example.com/api/token/0",
+      admin,
+      new address[](0),
+      new bytes[](0),
+      abi.encode(
+        FiniteChannel.FiniteParams({
+          createStart: uint80(block.timestamp),
+          mintStart: uint80(block.timestamp + 1),
+          mintEnd: uint80(block.timestamp + 20),
+          rewards: FiniteChannel.FiniteRewards({
+            ranks: ranks,
+            allocations: allocations,
+            totalAllocation: 100 ether,
+            token: NativeTokenLib.NATIVE_TOKEN
+          })
+        })
+      )
+    );
+  }
 
-    function test_upgrade_events() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+  function test_upgrade_events() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
+    address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
 
-        vm.startPrank(admin);
+    vm.startPrank(admin);
 
-        vm.expectEmit();
-        emit UpgradePath.UpgradeRegistered(oldImpls[0], newImpl);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
+    vm.expectEmit();
+    emit UpgradePath.UpgradeRegistered(oldImpls[0], newImpl);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
 
-        vm.expectEmit();
-        emit Upgraded(newImpl);
-        proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
+    vm.expectEmit();
+    emit Upgraded(newImpl);
+    proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
 
-        vm.expectEmit();
-        emit UpgradePath.UpgradeRemoved(oldImpls[0], newImpl);
-        upgradePath.removeUpgradePath(oldImpls[0], newImpl);
+    vm.expectEmit();
+    emit UpgradePath.UpgradeRemoved(oldImpls[0], newImpl);
+    upgradePath.removeUpgradePath(oldImpls[0], newImpl);
 
-        vm.stopPrank();
-    }
+    vm.stopPrank();
+  }
 
-    function test_upgrade_versioning() external {
-        assertEq(upgradePath.contractVersion(), "1.0.0");
-        assertEq(upgradePath.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
-        assertEq(upgradePath.contractName(), "Upgrade Path");
-    }
+  function test_upgrade_versioning() external {
+    assertEq(upgradePath.contractVersion(), "1.0.0");
+    assertEq(upgradePath.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(upgradePath.contractName(), "Upgrade Path");
+  }
 
-    function test_upgrade_infChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+  function test_upgrade_infChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
+    address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
 
-        vm.startPrank(admin);
+    vm.startPrank(admin);
 
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
-        vm.stopPrank();
-    }
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
+    vm.stopPrank();
+  }
 
-    function test_upgrade_finChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(finChannelImpl);
+  function test_upgrade_finChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(finChannelImpl);
 
-        address newImpl = address(new FiniteChannel(address(upgradePath), address(0)));
+    address newImpl = address(new FiniteChannel(address(upgradePath), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
-        vm.stopPrank();
-    }
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
+    vm.stopPrank();
+  }
 
-    function test_upgradeUnauthorized_infChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+  function test_upgradeUnauthorized_infChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(0), address(0)));
+    address newImpl = address(new InfiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        vm.stopPrank();
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    vm.stopPrank();
 
-        vm.expectRevert();
-        proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
-    }
+    vm.expectRevert();
+    proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
+  }
 
-    function test_upgradeUnauthorized_finChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(finChannelImpl);
+  function test_upgradeUnauthorized_finChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(finChannelImpl);
 
-        address newImpl = address(new FiniteChannel(address(0), address(0)));
+    address newImpl = address(new FiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        vm.stopPrank();
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    vm.stopPrank();
 
-        vm.expectRevert();
-        proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
-    }
+    vm.expectRevert();
+    proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
+  }
 
-    function test_upgradeUnregisteredPath_infChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+  function test_upgradeUnregisteredPath_infChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(0), address(0)));
+    address newImpl = address(new InfiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        vm.expectRevert();
-        proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
-        vm.stopPrank();
-    }
+    vm.startPrank(admin);
+    vm.expectRevert();
+    proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
+    vm.stopPrank();
+  }
 
-    function test_upgradeUnregisteredPath_finChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(finChannelImpl);
+  function test_upgradeUnregisteredPath_finChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(finChannelImpl);
 
-        address newImpl = address(new FiniteChannel(address(0), address(0)));
+    address newImpl = address(new FiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        vm.expectRevert();
-        proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
-        vm.stopPrank();
-    }
+    vm.startPrank(admin);
+    vm.expectRevert();
+    proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
+    vm.stopPrank();
+  }
 
-    function test_storageAfterUpgrade_infChannel() external {
-        proxiedInfChannel.createToken("http://test/1", address(0), 100);
+  function test_storageAfterUpgrade_infChannel() external {
+    proxiedInfChannel.createToken("http://test/1", address(0), 100);
 
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(0), address(0)));
+    address newImpl = address(new InfiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
-        assertEq(proxiedInfChannel.getToken(1).uri, "http://test/1");
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    proxiedInfChannel.upgradeToAndCall(newImpl, new bytes(0));
+    assertEq(proxiedInfChannel.getToken(1).uri, "http://test/1");
 
-        vm.stopPrank();
-    }
+    vm.stopPrank();
+  }
 
-    function test_storageAfterUpgrade_finChannel() external {
-        proxiedFinChannel.createToken("http://test/1", address(0), 100);
+  function test_storageAfterUpgrade_finChannel() external {
+    proxiedFinChannel.createToken("http://test/1", address(0), 100);
 
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(finChannelImpl);
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(finChannelImpl);
 
-        address newImpl = address(new FiniteChannel(address(0), address(0)));
+    address newImpl = address(new FiniteChannel(address(0), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
-        assertEq(proxiedFinChannel.getToken(1).uri, "http://test/1");
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    proxiedFinChannel.upgradeToAndCall(newImpl, new bytes(0));
+    assertEq(proxiedFinChannel.getToken(1).uri, "http://test/1");
 
-        vm.stopPrank();
-    }
+    vm.stopPrank();
+  }
 
-    function test_removeUpgrade_infChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(infChannelImpl);
+  function test_removeUpgrade_infChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(infChannelImpl);
 
-        address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
+    address newImpl = address(new InfiniteChannel(address(upgradePath), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        assertTrue(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
-        upgradePath.removeUpgradePath(oldImpls[0], newImpl);
-        assertFalse(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
-        vm.stopPrank();
-    }
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    assertTrue(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
+    upgradePath.removeUpgradePath(oldImpls[0], newImpl);
+    assertFalse(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
+    vm.stopPrank();
+  }
 
-    function test_removeUpgrade_finChannel() external {
-        address[] memory oldImpls = new address[](1);
-        oldImpls[0] = address(finChannelImpl);
+  function test_removeUpgrade_finChannel() external {
+    address[] memory oldImpls = new address[](1);
+    oldImpls[0] = address(finChannelImpl);
 
-        address newImpl = address(new FiniteChannel(address(upgradePath), address(0)));
+    address newImpl = address(new FiniteChannel(address(upgradePath), address(0)));
 
-        vm.startPrank(admin);
-        upgradePath.registerUpgradePath(oldImpls, newImpl);
-        assertTrue(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
-        upgradePath.removeUpgradePath(oldImpls[0], newImpl);
-        assertFalse(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
-        vm.stopPrank();
-    }
+    vm.startPrank(admin);
+    upgradePath.registerUpgradePath(oldImpls, newImpl);
+    assertTrue(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
+    upgradePath.removeUpgradePath(oldImpls[0], newImpl);
+    assertFalse(upgradePath.isRegisteredUpgradePath(oldImpls[0], newImpl));
+    vm.stopPrank();
+  }
 }

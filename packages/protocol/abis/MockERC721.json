@@ -1,15 +1,31 @@
 [
   {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "symbol",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
     "type": "function",
     "name": "approve",
     "inputs": [
       {
-        "name": "spender",
+        "name": "to",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -41,7 +57,7 @@
     "name": "getApproved",
     "inputs": [
       {
-        "name": "",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -57,33 +73,15 @@
   },
   {
     "type": "function",
-    "name": "initialize",
-    "inputs": [
-      {
-        "name": "_name",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "_symbol",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "isApprovedForAll",
     "inputs": [
       {
-        "name": "",
+        "name": "owner",
         "type": "address",
         "internalType": "address"
       },
       {
-        "name": "",
+        "name": "operator",
         "type": "address",
         "internalType": "address"
       }
@@ -96,6 +94,24 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "mint",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -115,14 +131,14 @@
     "name": "ownerOf",
     "inputs": [
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
     ],
     "outputs": [
       {
-        "name": "owner",
+        "name": "",
         "type": "address",
         "internalType": "address"
       }
@@ -144,7 +160,7 @@
         "internalType": "address"
       },
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -167,7 +183,7 @@
         "internalType": "address"
       },
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       },
@@ -215,7 +231,7 @@
         "internalType": "bool"
       }
     ],
-    "stateMutability": "pure"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -235,7 +251,7 @@
     "name": "tokenURI",
     "inputs": [
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -264,7 +280,7 @@
         "internalType": "address"
       },
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -283,13 +299,13 @@
         "internalType": "address"
       },
       {
-        "name": "spender",
+        "name": "approved",
         "type": "address",
         "indexed": true,
         "internalType": "address"
       },
       {
-        "name": "id",
+        "name": "tokenId",
         "type": "uint256",
         "indexed": true,
         "internalType": "uint256"
@@ -330,24 +346,6 @@
         "name": "from",
         "type": "address",
         "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "id",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  }
-]d": true,
         "internalType": "address"
       },
       {

@@ -1,0 +1,50 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - name: ChannelFactoryV1
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: ChannelFactory
+      address: "0x61B7c7982C666AF882851DE04a05565369007bEc"
+      startBlock: 10883135
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/channelFactoryMappings.ts
+      entities:
+        - Channel
+        - TransportLayer
+        - TransportConfig
+      abis:
+        - name: ChannelFactory
+          file: ./abis/ChannelFactory.json
+      eventHandlers:
+        - event: SetupNewContract(indexed address,string,address,address[],bytes)
+          handler: handleChannelCreated
+templates:
+  - name: Channel
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: Channel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/channelMappings.ts
+      entities:
+        - Channel
+      abis:
+        - name: Channel
+          file: ./abis/Channel.json
+      eventHandlers:
+        - event: ManagersUpdated(address[])
+          handler: handleUpdateManagers
+        - event: ManagerRenounced(indexed address)
+          handler: handleRenounceManager
+        - event: AdminTransferred(indexed address,indexed address)
+          handler: handleTransferAdmin
+

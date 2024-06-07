@@ -19,7 +19,7 @@
   },
   {
     "type": "function",
-    "name": "isCreatorApproved",
+    "name": "calculateCreatorInteractionPower",
     "inputs": [
       {
         "name": "user",
@@ -30,15 +30,15 @@
     "outputs": [
       {
         "name": "",
-        "type": "bool",
-        "internalType": "bool"
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
   },
   {
     "type": "function",
-    "name": "isMinterApproved",
+    "name": "calculateMinterInteractionPower",
     "inputs": [
       {
         "name": "user",
@@ -49,11 +49,50 @@
     "outputs": [
       {
         "name": "",
-        "type": "bool",
-        "internalType": "bool"
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "contractName",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "contractURI",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "contractVersion",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -80,102 +119,5 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "CreatorLogicSet",
-    "inputs": [
-      {
-        "name": "channel",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "logic",
-        "type": "tuple",
-        "indexed": false,
-        "internalType": "struct ILogic.InteractionLogic",
-        "components": [
-          {
-            "name": "targets",
-            "type": "address[]",
-            "internalType": "address[]"
-          },
-          {
-            "name": "signatures",
-            "type": "bytes4[]",
-            "internalType": "bytes4[]"
-          },
-          {
-            "name": "datas",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          },
-          {
-            "name": "operators",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          },
-          {
-            "name": "literalOperands",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          }
-        ]
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "MinterLogicSet",
-    "inputs": [
-      {
-        "name": "channel",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "logic",
-        "type": "tuple",
-        "indexed": false,
-        "internalType": "struct ILogic.InteractionLogic",
-        "components": [
-          {
-            "name": "targets",
-            "type": "address[]",
-            "internalType": "address[]"
-          },
-          {
-            "name": "signatures",
-            "type": "bytes4[]",
-            "internalType": "bytes4[]"
-          },
-          {
-            "name": "datas",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          },
-          {
-            "name": "operators",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          },
-          {
-            "name": "literalOperands",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          }
-        ]
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "CallFailed",
-    "inputs": []
   }
 ]

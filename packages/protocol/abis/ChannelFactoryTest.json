@@ -187,35 +187,21 @@
   },
   {
     "type": "function",
-    "name": "test_contractName",
+    "name": "test_factory_createChannel",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_contractURI",
+    "name": "test_factory_createFiniteChannelWithERC20Deposit",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "test_contractVersion",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_createChannel",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "test_initialize",
+    "name": "test_factory_initialize",
     "inputs": [
       {
         "name": "initialOwner",
@@ -228,7 +214,7 @@
   },
   {
     "type": "function",
-    "name": "test_upgrade",
+    "name": "test_factory_upgrade",
     "inputs": [
       {
         "name": "initialOwner",
@@ -236,6 +222,13 @@
         "internalType": "address"
       }
     ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "test_factory_versioning",
+    "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
   },
