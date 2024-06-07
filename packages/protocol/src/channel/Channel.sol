@@ -46,9 +46,6 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
         address indexed updater, ConfigUpdate indexed updateType, address feeContract, address logicContract
     );
 
-    event LogicUpdated(address indexed updater, address logicContract, bytes data);
-    event FeesUpdated(address indexed updater, address feeContract, bytes data);
-
     /* -------------------------------------------------------------------------- */
     /*                          CONSTRUCTOR & INITIALIZER                         */
     /* -------------------------------------------------------------------------- */
