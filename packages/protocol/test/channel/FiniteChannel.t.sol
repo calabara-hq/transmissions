@@ -507,4 +507,27 @@ contract FiniteChannelTest is Test {
         assertEq("Finite Channel", targetChannel.contractName());
         assertEq(targetChannel.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     }
+
+    function test_finiteChannel_promotingSingleNodeDoesNotWipeDLL() public {
+        uint40[] memory _ranks = new uint40[](1);
+        uint256[] memory _allocations = new uint256[](1);
+
+        _ranks[0] = 1;
+        _allocations[0] = 1;
+
+        uint256 _totalAllocation = 1;
+
+        initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
+
+        targetChannel.createToken("test", creator, 100);
+
+        vm.warp(block.timestamp + 10);
+        targetChannel.mint(minter, 1, 10, referral, "");
+
+        targetChannel.mint(minter, 1, 10, referral, "");
+
+        uint256[] memory winningTokenIds = targetChannel.getRankedTokenIds();
+
+        assertEq(winningTokenIds[0], 1);
+    }
 }

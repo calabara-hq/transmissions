@@ -214,6 +214,9 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     }
 
     function _promoteNode(uint256 tokenId, bytes32 promotedNodeKey) internal {
+        /// @dev do nothing if node to promote is only node in DLL
+        if (length == 1) return;
+
         Node memory promotedNode = nodes[promotedNodeKey];
         _removeNode(promotedNodeKey);
 
