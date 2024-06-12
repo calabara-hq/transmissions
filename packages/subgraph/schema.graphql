@@ -10,46 +10,207 @@ type Channel @entity {
 
     "The channel default admin address"
     
-    admin: Bytes!
+    admin: User!
 
     "The channel managers"
 
-    managers: [Bytes!]!
+    managers: [User!]!
 
     "The channel transport configuration"
 
     transportLayer: TransportLayer!
+
+    "The channel fee configuration"
+
+    fees: FeeConfig
+
+    "The channel creator logic configuration"
+
+    creatorLogic: LogicConfig
+
+    "The channel minter logic configuration"
+
+    minterLogic: LogicConfig
+
+    "The channel tokens"
+
+    tokens: [Token!]! @derivedFrom(field: "channel")
+
+    "The channel mints"
+
+    mints: [Mint!]! @derivedFrom(field: "channel")
+
+    "The channel reward transfer events"
+
+    rewardTransferEvents: [RewardTransferEvent!]! @derivedFrom(field: "channel")
+
+}
+
+type ApprovedDynamicLogicSignature @entity {
+    "Concatenation of tx hash + log index"
+    id: ID!
+
+    signature: Bytes!
+    calldataAddressOffset: BigInt!
 }
 
 type TransportLayer @entity {
-  id: ID!
-  type: String!
-    #transportLayer: TransportLayer!
-  saleDuration: BigInt
-  createStart: BigInt
-  mintStart: BigInt
-  mintEnd: BigInt
-  ranks: [BigInt!]
-  allocations: [BigInt!]
-  totalAllocation: BigInt
-  token: Bytes
+    id: ID!
+    type: String!
+    finiteTransportConfig: FiniteTransportConfig
+    infiniteTransportConfig: InfiniteTransportConfig
 }
 
-# type TransportConfig @entity {
-#   id: ID!
-#   transportLayer: TransportLayer!
-#   saleDuration: BigInt
-#   createStart: BigInt
-#   mintStart: BigInt
-#   mintEnd: BigInt
-#   ranks: [BigInt!]!
-#   allocations: [BigInt!]!
-#   totalAllocation: BigInt!
-#   token: Bytes!
-# }
+type FiniteTransportConfig @entity(immutable: true) {
+    id: ID!
+    createStart: BigInt!
+    mintStart: BigInt!
+    mintEnd: BigInt!
+    ranks: [BigInt!]!
+    allocations: [BigInt!]!
+    totalAllocation: BigInt!
+    token: Bytes!
+}
 
+type InfiniteTransportConfig @entity {
+  id: ID!
+  saleDuration: BigInt!
+}
+
+type FeeConfig @entity {
+    "The channel address"
+    id: ID!
+
+    updatedBy: Bytes!
+
+    "The fee contract address"
+    feeContract: Bytes!
+
+    type: String!
+
+    "The custom fee configuration"
+    customFees: CustomFees
+}
+
+type CustomFees @entity {
+    "The channel address"
+    id: ID!
+    
+    "The channel fee configuration"
+    channelTreasury: Bytes!
+    uplinkBps: BigInt!
+    channelBps: BigInt!
+    creatorBps: BigInt!
+    mintReferralBps: BigInt!
+    sponsorBps: BigInt!
+    ethMintPrice: BigInt!
+    erc20MintPrice: BigInt!
+    erc20Contract: Bytes!
+}
+
+type LogicConfig @entity {
+    "The channel address + the logic type"
+    id: ID!
+
+    updatedBy: Bytes!
+
+    "The logic contract address"
+    logicContract: Bytes!
+
+    type: String!
+
+    dynamicLogic: DynamicLogic
+}
+
+type DynamicLogic @entity {
+    id: ID!
+    targets: [Bytes!]!
+    signatures: [Bytes!]!
+    datas: [Bytes!]!
+    operators: [BigInt!]!
+    literalOperands: [Bytes!]!
+    interactionPowerTypes: [BigInt!]!
+    interactionPowers: [BigInt!]!
+}
+
+type User @entity {
+    id: ID!
+    createdTokens: [Token!]! @derivedFrom(field: "author")
+    sponsoredTokens: [Token!]! @derivedFrom(field: "sponsor")
+    mints: [Mint!]! @derivedFrom(field: "minter")
+    mintReferrals: [Mint!]! @derivedFrom(field: "referral")
+    collectedTokens: [TokenHolder!]! @derivedFrom(field: "user")
+
+}
+
+type TokenHolder @entity {
+    "Concatenation of the user address, channel address, and token id."
+    id: ID!
+    user: User!
+    token: Token!
+    balance: BigInt!
+    
+}
 
 type Token @entity {
+    "Concatenation of the channel address and the token id."
     id: ID!
-    saleEnd: BigInt!
+    tokenId: BigInt!
+    author: User!
+    sponsor: User!
+    uri: String!
+    totalMinted: BigInt!
+    maxSupply: BigInt!
+
+    createdAt: BigInt!
+
+    holders: [TokenHolder!]! @derivedFrom(field: "token")
+
+    "The token channel"
+    channel: Channel!
+}
+
+type Mint @entity(immutable: true) {
+    "Concatenation of tx hash and batch loop index"
+    id: ID!
+    token: Token!
+    amount: BigInt!
+    data: Bytes!
+    minter: User!
+    referral: User!
+
+    mintedAt: BigInt!
+
+    "The token channel"
+    channel: Channel!
+} 
+
+type RewardTransferEvent @entity(immutable: true) {
+    "Concatenation of tx hash and log index"  
+    id: ID!
+
+    from: User!
+    to: User!
+    amount: BigInt!
+    token: Bytes!
+
+    channel: Channel!
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+}
+
+type ChannelTokenTransferEvent @entity(immutable: true) {
+    "Concatenation of tx hash and log index"  
+    id: ID!
+
+    operator: User!
+    from: User!
+    to: User!
+    tokenId: BigInt!
+    value: BigInt!
+
+    token: Token!
+    channel: Channel!
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }

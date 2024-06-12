@@ -16,6 +16,7 @@ export default defineConfig({
         "CustomFees",
         "DynamicLogic",
         "UpgradePath",
+        "Rewards",
       ].map((contractName) => `${contractName}.json`),
     }),
   ],

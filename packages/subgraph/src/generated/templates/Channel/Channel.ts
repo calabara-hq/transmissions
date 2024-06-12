@@ -144,32 +144,6 @@ export class ETHTransferred__Params {
   }
 }
 
-export class FeesUpdated extends ethereum.Event {
-  get params(): FeesUpdated__Params {
-    return new FeesUpdated__Params(this);
-  }
-}
-
-export class FeesUpdated__Params {
-  _event: FeesUpdated;
-
-  constructor(event: FeesUpdated) {
-    this._event = event;
-  }
-
-  get updater(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get feeContract(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get data(): Bytes {
-    return this._event.parameters[2].value.toBytes();
-  }
-}
-
 export class Initialized extends ethereum.Event {
   get params(): Initialized__Params {
     return new Initialized__Params(this);
@@ -185,32 +159,6 @@ export class Initialized__Params {
 
   get version(): BigInt {
     return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class LogicUpdated extends ethereum.Event {
-  get params(): LogicUpdated__Params {
-    return new LogicUpdated__Params(this);
-  }
-}
-
-export class LogicUpdated__Params {
-  _event: LogicUpdated;
-
-  constructor(event: LogicUpdated) {
-    this._event = event;
-  }
-
-  get updater(): Address {
-    return this._event.parameters[0].value.toAddress();
-  }
-
-  get logicContract(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get data(): Bytes {
-    return this._event.parameters[2].value.toBytes();
   }
 }
 

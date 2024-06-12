@@ -10,7 +10,7 @@ import {
     logStore
 } from 'matchstick-as/assembly/index';
 
-import { Channel, TransportLayer } from '../src/generated/schema';
+import { Channel, FiniteTransportConfig, InfiniteTransportConfig, TransportLayer, FeeConfig } from '../src/generated/schema';
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
 import { ChannelCreatedData, createChannelCreatedData, finiteTransportBytes, infiniteTransportBytes } from './utils';
 import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
@@ -30,7 +30,7 @@ describe('ChannelFactory', () => {
     describe('handleChannelCreated', () => {
         test("properly sets fields for new finite channel", () => {
             const channelData = new ChannelCreatedData();
-            channelData.id = Address.fromString(CHANNEL_ADDRESS);
+            channelData.contractAddress = Address.fromString(CHANNEL_ADDRESS);
             channelData.uri = 'sample uri';
             channelData.admin = Address.fromString(ADMIN_ADDRESS);
             channelData.managers = [Address.fromString(MANAGER_ADDRESS)];
@@ -46,30 +46,33 @@ describe('ChannelFactory', () => {
             handleChannelCreated(event);
 
             const channel = Channel.load(CHANNEL_ADDRESS);
-            const transport = TransportLayer.load(CHANNEL_ADDRESS);
+            const transportLayer = TransportLayer.load(CHANNEL_ADDRESS);
+            const finiteTransportConfig = FiniteTransportConfig.load(CHANNEL_ADDRESS);
+            const infiniteTransportConfig = InfiniteTransportConfig.load(CHANNEL_ADDRESS);
 
+            /// check channel
             assert.stringEquals(channel!.uri, 'sample uri');
-            assert.bytesEquals(channel!.admin, channelData.admin);
-            assert.bytesEquals(channel!.managers[0], channelData.managers[0]);
+            assert.stringEquals(channel!.admin, channelData.admin.toHexString());
+            assert.stringEquals(channel!.managers[0], channelData.managers[0].toHexString());
 
-            assert.assertNotNull(transport);
+            /// check transport layer
+            assert.stringEquals(transportLayer!.type, 'finite');
+            assert.bigIntEquals(finiteTransportConfig!.createStart, BigInt.fromI32(1));
+            assert.bigIntEquals(finiteTransportConfig!.mintStart, BigInt.fromI32(2));
+            assert.bigIntEquals(finiteTransportConfig!.mintEnd, BigInt.fromI32(3));
+            assert.bigIntEquals(finiteTransportConfig!.ranks[0], BigInt.fromI32(1));
+            assert.bigIntEquals(finiteTransportConfig!.allocations[0], BigInt.fromI32(1));
+            assert.bigIntEquals(finiteTransportConfig!.totalAllocation, BigInt.fromI32(1));
+            assert.bytesEquals(finiteTransportConfig!.token, Address.fromString('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'));
 
-            if (transport != null) {
-                assert.stringEquals(transport.type!, 'finite');
-                assert.bigIntEquals(transport.createStart!, BigInt.fromI32(1));
-                assert.bigIntEquals(transport.mintStart!, BigInt.fromI32(2));
-                assert.bigIntEquals(transport.mintEnd!, BigInt.fromI32(3));
-                assert.bigIntEquals(transport.ranks![0], BigInt.fromI32(1));
-                assert.bigIntEquals(transport.allocations![0], BigInt.fromI32(1));
-                assert.bigIntEquals(transport.totalAllocation!, BigInt.fromI32(1));
-                assert.bytesEquals(transport.token!, Address.fromString('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'));
+            assert.assertNull(infiniteTransportConfig);
 
-            }
+
         });
 
         test("properly sets fields for new infinite channel", () => {
             const channelData = new ChannelCreatedData();
-            channelData.id = Address.fromString(CHANNEL_ADDRESS);
+            channelData.contractAddress = Address.fromString(CHANNEL_ADDRESS);
             channelData.uri = 'sample uri';
             channelData.admin = Address.fromString(ADMIN_ADDRESS);
             channelData.managers = [Address.fromString(MANAGER_ADDRESS)];
@@ -85,18 +88,21 @@ describe('ChannelFactory', () => {
             handleChannelCreated(event);
 
             const channel = Channel.load(CHANNEL_ADDRESS);
-            const transport = TransportLayer.load(CHANNEL_ADDRESS);
+            const transportLayer = TransportLayer.load(CHANNEL_ADDRESS);
+            const finiteTransportConfig = FiniteTransportConfig.load(CHANNEL_ADDRESS);
+            const infiniteTransportConfig = InfiniteTransportConfig.load(CHANNEL_ADDRESS);
 
             assert.stringEquals(channel!.uri, 'sample uri');
-            assert.bytesEquals(channel!.admin, channelData.admin);
-            assert.bytesEquals(channel!.managers[0], channelData.managers[0]);
+            assert.stringEquals(channel!.admin, channelData.admin.toHexString());
+            assert.stringEquals(channel!.managers[0], channelData.managers[0].toHexString());
 
-            assert.assertNotNull(transport);
+            assert.stringEquals(transportLayer!.type, 'infinite');
+            assert.bigIntEquals(infiniteTransportConfig!.saleDuration, BigInt.fromI32(1));
 
-            if (transport != null) {
-                assert.stringEquals(transport.type!, 'infinite');
-                assert.bigIntEquals(transport.saleDuration!, BigInt.fromI32(1));
-            }
+            assert.assertNull(finiteTransportConfig);
+
         });
     });
 });
+
+
