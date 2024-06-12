@@ -25,6 +25,7 @@ __export(package_exports, {
   dynamicLogicAbi: () => dynamicLogicAbi,
   finiteChannelAbi: () => finiteChannelAbi,
   infiniteChannelAbi: () => infiniteChannelAbi,
+  rewardsAbi: () => rewardsAbi,
   upgradePathAbi: () => upgradePathAbi
 });
 module.exports = __toCommonJS(package_exports);
@@ -1531,6 +1532,25 @@ var dynamicLogicAbi = [
       }
     ],
     name: "OwnershipTransferred"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "signature",
+        internalType: "bytes4",
+        type: "bytes4",
+        indexed: false
+      },
+      {
+        name: "calldataAddressPosition",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false
+      }
+    ],
+    name: "SignatureApproved"
   },
   { type: "error", inputs: [], name: "CallFailed" },
   { type: "error", inputs: [], name: "InvalidSignature" },
@@ -3530,6 +3550,81 @@ var infiniteChannelAbi = [
   },
   { type: "error", inputs: [], name: "Unauthorized" }
 ];
+var rewardsAbi = [
+  {
+    type: "constructor",
+    inputs: [{ name: "weth", internalType: "address", type: "address" }],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [{ name: "", internalType: "address", type: "address" }],
+    name: "erc20Balances",
+    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    stateMutability: "view"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "spender",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "recipient",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "amount",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false
+      },
+      {
+        name: "token",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      }
+    ],
+    name: "ERC20Transferred"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "spender",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "recipient",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "amount",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false
+      }
+    ],
+    name: "ETHTransferred"
+  },
+  { type: "error", inputs: [], name: "ERC20TransferFailed" },
+  { type: "error", inputs: [], name: "InsufficientBalance" },
+  { type: "error", inputs: [], name: "InvalidAmountSent" },
+  { type: "error", inputs: [], name: "InvalidTotalAllocation" },
+  { type: "error", inputs: [], name: "SplitLengthMismatch" }
+];
 var upgradePathAbi = [
   { type: "constructor", inputs: [], stateMutability: "nonpayable" },
   {
@@ -3718,6 +3813,7 @@ var upgradePathAbi = [
   dynamicLogicAbi,
   finiteChannelAbi,
   infiniteChannelAbi,
+  rewardsAbi,
   upgradePathAbi
 });
 //# sourceMappingURL=index.cjs.map

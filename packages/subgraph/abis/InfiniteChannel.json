@@ -1194,31 +1194,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "name": "updater",
-        "internalType": "address",
-        "type": "address",
-        "indexed": true
-      },
-      {
-        "name": "feeContract",
-        "internalType": "address",
-        "type": "address",
-        "indexed": false
-      },
-      {
-        "name": "data",
-        "internalType": "bytes",
-        "type": "bytes",
-        "indexed": false
-      }
-    ],
-    "name": "FeesUpdated"
-  },
-  {
-    "type": "event",
-    "anonymous": false,
-    "inputs": [
-      {
         "name": "version",
         "internalType": "uint64",
         "type": "uint64",
@@ -1226,31 +1201,6 @@
       }
     ],
     "name": "Initialized"
-  },
-  {
-    "type": "event",
-    "anonymous": false,
-    "inputs": [
-      {
-        "name": "updater",
-        "internalType": "address",
-        "type": "address",
-        "indexed": true
-      },
-      {
-        "name": "logicContract",
-        "internalType": "address",
-        "type": "address",
-        "indexed": false
-      },
-      {
-        "name": "data",
-        "internalType": "bytes",
-        "type": "bytes",
-        "indexed": false
-      }
-    ],
-    "name": "LogicUpdated"
   },
   {
     "type": "event",

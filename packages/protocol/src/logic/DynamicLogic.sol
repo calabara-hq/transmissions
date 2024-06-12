@@ -25,6 +25,7 @@ contract DynamicLogic is ILogic, Ownable {
 
   event CreatorLogicSet(address indexed channel, InteractionLogic logic);
   event MinterLogicSet(address indexed channel, InteractionLogic logic);
+  event SignatureApproved(bytes4 signature, uint256 calldataAddressPosition);
 
   /* -------------------------------------------------------------------------- */
   /*                                   STRUCTS                                  */
@@ -80,6 +81,7 @@ contract DynamicLogic is ILogic, Ownable {
    */
   function approveLogic(bytes4 signature, uint256 calldataAddressPosition) external onlyOwner {
     approvedSignatures[signature] = ApprovedSignature(true, calldataAddressPosition);
+    emit SignatureApproved(signature, calldataAddressPosition);
   }
 
   /**

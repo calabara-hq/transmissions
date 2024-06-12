@@ -8,7 +8,8 @@ import {
     finiteChannelAbi,
     dynamicLogicAbi,
     upgradePathAbi,
-    channelAbi
+    channelAbi,
+    rewardsAbi
 
 } from "protocol";
 
@@ -34,6 +35,7 @@ const main = () => {
     output_abi("FiniteChannel", finiteChannelAbi);
     output_abi("DynamicLogic", dynamicLogicAbi);
     output_abi("UpgradePath", upgradePathAbi);
+    output_abi("Rewards", rewardsAbi);
 }
 
 main();

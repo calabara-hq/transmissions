@@ -15,3 +15,13 @@ export class Channel extends DataSourceTemplate {
     DataSourceTemplate.createWithContext("Channel", [address.toHex()], context);
   }
 }
+
+export class Rewards extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("Rewards", [address.toHex()]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext("Rewards", [address.toHex()], context);
+  }
+}

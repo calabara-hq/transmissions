@@ -296,6 +296,25 @@
     "name": "OwnershipTransferred"
   },
   {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
+        "name": "signature",
+        "internalType": "bytes4",
+        "type": "bytes4",
+        "indexed": false
+      },
+      {
+        "name": "calldataAddressPosition",
+        "internalType": "uint256",
+        "type": "uint256",
+        "indexed": false
+      }
+    ],
+    "name": "SignatureApproved"
+  },
+  {
     "type": "error",
     "inputs": [],
     "name": "CallFailed"

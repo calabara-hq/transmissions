@@ -349,6 +349,17 @@
   },
   {
     "type": "error",
+    "inputs": [
+      {
+        "name": "account",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "AddressInsufficientBalance"
+  },
+  {
+    "type": "error",
     "inputs": [],
     "name": "AddressZero"
   },
@@ -367,6 +378,11 @@
     "type": "error",
     "inputs": [],
     "name": "ERC1967NonPayable"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "ERC20TransferFailed"
   },
   {
     "type": "error",
@@ -409,6 +425,17 @@
       }
     ],
     "name": "OwnableUnauthorizedAccount"
+  },
+  {
+    "type": "error",
+    "inputs": [
+      {
+        "name": "token",
+        "internalType": "address",
+        "type": "address"
+      }
+    ],
+    "name": "SafeERC20FailedOperation"
   },
   {
     "type": "error",

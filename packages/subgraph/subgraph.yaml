@@ -7,7 +7,7 @@ dataSources:
     network: base-sepolia
     source:
       abi: ChannelFactory
-      address: "0x61B7c7982C666AF882851DE04a05565369007bEc"
+      address: "0x72B4AedFce548E33f1759914758D84131ef35e0d"
       startBlock: 10883135
     mapping:
       kind: ethereum/events
@@ -24,6 +24,53 @@ dataSources:
       eventHandlers:
         - event: SetupNewContract(indexed address,string,address,address[],bytes)
           handler: handleChannelCreated
+  - name: CustomFeesV1
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: CustomFees
+      address: "0x9ca0A1C3a988E9C33899b0ec30738203E3f871ff"
+      startBlock: 10883135
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/customFeeMappings.ts
+      entities:
+        - CustomFees
+        - FeeConfig
+      abis:
+        - name: CustomFees
+          file: ./abis/CustomFees.json
+      eventHandlers:
+        - event: FeeConfigSet(indexed address,(address,uint16,uint16,uint16,uint16,uint16,uint256,uint256,address))
+          handler: handleUpdateCustomFees
+  - name: DynamicLogicV1
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: DynamicLogic
+      address: "0x6cA6eF939B64820b11F7328212DfDE5f836edbFb"
+      startBlock: 10883135
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/dynamicLogicMappings.ts
+      entities:
+        - DynamicLogic
+        - LogicConfig
+        - ApprovedDynamicLogicSignature
+      abis:
+        - name: DynamicLogic
+          file: ./abis/DynamicLogic.json
+      eventHandlers:
+        - event: CreatorLogicSet(indexed address,(address[],bytes4[],bytes[],uint8[],bytes[],uint8[],uint256[]))
+          handler: handleUpdateDynamicCreatorLogic
+        - event: MinterLogicSet(indexed address,(address[],bytes4[],bytes[],uint8[],bytes[],uint8[],uint256[]))
+          handler: handleUpdateDynamicMinterLogic
+        - event: SignatureApproved(bytes4,uint256)
+          handler: handleSignatureApproved
 templates:
   - name: Channel
     kind: ethereum/contract
@@ -37,14 +84,51 @@ templates:
       file: ./src/mappings/templates/channel/channelMappings.ts
       entities:
         - Channel
+        - Token
+        - User
+        - Mint
+        - ChannelTokenTransferEvent
+        
       abis:
         - name: Channel
           file: ./abis/Channel.json
       eventHandlers:
+        - event: TokenURIUpdated(indexed uint256,string)
+          handler: handleUpdateTokenURI
         - event: ManagersUpdated(address[])
           handler: handleUpdateManagers
         - event: ManagerRenounced(indexed address)
           handler: handleRenounceManager
         - event: AdminTransferred(indexed address,indexed address)
           handler: handleTransferAdmin
+        - event: ConfigUpdated(indexed address,indexed uint8,address,address)
+          handler: handleUpdateConfig
+        - event: TokenCreated(indexed uint256,(string,address,uint256,uint256,address))
+          handler: handleTokenCreated
+        - event: TokenMinted(indexed address,indexed address,uint256[],uint256[],bytes)
+          handler: handleTokenBatchMinted
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTransferSingleToken
+        - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
+          handler: handleTransferBatchToken
+  - name: Rewards
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: Rewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/channelMappings.ts
+      entities:
+        - RewardTransferEvent
+      eventHandlers:
+        - event: ERC20Transferred(indexed address,indexed address,uint256,indexed address)
+          handler: handleERC20Transferred
+        - event: ETHTransferred(indexed address,indexed address,uint256)
+          handler: handleETHTransferred
+      abis:
+        - name: Rewards
+          file: ./abis/Rewards.json
 
