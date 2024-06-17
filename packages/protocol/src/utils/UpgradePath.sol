@@ -92,10 +92,10 @@ contract UpgradePath is IUpgradePath, OwnableUpgradeable {
   }
 
   /**
-   * @notice Returns the contract uri
-   * @return string contract uri
+   * @notice Returns the contract source code repository
+   * @return string repository uri
    */
-  function contractURI() external pure returns (string memory) {
+  function codeRepository() external pure returns (string memory) {
     return "https://github.com/calabara-hq/transmissions/packages/protocol";
   }
 

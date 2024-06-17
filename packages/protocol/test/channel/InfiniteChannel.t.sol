@@ -69,12 +69,19 @@ contract InfiniteChannelTest is Test {
   function test_infChannel_versioning() external {
     assertEq("1.0.0", targetChannel.contractVersion());
     assertEq("Infinite Channel", targetChannel.contractName());
-    assertEq(targetChannel.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(targetChannel.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
   }
 
   function test_infChannel_revertOnInvalidTimingConfig() external {
     vm.expectRevert();
-    targetChannel.initialize("https://example.com/api/token/0", nick, new address[](0), new bytes[](0), abi.encode(0));
+    targetChannel.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      nick,
+      new address[](0),
+      new bytes[](0),
+      abi.encode(0)
+    );
   }
 
   function test_infChannel_revertOnSaleEnd() external {
@@ -93,11 +100,11 @@ contract InfiniteChannelTest is Test {
 
   function initializeSampleChannel(
     InfiniteChannel sampleChannel,
-    address creator,
+    address admin,
     string memory uri,
-    uint256 maxSupply
+    uint256 saleDuration
   ) internal {
-    sampleChannel.initialize(uri, creator, new address[](0), new bytes[](0), abi.encode(maxSupply));
+    sampleChannel.initialize(uri, "my contract", admin, new address[](0), new bytes[](0), abi.encode(saleDuration));
   }
 
   function assertSampleChannelState(

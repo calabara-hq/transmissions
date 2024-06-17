@@ -46,6 +46,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   );
 
   event TokenURIUpdated(uint256 indexed tokenId, string uri);
+  event ChannelMetadataUpdated(address indexed updater, string channelName, string uri);
   event ConfigUpdated(
     address indexed updater,
     ConfigUpdate indexed updateType,
@@ -61,6 +62,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
   function initialize(
     string calldata uri,
+    string calldata name,
     address defaultAdmin,
     address[] calldata managers,
     bytes[] calldata setupActions,
@@ -81,6 +83,9 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
     /// @dev set the transport configuration
     setTransportConfig(transportConfig);
+
+    /// @dev set the channel name
+    _setName(name);
 
     /// @dev set up the channel token
     _setupNewToken(uri, 0, _implementation());
@@ -104,8 +109,28 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   function setTransportConfig(bytes calldata data) public payable virtual;
 
   /* -------------------------------------------------------------------------- */
+  /*                                 OVERRIDES                                  */
+  /* -------------------------------------------------------------------------- */
+
+  /**
+   * @notice Returns the URI for a token
+   * @param tokenId The token ID to return the URI for
+   */
+  function uri(uint256 tokenId) public view override returns (string memory) {
+    return tokens[tokenId].uri;
+  }
+
+  /* -------------------------------------------------------------------------- */
   /*                          PUBLIC/EXTERNAL FUNCTIONS                         */
   /* -------------------------------------------------------------------------- */
+
+  /**
+   * @notice Get the contract URI
+   * @return string URI
+   */
+  function contractURI() external view returns (string memory) {
+    return uri(0);
+  }
 
   /**
    * @notice Get the ETH mint price for tokens in the channel
@@ -133,16 +158,32 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   }
 
   /**
+   * @notice Used to get the user stats
+   * @param user User address
+   * @return UserStats User stats
+   */
+  function getUserStats(address user) public view returns (UserStats memory) {
+    return userStats[user];
+  }
+
+  /**
+   * @notice Used to update the channel metadata
+   * @param channelName Channel name
+   * @param uri Channel uri
+   */
+  function updateChannelMetadata(string calldata channelName, string calldata uri) external onlyAdminOrManager {
+    _setName(channelName);
+    tokens[0].uri = uri;
+    emit ChannelMetadataUpdated(msg.sender, channelName, uri);
+  }
+
+  /**
    * @notice Used to update the default channel token uri
    * @param uri Token uri
    */
   function updateChannelTokenUri(string calldata uri) external onlyAdminOrManager {
     tokens[0].uri = uri;
     emit TokenURIUpdated(0, uri);
-  }
-
-  function getUserStats(address user) public view returns (UserStats memory) {
-    return userStats[user];
   }
 
   /**
@@ -302,6 +343,10 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     unchecked {
       return nextTokenId++;
     }
+  }
+
+  function _setName(string memory channelName) internal {
+    name = channelName;
   }
 
   function _setupNewToken(string memory newURI, uint256 maxSupply, address author) internal returns (uint256) {

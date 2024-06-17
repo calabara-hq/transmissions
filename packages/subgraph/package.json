@@ -7,7 +7,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "prepare:base-sepolia": "mustache config/base-sepolia.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:base-sepolia": "yarn extract-abis && mustache config/base-sepolia.json subgraph.template.yaml > subgraph.yaml",
     "extract-abis": "yarn tsx script/extract-abis.ts",
     "create-local": "graph create --node http://localhost:8020 ndodson/transmissions",
     "deploy-local": "graph deploy --node http://localhost:8020 --ipfs http://localhost:5001 ndodson/transmissions",

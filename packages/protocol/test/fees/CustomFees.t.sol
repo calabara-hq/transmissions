@@ -40,7 +40,7 @@ contract FeesTest is Test {
   function test_customFees_versioning() external {
     assertEq("1.0.0", customFeesImpl.contractVersion());
     assertEq("Custom Fees", customFeesImpl.contractName());
-    assertEq(customFeesImpl.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(customFeesImpl.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
   }
 
   function _mockBatchedMint(

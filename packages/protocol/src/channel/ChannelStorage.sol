@@ -9,6 +9,8 @@ import { IUpgradePath } from "../interfaces/IUpgradePath.sol";
 /// @author @nick
 
 contract ChannelStorage {
+  /// @dev channel name
+  string public name;
   /// @dev channel tokens
   mapping(uint256 => TokenConfig) public tokens;
   /// @dev token id counter

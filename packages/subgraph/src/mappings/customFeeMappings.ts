@@ -6,17 +6,17 @@ export function handleUpdateCustomFees(event: FeeConfigSet): void {
     let channelId = event.params.channel.toHexString();
     let customFees = getOrCreateCustomFees(channelId);
 
-    let feeConfig = event.params.feeconfig;
+    let fees = event.params.feeconfig;
 
-    customFees.channelTreasury = Bytes.fromHexString(feeConfig.channelTreasury.toHexString());
-    customFees.uplinkBps = BigInt.fromI32(feeConfig.uplinkBps);
-    customFees.channelBps = BigInt.fromI32(feeConfig.channelBps);
-    customFees.creatorBps = BigInt.fromI32(feeConfig.creatorBps);
-    customFees.mintReferralBps = BigInt.fromI32(feeConfig.mintReferralBps);
-    customFees.sponsorBps = BigInt.fromI32(feeConfig.sponsorBps);
-    customFees.ethMintPrice = feeConfig.ethMintPrice;
-    customFees.erc20MintPrice = feeConfig.erc20MintPrice;
-    customFees.erc20Contract = Bytes.fromHexString(feeConfig.erc20Contract.toHexString());
+    customFees.channelTreasury = Bytes.fromHexString(fees.channelTreasury.toHexString());
+    customFees.uplinkBps = BigInt.fromI32(fees.uplinkBps);
+    customFees.channelBps = BigInt.fromI32(fees.channelBps);
+    customFees.creatorBps = BigInt.fromI32(fees.creatorBps);
+    customFees.mintReferralBps = BigInt.fromI32(fees.mintReferralBps);
+    customFees.sponsorBps = BigInt.fromI32(fees.sponsorBps);
+    customFees.ethMintPrice = fees.ethMintPrice;
+    customFees.erc20MintPrice = fees.erc20MintPrice;
+    customFees.erc20Contract = Bytes.fromHexString(fees.erc20Contract.toHexString());
 
     customFees.save();
 

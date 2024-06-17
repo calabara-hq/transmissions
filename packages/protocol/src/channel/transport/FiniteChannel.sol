@@ -346,7 +346,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     return "1.0.0";
   }
 
-  function contractURI() external pure returns (string memory) {
+  function codeRepository() external pure returns (string memory) {
     return "https://github.com/calabara-hq/transmissions/packages/protocol";
   }
 

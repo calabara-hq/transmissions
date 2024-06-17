@@ -104,6 +104,19 @@
   },
   {
     "type": "function",
+    "name": "codeRepository",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "contractName",
     "inputs": [],
     "outputs": [
@@ -126,7 +139,7 @@
         "internalType": "string"
       }
     ],
-    "stateMutability": "pure"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -482,6 +495,11 @@
         "internalType": "string"
       },
       {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
         "name": "defaultAdmin",
         "type": "address",
         "internalType": "address"
@@ -743,6 +761,19 @@
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "name",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1079,6 +1110,24 @@
   },
   {
     "type": "function",
+    "name": "updateChannelMetadata",
+    "inputs": [
+      {
+        "name": "channelName",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "updateChannelTokenUri",
     "inputs": [
       {
@@ -1113,7 +1162,7 @@
     "name": "uri",
     "inputs": [
       {
-        "name": "",
+        "name": "tokenId",
         "type": "uint256",
         "internalType": "uint256"
       }
@@ -1214,6 +1263,31 @@
         "type": "bool",
         "indexed": false,
         "internalType": "bool"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ChannelMetadataUpdated",
+    "inputs": [
+      {
+        "name": "updater",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "channelName",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
       }
     ],
     "anonymous": false

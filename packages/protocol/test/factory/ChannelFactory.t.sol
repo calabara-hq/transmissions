@@ -43,7 +43,7 @@ contract ChannelFactoryTest is Test {
   function test_factory_versioning() external {
     assertEq("1.0.0", channelFactory.contractVersion());
     assertEq("Uplink Channel Factory", channelFactory.contractName());
-    assertEq(channelFactory.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(channelFactory.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
   }
 
   function test_factory_initialize(address initialOwner) external {
@@ -89,6 +89,7 @@ contract ChannelFactoryTest is Test {
   function test_factory_createChannel() external {
     address newInfiniteChannel = channelFactory.createInfiniteChannel(
       "https://example.com/api/token/0",
+      "my contract",
       address(this),
       new address[](0),
       new bytes[](0),
@@ -102,6 +103,7 @@ contract ChannelFactoryTest is Test {
 
     address newFiniteChannel = channelFactory.createFiniteChannel{ value: 100 ether }(
       "https://example.com/api/token/0",
+      "my contract",
       address(this),
       new address[](0),
       new bytes[](0),
@@ -135,6 +137,7 @@ contract ChannelFactoryTest is Test {
 
     address newFiniteChannel = channelFactory.createFiniteChannel(
       "https://example.com/api/token/0",
+      "my contract",
       address(this),
       new address[](0),
       new bytes[](0),

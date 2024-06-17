@@ -131,7 +131,14 @@ contract ChannelTest is Test {
       setupActions = new bytes[](0);
     }
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, new address[](0), setupActions, abi.encode(100));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      new address[](0),
+      setupActions,
+      abi.encode(100)
+    );
   }
 
   /* -------------------------------------------------------------------------- */
@@ -141,7 +148,8 @@ contract ChannelTest is Test {
   function test_channel_initialization() external {
     initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
-    assertEq(channelImpl.getToken(0).uri, "https://example.com/api/token/0");
+    assertEq(channelImpl.uri(0), "https://example.com/api/token/0");
+    assertEq(channelImpl.name(), "my contract");
   }
 
   function test_channel_updateChannelTokenUri() external {
@@ -153,7 +161,18 @@ contract ChannelTest is Test {
     channelImpl.updateChannelTokenUri("https://example.com/api/token/1");
     vm.stopPrank();
 
-    assertEq(channelImpl.getToken(0).uri, "https://example.com/api/token/1");
+    assertEq(channelImpl.uri(0), "https://example.com/api/token/1");
+  }
+
+  function test_channel_updateChannelMetadata() external {
+    initializeChannelWithSetupActions(new bytes(0), new bytes(0));
+
+    vm.startPrank(admin);
+    channelImpl.updateChannelMetadata("new name", "new uri");
+    vm.stopPrank();
+
+    assertEq(channelImpl.name(), "new name");
+    assertEq(channelImpl.uri(0), "new uri");
   }
 
   function test_channel_mintTokenWithETH() external {

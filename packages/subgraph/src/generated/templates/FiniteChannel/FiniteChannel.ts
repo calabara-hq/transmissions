@@ -302,6 +302,24 @@ export class RoleRevoked__Params {
   }
 }
 
+export class Settled extends ethereum.Event {
+  get params(): Settled__Params {
+    return new Settled__Params(this);
+  }
+}
+
+export class Settled__Params {
+  _event: Settled;
+
+  constructor(event: Settled) {
+    this._event = event;
+  }
+
+  get caller(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class TokenCreated extends ethereum.Event {
   get params(): TokenCreated__Params {
     return new TokenCreated__Params(this);
@@ -512,7 +530,69 @@ export class Upgraded__Params {
   }
 }
 
-export class Channel__getTokenResultValue0Struct extends ethereum.Tuple {
+export class FiniteChannel__finiteChannelParamsResultRewardsStruct extends ethereum.Tuple {
+  get ranks(): Array<BigInt> {
+    return this[0].toBigIntArray();
+  }
+
+  get allocations(): Array<BigInt> {
+    return this[1].toBigIntArray();
+  }
+
+  get totalAllocation(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get token(): Address {
+    return this[3].toAddress();
+  }
+}
+
+export class FiniteChannel__finiteChannelParamsResult {
+  value0: BigInt;
+  value1: BigInt;
+  value2: BigInt;
+  value3: FiniteChannel__finiteChannelParamsResultRewardsStruct;
+
+  constructor(
+    value0: BigInt,
+    value1: BigInt,
+    value2: BigInt,
+    value3: FiniteChannel__finiteChannelParamsResultRewardsStruct,
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set("value3", ethereum.Value.fromTuple(this.value3));
+    return map;
+  }
+
+  getCreateStart(): BigInt {
+    return this.value0;
+  }
+
+  getMintStart(): BigInt {
+    return this.value1;
+  }
+
+  getMintEnd(): BigInt {
+    return this.value2;
+  }
+
+  getRewards(): FiniteChannel__finiteChannelParamsResultRewardsStruct {
+    return this.value3;
+  }
+}
+
+export class FiniteChannel__getTokenResultValue0Struct extends ethereum.Tuple {
   get uri(): string {
     return this[0].toString();
   }
@@ -534,7 +614,7 @@ export class Channel__getTokenResultValue0Struct extends ethereum.Tuple {
   }
 }
 
-export class Channel__getUserStatsResultValue0Struct extends ethereum.Tuple {
+export class FiniteChannel__getUserStatsResultValue0Struct extends ethereum.Tuple {
   get numCreations(): BigInt {
     return this[0].toBigInt();
   }
@@ -544,7 +624,39 @@ export class Channel__getUserStatsResultValue0Struct extends ethereum.Tuple {
   }
 }
 
-export class Channel__tokensResult {
+export class FiniteChannel__nodesResult {
+  value0: Bytes;
+  value1: Bytes;
+  value2: BigInt;
+
+  constructor(value0: Bytes, value1: Bytes, value2: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromFixedBytes(this.value0));
+    map.set("value1", ethereum.Value.fromFixedBytes(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    return map;
+  }
+
+  getNext(): Bytes {
+    return this.value0;
+  }
+
+  getPrev(): Bytes {
+    return this.value1;
+  }
+
+  getTokenId(): BigInt {
+    return this.value2;
+  }
+}
+
+export class FiniteChannel__tokensResult {
   value0: string;
   value1: Address;
   value2: BigInt;
@@ -596,7 +708,7 @@ export class Channel__tokensResult {
   }
 }
 
-export class Channel__userStatsResult {
+export class FiniteChannel__userStatsResult {
   value0: BigInt;
   value1: BigInt;
 
@@ -621,9 +733,9 @@ export class Channel__userStatsResult {
   }
 }
 
-export class Channel extends ethereum.SmartContract {
-  static bind(address: Address): Channel {
-    return new Channel("Channel", address);
+export class FiniteChannel extends ethereum.SmartContract {
+  static bind(address: Address): FiniteChannel {
+    return new FiniteChannel("FiniteChannel", address);
   }
 
   DEFAULT_ADMIN_ROLE(): Bytes {
@@ -748,6 +860,40 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigIntArray());
   }
 
+  codeRepository(): string {
+    let result = super.call("codeRepository", "codeRepository():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_codeRepository(): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "codeRepository",
+      "codeRepository():(string)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  contractName(): string {
+    let result = super.call("contractName", "contractName():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_contractName(): ethereum.CallResult<string> {
+    let result = super.tryCall("contractName", "contractName():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   contractURI(): string {
     let result = super.call("contractURI", "contractURI():(string)", []);
 
@@ -756,6 +902,29 @@ export class Channel extends ethereum.SmartContract {
 
   try_contractURI(): ethereum.CallResult<string> {
     let result = super.tryCall("contractURI", "contractURI():(string)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
+  contractVersion(): string {
+    let result = super.call(
+      "contractVersion",
+      "contractVersion():(string)",
+      [],
+    );
+
+    return result[0].toString();
+  }
+
+  try_contractVersion(): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "contractVersion",
+      "contractVersion():(string)",
+      [],
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -870,6 +1039,45 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
+  finiteChannelParams(): FiniteChannel__finiteChannelParamsResult {
+    let result = super.call(
+      "finiteChannelParams",
+      "finiteChannelParams():(uint80,uint80,uint80,(uint40[],uint256[],uint256,address))",
+      [],
+    );
+
+    return new FiniteChannel__finiteChannelParamsResult(
+      result[0].toBigInt(),
+      result[1].toBigInt(),
+      result[2].toBigInt(),
+      changetype<FiniteChannel__finiteChannelParamsResultRewardsStruct>(
+        result[3].toTuple(),
+      ),
+    );
+  }
+
+  try_finiteChannelParams(): ethereum.CallResult<FiniteChannel__finiteChannelParamsResult> {
+    let result = super.tryCall(
+      "finiteChannelParams",
+      "finiteChannelParams():(uint80,uint80,uint80,(uint40[],uint256[],uint256,address))",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new FiniteChannel__finiteChannelParamsResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+        value[2].toBigInt(),
+        changetype<FiniteChannel__finiteChannelParamsResultRewardsStruct>(
+          value[3].toTuple(),
+        ),
+      ),
+    );
+  }
+
   getRoleAdmin(role: Bytes): Bytes {
     let result = super.call("getRoleAdmin", "getRoleAdmin(bytes32):(bytes32)", [
       ethereum.Value.fromFixedBytes(role),
@@ -943,19 +1151,21 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getToken(tokenId: BigInt): Channel__getTokenResultValue0Struct {
+  getToken(tokenId: BigInt): FiniteChannel__getTokenResultValue0Struct {
     let result = super.call(
       "getToken",
       "getToken(uint256):((string,address,uint256,uint256,address))",
       [ethereum.Value.fromUnsignedBigInt(tokenId)],
     );
 
-    return changetype<Channel__getTokenResultValue0Struct>(result[0].toTuple());
+    return changetype<FiniteChannel__getTokenResultValue0Struct>(
+      result[0].toTuple(),
+    );
   }
 
   try_getToken(
     tokenId: BigInt,
-  ): ethereum.CallResult<Channel__getTokenResultValue0Struct> {
+  ): ethereum.CallResult<FiniteChannel__getTokenResultValue0Struct> {
     let result = super.tryCall(
       "getToken",
       "getToken(uint256):((string,address,uint256,uint256,address))",
@@ -966,25 +1176,25 @@ export class Channel extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      changetype<Channel__getTokenResultValue0Struct>(value[0].toTuple()),
+      changetype<FiniteChannel__getTokenResultValue0Struct>(value[0].toTuple()),
     );
   }
 
-  getUserStats(user: Address): Channel__getUserStatsResultValue0Struct {
+  getUserStats(user: Address): FiniteChannel__getUserStatsResultValue0Struct {
     let result = super.call(
       "getUserStats",
       "getUserStats(address):((uint256,uint256))",
       [ethereum.Value.fromAddress(user)],
     );
 
-    return changetype<Channel__getUserStatsResultValue0Struct>(
+    return changetype<FiniteChannel__getUserStatsResultValue0Struct>(
       result[0].toTuple(),
     );
   }
 
   try_getUserStats(
     user: Address,
-  ): ethereum.CallResult<Channel__getUserStatsResultValue0Struct> {
+  ): ethereum.CallResult<FiniteChannel__getUserStatsResultValue0Struct> {
     let result = super.tryCall(
       "getUserStats",
       "getUserStats(address):((uint256,uint256))",
@@ -995,7 +1205,9 @@ export class Channel extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      changetype<Channel__getUserStatsResultValue0Struct>(value[0].toTuple()),
+      changetype<FiniteChannel__getUserStatsResultValue0Struct>(
+        value[0].toTuple(),
+      ),
     );
   }
 
@@ -1018,6 +1230,21 @@ export class Channel extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  head(): Bytes {
+    let result = super.call("head", "head():(bytes32)", []);
+
+    return result[0].toBytes();
+  }
+
+  try_head(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall("head", "head():(bytes32)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
   isAdmin(addr: Address): boolean {
@@ -1090,6 +1317,21 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
+  length(): BigInt {
+    let result = super.call("length", "length():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_length(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("length", "length():(uint256)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
   logicContract(): Address {
     let result = super.call("logicContract", "logicContract():(address)", []);
 
@@ -1158,6 +1400,39 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
+  nodes(param0: Bytes): FiniteChannel__nodesResult {
+    let result = super.call(
+      "nodes",
+      "nodes(bytes32):(bytes32,bytes32,uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+
+    return new FiniteChannel__nodesResult(
+      result[0].toBytes(),
+      result[1].toBytes(),
+      result[2].toBigInt(),
+    );
+  }
+
+  try_nodes(param0: Bytes): ethereum.CallResult<FiniteChannel__nodesResult> {
+    let result = super.tryCall(
+      "nodes",
+      "nodes(bytes32):(bytes32,bytes32,uint256)",
+      [ethereum.Value.fromFixedBytes(param0)],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new FiniteChannel__nodesResult(
+        value[0].toBytes(),
+        value[1].toBytes(),
+        value[2].toBigInt(),
+      ),
+    );
+  }
+
   proxiableUUID(): Bytes {
     let result = super.call("proxiableUUID", "proxiableUUID():(bytes32)", []);
 
@@ -1200,14 +1475,29 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  tokens(param0: BigInt): Channel__tokensResult {
+  tail(): Bytes {
+    let result = super.call("tail", "tail():(bytes32)", []);
+
+    return result[0].toBytes();
+  }
+
+  try_tail(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall("tail", "tail():(bytes32)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  tokens(param0: BigInt): FiniteChannel__tokensResult {
     let result = super.call(
       "tokens",
       "tokens(uint256):(string,address,uint256,uint256,address)",
       [ethereum.Value.fromUnsignedBigInt(param0)],
     );
 
-    return new Channel__tokensResult(
+    return new FiniteChannel__tokensResult(
       result[0].toString(),
       result[1].toAddress(),
       result[2].toBigInt(),
@@ -1216,7 +1506,7 @@ export class Channel extends ethereum.SmartContract {
     );
   }
 
-  try_tokens(param0: BigInt): ethereum.CallResult<Channel__tokensResult> {
+  try_tokens(param0: BigInt): ethereum.CallResult<FiniteChannel__tokensResult> {
     let result = super.tryCall(
       "tokens",
       "tokens(uint256):(string,address,uint256,uint256,address)",
@@ -1227,7 +1517,7 @@ export class Channel extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Channel__tokensResult(
+      new FiniteChannel__tokensResult(
         value[0].toString(),
         value[1].toAddress(),
         value[2].toBigInt(),
@@ -1256,14 +1546,14 @@ export class Channel extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
-  userStats(param0: Address): Channel__userStatsResult {
+  userStats(param0: Address): FiniteChannel__userStatsResult {
     let result = super.call(
       "userStats",
       "userStats(address):(uint256,uint256)",
       [ethereum.Value.fromAddress(param0)],
     );
 
-    return new Channel__userStatsResult(
+    return new FiniteChannel__userStatsResult(
       result[0].toBigInt(),
       result[1].toBigInt(),
     );
@@ -1271,7 +1561,7 @@ export class Channel extends ethereum.SmartContract {
 
   try_userStats(
     param0: Address,
-  ): ethereum.CallResult<Channel__userStatsResult> {
+  ): ethereum.CallResult<FiniteChannel__userStatsResult> {
     let result = super.tryCall(
       "userStats",
       "userStats(address):(uint256,uint256)",
@@ -1282,8 +1572,45 @@ export class Channel extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Channel__userStatsResult(value[0].toBigInt(), value[1].toBigInt()),
+      new FiniteChannel__userStatsResult(
+        value[0].toBigInt(),
+        value[1].toBigInt(),
+      ),
     );
+  }
+}
+
+export class ConstructorCall extends ethereum.Call {
+  get inputs(): ConstructorCall__Inputs {
+    return new ConstructorCall__Inputs(this);
+  }
+
+  get outputs(): ConstructorCall__Outputs {
+    return new ConstructorCall__Outputs(this);
+  }
+}
+
+export class ConstructorCall__Inputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
+  }
+
+  get _upgradePath(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get _weth(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+}
+
+export class ConstructorCall__Outputs {
+  _call: ConstructorCall;
+
+  constructor(call: ConstructorCall) {
+    this._call = call;
   }
 }
 
@@ -1957,6 +2284,32 @@ export class SetTransportConfigCall__Outputs {
   }
 }
 
+export class SettleCall extends ethereum.Call {
+  get inputs(): SettleCall__Inputs {
+    return new SettleCall__Inputs(this);
+  }
+
+  get outputs(): SettleCall__Outputs {
+    return new SettleCall__Outputs(this);
+  }
+}
+
+export class SettleCall__Inputs {
+  _call: SettleCall;
+
+  constructor(call: SettleCall) {
+    this._call = call;
+  }
+}
+
+export class SettleCall__Outputs {
+  _call: SettleCall;
+
+  constructor(call: SettleCall) {
+    this._call = call;
+  }
+}
+
 export class TransferAdminCall extends ethereum.Call {
   get inputs(): TransferAdminCall__Inputs {
     return new TransferAdminCall__Inputs(this);
@@ -2081,6 +2434,44 @@ export class UpgradeToAndCallCall__Outputs {
   _call: UpgradeToAndCallCall;
 
   constructor(call: UpgradeToAndCallCall) {
+    this._call = call;
+  }
+}
+
+export class WithdrawRewardsCall extends ethereum.Call {
+  get inputs(): WithdrawRewardsCall__Inputs {
+    return new WithdrawRewardsCall__Inputs(this);
+  }
+
+  get outputs(): WithdrawRewardsCall__Outputs {
+    return new WithdrawRewardsCall__Outputs(this);
+  }
+}
+
+export class WithdrawRewardsCall__Inputs {
+  _call: WithdrawRewardsCall;
+
+  constructor(call: WithdrawRewardsCall) {
+    this._call = call;
+  }
+
+  get token(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get to(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get amount(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class WithdrawRewardsCall__Outputs {
+  _call: WithdrawRewardsCall;
+
+  constructor(call: WithdrawRewardsCall) {
     this._call = call;
   }
 }

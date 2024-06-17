@@ -57,7 +57,7 @@
   },
   {
     "type": "function",
-    "name": "contractName",
+    "name": "codeRepository",
     "inputs": [],
     "outputs": [
       {
@@ -70,7 +70,7 @@
   },
   {
     "type": "function",
-    "name": "contractURI",
+    "name": "contractName",
     "inputs": [],
     "outputs": [
       {

@@ -1,6 +1,19 @@
 [
   {
     "type": "function",
+    "name": "contractURI",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "createToken",
     "inputs": [
       {
@@ -80,6 +93,11 @@
     "inputs": [
       {
         "name": "uri",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "name",
         "type": "string",
         "internalType": "string"
       },
@@ -275,6 +293,24 @@
         "name": "minterLogic",
         "type": "bytes",
         "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "updateChannelMetadata",
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "uri",
+        "type": "string",
+        "internalType": "string"
       }
     ],
     "outputs": [],

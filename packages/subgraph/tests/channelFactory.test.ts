@@ -14,6 +14,7 @@ import { Channel, FiniteTransportConfig, InfiniteTransportConfig, TransportLayer
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
 import { ChannelCreatedData, createChannelCreatedData, finiteTransportBytes, infiniteTransportBytes } from './utils';
 import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
+import { ZERO_ADDRESS } from '../src/utils/constants';
 
 
 const CHANNEL_ADDRESS = "0x0000000000000000000000000000000000000001";
@@ -32,6 +33,7 @@ describe('ChannelFactory', () => {
             const channelData = new ChannelCreatedData();
             channelData.contractAddress = Address.fromString(CHANNEL_ADDRESS);
             channelData.uri = 'sample uri';
+            channelData.name = 'sample name';
             channelData.admin = Address.fromString(ADMIN_ADDRESS);
             channelData.managers = [Address.fromString(MANAGER_ADDRESS)];
             channelData.transportConfig = Bytes.fromHexString(finiteTransportBytes);
@@ -52,6 +54,7 @@ describe('ChannelFactory', () => {
 
             /// check channel
             assert.stringEquals(channel!.uri, 'sample uri');
+            assert.stringEquals(channel!.name, 'sample name');
             assert.stringEquals(channel!.admin, channelData.admin.toHexString());
             assert.stringEquals(channel!.managers[0], channelData.managers[0].toHexString());
 
@@ -65,6 +68,10 @@ describe('ChannelFactory', () => {
             assert.bigIntEquals(finiteTransportConfig!.totalAllocation, BigInt.fromI32(1));
             assert.bytesEquals(finiteTransportConfig!.token, Address.fromString('0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'));
 
+            assert.booleanEquals(finiteTransportConfig!.settled, false);
+            assert.bytesEquals(finiteTransportConfig!.settledBy, Address.fromString(ZERO_ADDRESS));
+            assert.bigIntEquals(finiteTransportConfig!.settledAt, BigInt.fromI32(0));
+
             assert.assertNull(infiniteTransportConfig);
 
 
@@ -74,6 +81,7 @@ describe('ChannelFactory', () => {
             const channelData = new ChannelCreatedData();
             channelData.contractAddress = Address.fromString(CHANNEL_ADDRESS);
             channelData.uri = 'sample uri';
+            channelData.name = 'sample name';
             channelData.admin = Address.fromString(ADMIN_ADDRESS);
             channelData.managers = [Address.fromString(MANAGER_ADDRESS)];
             channelData.transportConfig = Bytes.fromHexString(infiniteTransportBytes);
@@ -93,6 +101,7 @@ describe('ChannelFactory', () => {
             const infiniteTransportConfig = InfiniteTransportConfig.load(CHANNEL_ADDRESS);
 
             assert.stringEquals(channel!.uri, 'sample uri');
+            assert.stringEquals(channel!.name, 'sample name');
             assert.stringEquals(channel!.admin, channelData.admin.toHexString());
             assert.stringEquals(channel!.managers[0], channelData.managers[0].toHexString());
 

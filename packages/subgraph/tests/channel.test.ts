@@ -10,13 +10,13 @@ import {
     createMockedFunction,
     logStore
 } from 'matchstick-as/assembly/index';
-import { BatchTokenTransferredData, ChannelCreatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTokenURIUpdatedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TokenURIUpdatedData, TransferAdminData } from './utils';
+import { BatchTokenTransferredData, ChannelCreatedData, ChannelMetadataUpdatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createChannelMetadataUpdatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTokenURIUpdatedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TokenURIUpdatedData, TransferAdminData } from './utils';
 import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
 import { ApprovedDynamicLogicSignature, Channel, CustomFees, DynamicLogic, FeeConfig, LogicConfig, Mint, RewardTransferEvent, Token, TokenHolder, User } from '../src/generated/schema';
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
-import { handleERC20Transferred, handleETHTransferred, handleRenounceManager, handleTokenBatchMinted, handleTokenCreated, handleTokenURIUpdated, handleTransferAdmin, handleTransferBatchToken, handleTransferSingleToken, handleUpdateConfig, handleUpdateManagers } from '../src/mappings/templates/channel/channelMappings';
+import { handleRenounceManager, handleTokenBatchMinted, handleTokenCreated, handleTokenURIUpdated, handleTransferAdmin, handleTransferBatchToken, handleTransferSingleToken, handleUpdateChannelMetadata, handleUpdateConfig, handleUpdateManagers } from '../src/mappings/templates/channel/channelMappings';
 import { handleUpdateCustomFees } from '../src/mappings/customFeeMappings';
-import { BIGINT_10K, BIGINT_ZERO, NATIVE_TOKEN, ZERO_ADDRESS } from '../src/utils/constants';
+import { BIGINT_10K, ZERO_ADDRESS } from '../src/utils/constants';
 import { handleSignatureApproved, handleUpdateDynamicCreatorLogic, handleUpdateDynamicMinterLogic } from '../src/mappings/dynamicLogicMappings';
 
 const CHANNEL_ADDRESS = "0x0000000000000000000000000000000000000001";
@@ -64,6 +64,7 @@ describe("Channel", () => {
         const channelData = new ChannelCreatedData();
         channelData.contractAddress = Address.fromString(CHANNEL_ADDRESS);
         channelData.uri = 'sample uri';
+        channelData.name = 'sample name';
         channelData.admin = Address.fromString(ADMIN_ADDRESS);
         channelData.managers = [Address.fromString(MANAGER1_ADDRESS)];
         channelData.transportConfig = Bytes.fromHexString(infiniteTransportBytes)
@@ -121,6 +122,55 @@ describe("Channel", () => {
 
         });
     });
+
+    describe("handle channel metadata updated event", () => {
+        beforeEach(() => {
+            /// mock the default token on initialization
+            const tokenCreatedData = new TokenCreatedData();
+            tokenCreatedData.tokenId = BigInt.fromI32(0);
+            tokenCreatedData.author = Address.fromString(CREATOR_ADDRESS);
+            tokenCreatedData.sponsor = Address.fromString(SPONSOR_ADDRESS);
+            tokenCreatedData.uri = "sample uri";
+            tokenCreatedData.maxSupply = BigInt.fromI32(100);
+            tokenCreatedData.totalMinted = BigInt.fromI32(0);
+
+            tokenCreatedData.eventBlockNumber = BigInt.fromI32(123456);
+            tokenCreatedData.eventBlockTimestamp = BigInt.fromI32(1620012345);
+            tokenCreatedData.txHash = Bytes.fromHexString("0x1234");
+            tokenCreatedData.logIndex = BigInt.fromI32(0);
+            tokenCreatedData.address = Address.fromString(CHANNEL_ADDRESS);
+
+            const event = createTokenCreatedData(tokenCreatedData);
+
+            handleTokenCreated(event);
+
+        });
+        test("properly updates channel metadata", () => {
+            const metadataUpdatedData = new ChannelMetadataUpdatedData();
+            metadataUpdatedData.updater = Address.fromString(ADMIN_ADDRESS);
+            metadataUpdatedData.channelName = "new name";
+            metadataUpdatedData.uri = "new uri";
+
+            metadataUpdatedData.eventBlockNumber = BigInt.fromI32(123456);
+            metadataUpdatedData.eventBlockTimestamp = BigInt.fromI32(1620012345);
+            metadataUpdatedData.txHash = Bytes.fromHexString("0x1234");
+            metadataUpdatedData.logIndex = BigInt.fromI32(0);
+            metadataUpdatedData.address = Address.fromString(CHANNEL_ADDRESS);
+
+            const event = createChannelMetadataUpdatedData(metadataUpdatedData);
+
+            handleUpdateChannelMetadata(event);
+
+            const updatedChannel = Channel.load(CHANNEL_ADDRESS);
+
+            assert.stringEquals(updatedChannel!.name, "new name");
+            assert.stringEquals(updatedChannel!.uri, "new uri");
+
+            const updatedTokenZero = Token.load(CHANNEL_ADDRESS + '-0');
+            assert.stringEquals(updatedTokenZero!.uri, "new uri");
+
+        })
+    })
 
 
     describe("handle RBAC events", () => {
@@ -229,7 +279,7 @@ describe("Channel", () => {
             const updatedCustomFees = CustomFees.load(CHANNEL_ADDRESS);
 
             assert.stringEquals(channel!.fees!, updatedFeeConfig!.id);
-            assert.stringEquals(updatedCustomFees!.id, updatedFeeConfig!.id);
+            assert.stringEquals(updatedCustomFees!.id, updatedFeeConfig!.customFees!);
 
         });
 
@@ -242,7 +292,6 @@ describe("Channel", () => {
             // then, unlink the fee config with custom fees
 
             simulateConfigUpdateEvent(BigInt.fromI32(0), Address.fromString(ZERO_ADDRESS), Address.fromString(LOGIC_CONTRACT_ADDRESS));
-
 
             const updatedFeeConfig = FeeConfig.load(CHANNEL_ADDRESS);
             const channel = Channel.load(CHANNEL_ADDRESS);
@@ -363,6 +412,9 @@ describe("Channel", () => {
 
             /// dynamic logic entity should be deleted
             assert.assertNull(updatedDynamicLogic);
+
+            /// dynamic logiclink should be removed from logic config
+            assert.assertNull(updatedLogicConfig!.dynamicLogic);
         });
 
 
@@ -474,73 +526,6 @@ describe("Channel", () => {
         })
     });
 
-
-    describe("handle reward transfer events", () => {
-        test("properly handles erc20 reward transfer", () => {
-            const rewardTransferData = new ERC20TransferredData();
-            rewardTransferData.spender = Address.fromString(MINTER_ADDRESS);
-            rewardTransferData.recipient = Address.fromString(REFERRAL_ADDRESS);
-            rewardTransferData.amount = BigInt.fromI32(1);
-            rewardTransferData.token = Address.fromString(ERC20_CONTRACT_ADDRESS);
-
-            rewardTransferData.eventBlockNumber = BigInt.fromI32(123456);
-            rewardTransferData.eventBlockTimestamp = BigInt.fromI32(1620012345);
-            rewardTransferData.txHash = Bytes.fromHexString("0x1234");
-            rewardTransferData.logIndex = BigInt.fromI32(0);
-            rewardTransferData.address = Address.fromString(CHANNEL_ADDRESS);
-
-            const event = createERC20TransferredData(rewardTransferData);
-
-            handleERC20Transferred(event);
-
-            const rewardTransferEvent = RewardTransferEvent.load(rewardTransferData.txHash.toHexString() + '-0');
-
-            assert.stringEquals(rewardTransferEvent!.from, MINTER_ADDRESS);
-            assert.stringEquals(rewardTransferEvent!.to, REFERRAL_ADDRESS);
-            assert.bigIntEquals(rewardTransferEvent!.amount, BigInt.fromI32(1));
-            assert.bytesEquals(rewardTransferEvent!.token, Address.fromString(ERC20_CONTRACT_ADDRESS));
-
-            /// user validation
-
-            const spender = User.load(MINTER_ADDRESS);
-            const recipient = User.load(REFERRAL_ADDRESS);
-
-            assert.stringEquals(spender!.id, rewardTransferEvent!.from);
-            assert.stringEquals(recipient!.id, rewardTransferEvent!.to);
-
-        });
-
-        test("properly handles eth reward transfer", () => {
-            const rewardTransferData = new ETHTransferredData();
-            rewardTransferData.spender = Address.fromString(MINTER_ADDRESS);
-            rewardTransferData.recipient = Address.fromString(REFERRAL_ADDRESS);
-            rewardTransferData.amount = BigInt.fromI32(1);
-
-            rewardTransferData.eventBlockNumber = BigInt.fromI32(123456);
-            rewardTransferData.eventBlockTimestamp = BigInt.fromI32(1620012345);
-            rewardTransferData.txHash = Bytes.fromHexString("0x1234");
-            rewardTransferData.logIndex = BigInt.fromI32(0);
-            rewardTransferData.address = Address.fromString(CHANNEL_ADDRESS);
-
-            const event = createETHTransferredData(rewardTransferData);
-
-            handleETHTransferred(event);
-
-            const rewardTransferEvent = RewardTransferEvent.load(rewardTransferData.txHash.toHexString() + '-0');
-
-            assert.stringEquals(rewardTransferEvent!.from, MINTER_ADDRESS);
-            assert.stringEquals(rewardTransferEvent!.to, REFERRAL_ADDRESS);
-            assert.bigIntEquals(rewardTransferEvent!.amount, BigInt.fromI32(1));
-            assert.bytesEquals(rewardTransferEvent!.token, Address.fromString(NATIVE_TOKEN));
-            /// user validation
-
-            const spender = User.load(MINTER_ADDRESS);
-            const recipient = User.load(REFERRAL_ADDRESS);
-
-            assert.stringEquals(spender!.id, rewardTransferEvent!.from);
-            assert.stringEquals(recipient!.id, rewardTransferEvent!.to);
-        });
-    });
 
     describe("handle single token transfer events", () => {
 

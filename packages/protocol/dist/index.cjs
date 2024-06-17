@@ -73,6 +73,13 @@ var channelAbi = [
   },
   {
     type: "function",
+    inputs: [],
+    name: "contractURI",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
       { name: "author", internalType: "address", type: "address" },
@@ -195,6 +202,7 @@ var channelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
+      { name: "name", internalType: "string", type: "string" },
       { name: "defaultAdmin", internalType: "address", type: "address" },
       { name: "managers", internalType: "address[]", type: "address[]" },
       { name: "setupActions", internalType: "bytes[]", type: "bytes[]" },
@@ -293,6 +301,13 @@ var channelAbi = [
     name: "multicall",
     outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
     stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view"
   },
   {
     type: "function",
@@ -428,6 +443,16 @@ var channelAbi = [
   },
   {
     type: "function",
+    inputs: [
+      { name: "channelName", internalType: "string", type: "string" },
+      { name: "uri", internalType: "string", type: "string" }
+    ],
+    name: "updateChannelMetadata",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     inputs: [{ name: "uri", internalType: "string", type: "string" }],
     name: "updateChannelTokenUri",
     outputs: [],
@@ -445,7 +470,7 @@ var channelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "view"
@@ -498,6 +523,26 @@ var channelAbi = [
       { name: "approved", internalType: "bool", type: "bool", indexed: false }
     ],
     name: "ApprovalForAll"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "updater",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "channelName",
+        internalType: "string",
+        type: "string",
+        indexed: false
+      },
+      { name: "uri", internalType: "string", type: "string", indexed: false }
+    ],
+    name: "ChannelMetadataUpdated"
   },
   {
     type: "event",
@@ -950,14 +995,14 @@ var channelFactoryAbi = [
   {
     type: "function",
     inputs: [],
-    name: "contractName",
+    name: "codeRepository",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
   {
     type: "function",
     inputs: [],
-    name: "contractURI",
+    name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
@@ -972,6 +1017,7 @@ var channelFactoryAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
+      { name: "name", internalType: "string", type: "string" },
       { name: "defaultAdmin", internalType: "address", type: "address" },
       { name: "managers", internalType: "address[]", type: "address[]" },
       { name: "setupActions", internalType: "bytes[]", type: "bytes[]" },
@@ -985,6 +1031,7 @@ var channelFactoryAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
+      { name: "name", internalType: "string", type: "string" },
       { name: "defaultAdmin", internalType: "address", type: "address" },
       { name: "managers", internalType: "address[]", type: "address[]" },
       { name: "setupActions", internalType: "bytes[]", type: "bytes[]" },
@@ -1097,6 +1144,7 @@ var channelFactoryAbi = [
         indexed: true
       },
       { name: "uri", internalType: "string", type: "string", indexed: false },
+      { name: "name", internalType: "string", type: "string", indexed: false },
       {
         name: "defaultAdmin",
         internalType: "address",
@@ -1207,14 +1255,14 @@ var customFeesAbi = [
   {
     type: "function",
     inputs: [],
-    name: "contractName",
+    name: "codeRepository",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
   {
     type: "function",
     inputs: [],
-    name: "contractURI",
+    name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
@@ -1381,14 +1429,14 @@ var dynamicLogicAbi = [
   {
     type: "function",
     inputs: [],
-    name: "contractName",
+    name: "codeRepository",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
   {
     type: "function",
     inputs: [],
-    name: "contractURI",
+    name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
@@ -1618,6 +1666,13 @@ var finiteChannelAbi = [
   {
     type: "function",
     inputs: [],
+    name: "codeRepository",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "pure"
+  },
+  {
+    type: "function",
+    inputs: [],
     name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
@@ -1627,7 +1682,7 @@ var finiteChannelAbi = [
     inputs: [],
     name: "contractURI",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "pure"
+    stateMutability: "view"
   },
   {
     type: "function",
@@ -1789,6 +1844,7 @@ var finiteChannelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
+      { name: "name", internalType: "string", type: "string" },
       { name: "defaultAdmin", internalType: "address", type: "address" },
       { name: "managers", internalType: "address[]", type: "address[]" },
       { name: "setupActions", internalType: "bytes[]", type: "bytes[]" },
@@ -1894,6 +1950,13 @@ var finiteChannelAbi = [
     name: "multicall",
     outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
     stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view"
   },
   {
     type: "function",
@@ -2054,6 +2117,16 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
+    inputs: [
+      { name: "channelName", internalType: "string", type: "string" },
+      { name: "uri", internalType: "string", type: "string" }
+    ],
+    name: "updateChannelMetadata",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     inputs: [{ name: "uri", internalType: "string", type: "string" }],
     name: "updateChannelTokenUri",
     outputs: [],
@@ -2071,7 +2144,7 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "view"
@@ -2135,6 +2208,26 @@ var finiteChannelAbi = [
       { name: "approved", internalType: "bool", type: "bool", indexed: false }
     ],
     name: "ApprovalForAll"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "updater",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "channelName",
+        internalType: "string",
+        type: "string",
+        indexed: false
+      },
+      { name: "uri", internalType: "string", type: "string", indexed: false }
+    ],
+    name: "ChannelMetadataUpdated"
   },
   {
     type: "event",
@@ -2635,6 +2728,13 @@ var infiniteChannelAbi = [
   {
     type: "function",
     inputs: [],
+    name: "codeRepository",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "pure"
+  },
+  {
+    type: "function",
+    inputs: [],
     name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
@@ -2644,7 +2744,7 @@ var infiniteChannelAbi = [
     inputs: [],
     name: "contractURI",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "pure"
+    stateMutability: "view"
   },
   {
     type: "function",
@@ -2777,6 +2877,7 @@ var infiniteChannelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
+      { name: "name", internalType: "string", type: "string" },
       { name: "defaultAdmin", internalType: "address", type: "address" },
       { name: "managers", internalType: "address[]", type: "address[]" },
       { name: "setupActions", internalType: "bytes[]", type: "bytes[]" },
@@ -2875,6 +2976,13 @@ var infiniteChannelAbi = [
     name: "multicall",
     outputs: [{ name: "results", internalType: "bytes[]", type: "bytes[]" }],
     stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "name",
+    outputs: [{ name: "", internalType: "string", type: "string" }],
+    stateMutability: "view"
   },
   {
     type: "function",
@@ -3024,6 +3132,16 @@ var infiniteChannelAbi = [
   },
   {
     type: "function",
+    inputs: [
+      { name: "channelName", internalType: "string", type: "string" },
+      { name: "uri", internalType: "string", type: "string" }
+    ],
+    name: "updateChannelMetadata",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
     inputs: [{ name: "uri", internalType: "string", type: "string" }],
     name: "updateChannelTokenUri",
     outputs: [],
@@ -3041,7 +3159,7 @@ var infiniteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
+    inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "view"
@@ -3094,6 +3212,26 @@ var infiniteChannelAbi = [
       { name: "approved", internalType: "bool", type: "bool", indexed: false }
     ],
     name: "ApprovalForAll"
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "updater",
+        internalType: "address",
+        type: "address",
+        indexed: true
+      },
+      {
+        name: "channelName",
+        internalType: "string",
+        type: "string",
+        indexed: false
+      },
+      { name: "uri", internalType: "string", type: "string", indexed: false }
+    ],
+    name: "ChannelMetadataUpdated"
   },
   {
     type: "event",
@@ -3630,14 +3768,14 @@ var upgradePathAbi = [
   {
     type: "function",
     inputs: [],
-    name: "contractName",
+    name: "codeRepository",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },
   {
     type: "function",
     inputs: [],
-    name: "contractURI",
+    name: "contractName",
     outputs: [{ name: "", internalType: "string", type: "string" }],
     stateMutability: "pure"
   },

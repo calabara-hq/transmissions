@@ -320,6 +320,25 @@ export class CustomFees extends ethereum.SmartContract {
     );
   }
 
+  codeRepository(): string {
+    let result = super.call("codeRepository", "codeRepository():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_codeRepository(): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "codeRepository",
+      "codeRepository():(string)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   contractName(): string {
     let result = super.call("contractName", "contractName():(string)", []);
 
@@ -328,21 +347,6 @@ export class CustomFees extends ethereum.SmartContract {
 
   try_contractName(): ethereum.CallResult<string> {
     let result = super.tryCall("contractName", "contractName():(string)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toString());
-  }
-
-  contractURI(): string {
-    let result = super.call("contractURI", "contractURI():(string)", []);
-
-    return result[0].toString();
-  }
-
-  try_contractURI(): ethereum.CallResult<string> {
-    let result = super.tryCall("contractURI", "contractURI():(string)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }

@@ -31,7 +31,7 @@ export function updateFeeConfig(channelId: string, event: ConfigUpdated): string
         feeConfig.type = "";
         store.remove('CustomFees', channelId);
     } else {
-        let customFees = getOrCreateCustomFees(event.params.feeContract.toHexString());
+        let customFees = getOrCreateCustomFees(channelId);
         feeConfig.type = "customFees";
         feeConfig.customFees = customFees.id;
     }
@@ -65,8 +65,8 @@ export function updateLogicConfig(channelId: string, event: ConfigUpdated): Upda
         store.remove('DynamicLogic', channelId + '-minter');
         minterLogicConfig.type = "";
     } else {
-        let creatorLogic = getOrCreateDynamicLogic(event.params.logicContract.toHexString() + '-creator');
-        let minterLogic = getOrCreateDynamicLogic(event.params.logicContract.toHexString() + '-minter');
+        let creatorLogic = getOrCreateDynamicLogic(channelId + '-creator');
+        let minterLogic = getOrCreateDynamicLogic(channelId + '-minter');
 
         creatorLogicConfig.type = "dynamicLogic";
         creatorLogicConfig.dynamicLogic = creatorLogic.id;

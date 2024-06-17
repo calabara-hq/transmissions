@@ -21,7 +21,14 @@ contract ChannelAccess is Test {
     channelManagers[0] = sampleManager;
 
     // initialize the channel
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     // check managers after initialization
     assertTrue(channelImpl.isManager(admin));
@@ -39,7 +46,14 @@ contract ChannelAccess is Test {
     address[] memory channelManagers = new address[](1);
     channelManagers[0] = sampleManager;
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     address[] memory newManagers = new address[](1);
     newManagers[0] = makeAddr("new manager");
@@ -58,7 +72,14 @@ contract ChannelAccess is Test {
     channelManagers[0] = sampleManager;
     channelManagers[1] = sampleManager2;
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     address[] memory newManagers = new address[](1);
     newManagers[0] = makeAddr("new manager");
@@ -88,7 +109,14 @@ contract ChannelAccess is Test {
     address[] memory channelManagers = new address[](1);
     channelManagers[0] = sampleManager;
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     address[] memory newManagers = new address[](1);
     newManagers[0] = makeAddr("new manager");
@@ -108,7 +136,14 @@ contract ChannelAccess is Test {
     channelManagers[0] = sampleManager;
     channelManagers[1] = sampleManager2;
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     // verify that a manager cannot add another manager
     vm.startPrank(sampleManager);
@@ -118,7 +153,14 @@ contract ChannelAccess is Test {
   }
 
   function test_managers_noPublicAccessToRoleManagement() external {
-    channelImpl.initialize("https://example.com/api/token/0", admin, new address[](0), new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      new address[](0),
+      new bytes[](0),
+      new bytes(0)
+    );
 
     address newManager = makeAddr("new manager");
     address newAdmin = makeAddr("new admin");
@@ -136,7 +178,14 @@ contract ChannelAccess is Test {
   }
 
   function test_managers_transferAdmin() external {
-    channelImpl.initialize("https://example.com/api/token/0", admin, new address[](0), new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      new address[](0),
+      new bytes[](0),
+      new bytes(0)
+    );
 
     address newAdmin = makeAddr("new admin");
 
@@ -156,7 +205,14 @@ contract ChannelAccess is Test {
     channelManagers[0] = sampleManager;
     channelManagers[1] = sampleManager2;
 
-    channelImpl.initialize("https://example.com/api/token/0", admin, channelManagers, new bytes[](0), new bytes(0));
+    channelImpl.initialize(
+      "https://example.com/api/token/0",
+      "my contract",
+      admin,
+      channelManagers,
+      new bytes[](0),
+      new bytes(0)
+    );
 
     // verify that a manager can renounce their role
     vm.startPrank(sampleManager);

@@ -72,7 +72,7 @@
   {
     "type": "function",
     "inputs": [],
-    "name": "contractName",
+    "name": "codeRepository",
     "outputs": [
       {
         "name": "",
@@ -85,7 +85,7 @@
   {
     "type": "function",
     "inputs": [],
-    "name": "contractURI",
+    "name": "contractName",
     "outputs": [
       {
         "name": "",

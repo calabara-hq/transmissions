@@ -4,10 +4,12 @@ pragma solidity ^0.8.0;
 import { ChannelStorage } from "../channel/ChannelStorage.sol";
 
 interface IChannel {
+  function contractURI() external view returns (string memory);
   function getToken(uint256 tokenId) external view returns (ChannelStorage.TokenConfig memory);
 
   function initialize(
     string memory uri,
+    string memory name,
     address defaultAdmin,
     address[] calldata managers,
     bytes[] calldata setupActions,
@@ -16,6 +18,7 @@ interface IChannel {
 
   function setFees(address fees, bytes calldata data) external;
   function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
+  function updateChannelMetadata(string calldata name, string calldata uri) external;
   function updateChannelTokenUri(string calldata uri) external;
   function createToken(string calldata uri, address author, uint256 maxSupply) external returns (uint256 tokenId);
   function mint(address to, uint256 tokenId, uint256 amount, address mintReferral, bytes memory data) external payable;

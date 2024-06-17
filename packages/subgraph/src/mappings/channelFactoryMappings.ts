@@ -1,5 +1,6 @@
 import { Channel as ChannelTemplate } from "../generated/templates";
-import { ethereum } from '@graphprotocol/graph-ts';
+import { FiniteChannel as FiniteChannelTemplate } from "../generated/templates";
+import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { SetupNewContract } from "../generated/ChannelFactoryV1/ChannelFactory";
 import {
     getOrCreateChannel,
@@ -8,6 +9,7 @@ import {
     getOrCreateTransportLayer,
     getOrCreateUser
 } from "../utils/helpers";
+import { BIGINT_ZERO, ZERO_ADDRESS } from "../utils/constants";
 
 
 export function handleChannelCreated(event: SetupNewContract): void {
@@ -26,6 +28,7 @@ export function handleChannelCreated(event: SetupNewContract): void {
     admin.save();
 
     channel.uri = event.params.uri;
+    channel.name = event.params.name;
     channel.managers = tempManagers;
     channel.admin = admin.id;
 
@@ -64,9 +67,16 @@ export function handleChannelCreated(event: SetupNewContract): void {
         finiteTransportConfig.totalAllocation = rewardsTuple[2].toBigInt();
         finiteTransportConfig.token = rewardsTuple[3].toAddress();
 
+        finiteTransportConfig.settled = false;
+        finiteTransportConfig.settledBy = Address.fromString(ZERO_ADDRESS);
+        finiteTransportConfig.settledAt = BIGINT_ZERO;
+
         finiteTransportConfig.save();
 
         transportLayer.finiteTransportConfig = finiteTransportConfig.id;
+
+        FiniteChannelTemplate.create(event.params.contractAddress);
+
     }
 
     channel.transportLayer = transportLayer.id;

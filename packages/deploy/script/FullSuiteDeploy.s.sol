@@ -33,6 +33,9 @@ contract FullSuiteDeploy is DeployFns {
         console.log("deploy factory proxy");
         deployFactoryProxy(deployment);
 
+        console.log("deploy channel proxies");
+        deployChannelProxies(deployment);
+
         console.log("deployed to", chainId());
 
         vm.stopBroadcast();

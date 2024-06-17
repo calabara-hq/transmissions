@@ -13,7 +13,7 @@ type Deploy = {
   chain: number;
 };
 async function copyEnvironmentRunFiles() {
-  const latestFiles = await glob(`broadcast/**/*run-latest.json`);
+  const latestFiles = await glob(`broadcast/FullSuiteDeploy.s.sol/**/*run-latest.json`);
 
   const allFileContents = await Promise.all(
     latestFiles.map(async (file: string) => {

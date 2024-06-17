@@ -122,6 +122,7 @@ contract FiniteChannelTest is Test {
 
     targetChannel.initialize{ value: 1 }(
       "https://example.com/api/token/0",
+      "my contract",
       admin,
       new address[](0),
       new bytes[](0),
@@ -136,6 +137,7 @@ contract FiniteChannelTest is Test {
   ) internal {
     targetChannel.initialize{ value: totalAllocation }(
       "https://example.com/api/token/0",
+      "my contract",
       admin,
       new address[](0),
       new bytes[](0),
@@ -161,6 +163,7 @@ contract FiniteChannelTest is Test {
 
     targetChannel.initialize(
       "https://example.com/api/token/0",
+      "my contract",
       admin,
       new address[](0),
       new bytes[](0),
@@ -505,7 +508,7 @@ contract FiniteChannelTest is Test {
   function test_finiteChannel_versioning() public {
     assertEq("1.0.0", targetChannel.contractVersion());
     assertEq("Finite Channel", targetChannel.contractName());
-    assertEq(targetChannel.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(targetChannel.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
   }
 
   function test_finiteChannel_promotingSingleNodeDoesNotWipeDLL() public {

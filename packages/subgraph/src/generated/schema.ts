@@ -63,6 +63,19 @@ export class Channel extends Entity {
     this.set("uri", Value.fromString(value));
   }
 
+  get name(): string {
+    let value = this.get("name");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set name(value: string) {
+    this.set("name", Value.fromString(value));
+  }
+
   get admin(): string {
     let value = this.get("admin");
     if (!value || value.kind == ValueKind.NULL) {
@@ -467,6 +480,45 @@ export class FiniteTransportConfig extends Entity {
 
   set token(value: Bytes) {
     this.set("token", Value.fromBytes(value));
+  }
+
+  get settled(): boolean {
+    let value = this.get("settled");
+    if (!value || value.kind == ValueKind.NULL) {
+      return false;
+    } else {
+      return value.toBoolean();
+    }
+  }
+
+  set settled(value: boolean) {
+    this.set("settled", Value.fromBoolean(value));
+  }
+
+  get settledBy(): Bytes {
+    let value = this.get("settledBy");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set settledBy(value: Bytes) {
+    this.set("settledBy", Value.fromBytes(value));
+  }
+
+  get settledAt(): BigInt {
+    let value = this.get("settledAt");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set settledAt(value: BigInt) {
+    this.set("settledAt", Value.fromBigInt(value));
   }
 }
 

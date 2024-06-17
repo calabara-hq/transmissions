@@ -16,6 +16,20 @@ export class Channel extends DataSourceTemplate {
   }
 }
 
+export class FiniteChannel extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("FiniteChannel", [address.toHex()]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext(
+      "FiniteChannel",
+      [address.toHex()],
+      context,
+    );
+  }
+}
+
 export class Rewards extends DataSourceTemplate {
   static create(address: Address): void {
     DataSourceTemplate.create("Rewards", [address.toHex()]);

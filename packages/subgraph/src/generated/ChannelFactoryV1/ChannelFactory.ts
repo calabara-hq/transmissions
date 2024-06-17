@@ -85,16 +85,20 @@ export class SetupNewContract__Params {
     return this._event.parameters[1].value.toString();
   }
 
+  get name(): string {
+    return this._event.parameters[2].value.toString();
+  }
+
   get defaultAdmin(): Address {
-    return this._event.parameters[2].value.toAddress();
+    return this._event.parameters[3].value.toAddress();
   }
 
   get managers(): Array<Address> {
-    return this._event.parameters[3].value.toAddressArray();
+    return this._event.parameters[4].value.toAddressArray();
   }
 
   get transportConfig(): Bytes {
-    return this._event.parameters[4].value.toBytes();
+    return this._event.parameters[5].value.toBytes();
   }
 }
 
@@ -144,6 +148,25 @@ export class ChannelFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toString());
   }
 
+  codeRepository(): string {
+    let result = super.call("codeRepository", "codeRepository():(string)", []);
+
+    return result[0].toString();
+  }
+
+  try_codeRepository(): ethereum.CallResult<string> {
+    let result = super.tryCall(
+      "codeRepository",
+      "codeRepository():(string)",
+      [],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toString());
+  }
+
   contractName(): string {
     let result = super.call("contractName", "contractName():(string)", []);
 
@@ -152,21 +175,6 @@ export class ChannelFactory extends ethereum.SmartContract {
 
   try_contractName(): ethereum.CallResult<string> {
     let result = super.tryCall("contractName", "contractName():(string)", []);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toString());
-  }
-
-  contractURI(): string {
-    let result = super.call("contractURI", "contractURI():(string)", []);
-
-    return result[0].toString();
-  }
-
-  try_contractURI(): ethereum.CallResult<string> {
-    let result = super.tryCall("contractURI", "contractURI():(string)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -199,6 +207,7 @@ export class ChannelFactory extends ethereum.SmartContract {
 
   createInfiniteChannel(
     uri: string,
+    name: string,
     defaultAdmin: Address,
     managers: Array<Address>,
     setupActions: Array<Bytes>,
@@ -206,9 +215,10 @@ export class ChannelFactory extends ethereum.SmartContract {
   ): Address {
     let result = super.call(
       "createInfiniteChannel",
-      "createInfiniteChannel(string,address,address[],bytes[],bytes):(address)",
+      "createInfiniteChannel(string,string,address,address[],bytes[],bytes):(address)",
       [
         ethereum.Value.fromString(uri),
+        ethereum.Value.fromString(name),
         ethereum.Value.fromAddress(defaultAdmin),
         ethereum.Value.fromAddressArray(managers),
         ethereum.Value.fromBytesArray(setupActions),
@@ -221,6 +231,7 @@ export class ChannelFactory extends ethereum.SmartContract {
 
   try_createInfiniteChannel(
     uri: string,
+    name: string,
     defaultAdmin: Address,
     managers: Array<Address>,
     setupActions: Array<Bytes>,
@@ -228,9 +239,10 @@ export class ChannelFactory extends ethereum.SmartContract {
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "createInfiniteChannel",
-      "createInfiniteChannel(string,address,address[],bytes[],bytes):(address)",
+      "createInfiniteChannel(string,string,address,address[],bytes[],bytes):(address)",
       [
         ethereum.Value.fromString(uri),
+        ethereum.Value.fromString(name),
         ethereum.Value.fromAddress(defaultAdmin),
         ethereum.Value.fromAddressArray(managers),
         ethereum.Value.fromBytesArray(setupActions),
@@ -380,20 +392,24 @@ export class CreateFiniteChannelCall__Inputs {
     return this._call.inputValues[0].value.toString();
   }
 
+  get name(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+
   get defaultAdmin(): Address {
-    return this._call.inputValues[1].value.toAddress();
+    return this._call.inputValues[2].value.toAddress();
   }
 
   get managers(): Array<Address> {
-    return this._call.inputValues[2].value.toAddressArray();
+    return this._call.inputValues[3].value.toAddressArray();
   }
 
   get setupActions(): Array<Bytes> {
-    return this._call.inputValues[3].value.toBytesArray();
+    return this._call.inputValues[4].value.toBytesArray();
   }
 
   get transportConfig(): Bytes {
-    return this._call.inputValues[4].value.toBytes();
+    return this._call.inputValues[5].value.toBytes();
   }
 }
 
@@ -430,20 +446,24 @@ export class CreateInfiniteChannelCall__Inputs {
     return this._call.inputValues[0].value.toString();
   }
 
+  get name(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+
   get defaultAdmin(): Address {
-    return this._call.inputValues[1].value.toAddress();
+    return this._call.inputValues[2].value.toAddress();
   }
 
   get managers(): Array<Address> {
-    return this._call.inputValues[2].value.toAddressArray();
+    return this._call.inputValues[3].value.toAddressArray();
   }
 
   get setupActions(): Array<Bytes> {
-    return this._call.inputValues[3].value.toBytesArray();
+    return this._call.inputValues[4].value.toBytesArray();
   }
 
   get transportConfig(): Bytes {
-    return this._call.inputValues[4].value.toBytes();
+    return this._call.inputValues[5].value.toBytes();
   }
 }
 

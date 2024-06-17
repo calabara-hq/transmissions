@@ -5,14 +5,12 @@ import {
     getOrCreateToken,
     getOrCreateUser,
     getOrCreateMint,
-    getOrCreateRewardTransferEvent,
     handleUpdateTokenHolders
 } from "../../../utils/helpers";
 import {
     AdminTransferred,
+    ChannelMetadataUpdated,
     ConfigUpdated,
-    ERC20Transferred,
-    ETHTransferred,
     ManagerRenounced,
     ManagersUpdated,
     TokenCreated,
@@ -21,8 +19,6 @@ import {
     TransferBatch,
     TransferSingle
 } from "../../../generated/templates/Channel/Channel";
-import { Bytes } from "@graphprotocol/graph-ts";
-import { NATIVE_TOKEN } from "../../../utils/constants";
 
 
 export function handleTokenURIUpdated(event: TokenURIUpdated): void {
@@ -34,6 +30,19 @@ export function handleTokenURIUpdated(event: TokenURIUpdated): void {
     token.uri = event.params.uri;
     token.save();
     channel.save();
+}
+
+
+export function handleUpdateChannelMetadata(event: ChannelMetadataUpdated): void {
+    let channel = getOrCreateChannel(event.address.toHexString());
+    let token = getOrCreateToken(channel.id + '-0');
+
+    channel.name = event.params.channelName;
+    channel.uri = event.params.uri;
+    token.uri = event.params.uri;
+
+    channel.save();
+    token.save();
 }
 
 export function handleUpdateManagers(event: ManagersUpdated): void {
@@ -156,56 +165,6 @@ export function handleTokenBatchMinted(event: TokenMinted): void {
     referral.save();
 }
 
-
-export function handleERC20Transferred(event: ERC20Transferred): void {
-    let channel = getOrCreateChannel(event.address.toHexString());
-
-    let spender = getOrCreateUser(event.params.spender.toHexString());
-    let recipient = getOrCreateUser(event.params.recipient.toHexString());
-    let amount = event.params.amount;
-    let token = event.params.token;
-
-    let transferEvent = getOrCreateRewardTransferEvent(event.transaction.hash.toHexString() + '-' + event.logIndex.toString());
-
-    transferEvent.from = spender.id;
-    transferEvent.to = recipient.id;
-    transferEvent.amount = amount;
-    transferEvent.token = Bytes.fromHexString(token.toHexString());
-
-    transferEvent.blockNumber = event.block.number;
-    transferEvent.blockTimestamp = event.block.timestamp;
-
-    transferEvent.channel = channel.id;
-
-    spender.save();
-    recipient.save();
-    transferEvent.save();
-}
-
-
-export function handleETHTransferred(event: ETHTransferred): void {
-    let channel = getOrCreateChannel(event.address.toHexString());
-
-    let spender = getOrCreateUser(event.params.spender.toHexString());
-    let recipient = getOrCreateUser(event.params.recipient.toHexString());
-    let amount = event.params.amount;
-
-    let transferEvent = getOrCreateRewardTransferEvent(event.transaction.hash.toHexString() + '-' + event.logIndex.toString());
-
-    transferEvent.from = spender.id;
-    transferEvent.to = recipient.id;
-    transferEvent.amount = amount;
-    transferEvent.token = Bytes.fromHexString(NATIVE_TOKEN);
-
-    transferEvent.blockNumber = event.block.number;
-    transferEvent.blockTimestamp = event.block.timestamp;
-
-    transferEvent.channel = channel.id;
-
-    spender.save();
-    recipient.save();
-    transferEvent.save();
-}
 
 export function handleTransferSingleToken(event: TransferSingle): void {
     handleUpdateTokenHolders(

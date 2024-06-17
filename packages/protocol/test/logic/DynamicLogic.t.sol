@@ -53,6 +53,12 @@ contract ChannelTest is Test {
     mockBool = new MockBool();
   }
 
+  function test_dynamicLogic_versioning() external {
+    assertEq("1.0.0", logicImpl.contractVersion());
+    assertEq("Dynamic Logic", logicImpl.contractName());
+    assertEq(logicImpl.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+  }
+
   function test_creatorLogic_uniformRule() external {
     address[] memory targets = new address[](1);
     bytes4[] memory signatures = new bytes4[](1);

@@ -38,6 +38,7 @@ contract ChannelTest is Test {
     proxiedInfChannel = InfiniteChannel(payable(address(new InfiniteUplink1155(address(infChannelImpl)))));
     proxiedInfChannel.initialize(
       "https://example.com/api/token/0",
+      "my contract",
       admin,
       new address[](0),
       new bytes[](0),
@@ -55,6 +56,7 @@ contract ChannelTest is Test {
     vm.deal(address(this), 100 ether);
     proxiedFinChannel.initialize{ value: 100 ether }(
       "https://example.com/api/token/0",
+      "my contract",
       admin,
       new address[](0),
       new bytes[](0),
@@ -99,7 +101,7 @@ contract ChannelTest is Test {
 
   function test_upgrade_versioning() external {
     assertEq(upgradePath.contractVersion(), "1.0.0");
-    assertEq(upgradePath.contractURI(), "https://github.com/calabara-hq/transmissions/packages/protocol");
+    assertEq(upgradePath.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
     assertEq(upgradePath.contractName(), "Upgrade Path");
   }
 

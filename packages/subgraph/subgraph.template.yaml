@@ -23,7 +23,7 @@ dataSources:
         - name: ChannelFactory
           file: ./abis/ChannelFactory.json
       eventHandlers:
-        - event: SetupNewContract(indexed address,string,address,address[],bytes)
+        - event: SetupNewContract(indexed address,string,string,address,address[],bytes)
           handler: handleChannelCreated
 {{/channelFactory}}
 {{#customFees}}
@@ -94,7 +94,6 @@ templates:
         - User
         - Mint
         - ChannelTokenTransferEvent
-        
       abis:
         - name: Channel
           file: ./abis/Channel.json
@@ -117,6 +116,26 @@ templates:
           handler: handleTransferSingleToken
         - event: TransferBatch(indexed address,indexed address,indexed address,uint256[],uint256[])
           handler: handleTransferBatchToken
+        - event: ChannelMetadataUpdated(indexed address,string,string)
+          handler: handleUpdateChannelMetadata
+  - name: FiniteChannel
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: FiniteChannel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/channelMappings.ts
+      entities:
+        - FiniteTransportConfig
+      eventHandlers:
+        - event: Settled(indexed address)
+          handler: handleFiniteChannelSettled
+      abis:
+        - name: FiniteChannel
+          file: ./abis/FiniteChannel.json
   - name: Rewards
     kind: ethereum/contract
     network: {{network}}
@@ -126,7 +145,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/templates/channel/channelMappings.ts
+      file: ./src/mappings/templates/channel/rewardsMappings.ts
       entities:
         - RewardTransferEvent
       eventHandlers:

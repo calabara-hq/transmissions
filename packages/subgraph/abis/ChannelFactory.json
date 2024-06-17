@@ -31,7 +31,7 @@
   {
     "type": "function",
     "inputs": [],
-    "name": "contractName",
+    "name": "codeRepository",
     "outputs": [
       {
         "name": "",
@@ -44,7 +44,7 @@
   {
     "type": "function",
     "inputs": [],
-    "name": "contractURI",
+    "name": "contractName",
     "outputs": [
       {
         "name": "",
@@ -72,6 +72,11 @@
     "inputs": [
       {
         "name": "uri",
+        "internalType": "string",
+        "type": "string"
+      },
+      {
+        "name": "name",
         "internalType": "string",
         "type": "string"
       },
@@ -111,6 +116,11 @@
     "inputs": [
       {
         "name": "uri",
+        "internalType": "string",
+        "type": "string"
+      },
+      {
+        "name": "name",
         "internalType": "string",
         "type": "string"
       },
@@ -298,6 +308,12 @@
       },
       {
         "name": "uri",
+        "internalType": "string",
+        "type": "string",
+        "indexed": false
+      },
+      {
+        "name": "name",
         "internalType": "string",
         "type": "string",
         "indexed": false

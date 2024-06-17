@@ -11,6 +11,9 @@ import { ChainConfig, Deployment, ScriptDeploymentConfig } from "./DeployConfig.
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
 import "forge-std/Test.sol";
+
+import { FiniteUplink1155 } from "protocol/src/proxies/FiniteUplink1155.sol";
+import { InfiniteUplink1155 } from "protocol/src/proxies/InfiniteUplink1155.sol";
 import { Uplink1155Factory } from "protocol/src/proxies/Uplink1155Factory.sol";
 import { ProxyShim } from "protocol/src/utils/ProxyShim.sol";
 import { UpgradePath } from "protocol/src/utils/UpgradePath.sol";
@@ -98,5 +101,16 @@ abstract contract DeployFns is ScriptDeploymentConfig {
         channelFactory.initialize(chainConfig.owner);
 
         deployment.factoryProxy = address(factoryProxy);
+    }
+
+    function deployChannelProxies(Deployment memory deployment) internal {
+        ChainConfig memory chainConfig = getChainConfig();
+        if (deployment.infiniteChannelImpl == address(0)) revert("Infinite channel implementation not set");
+        if (deployment.finiteChannelImpl == address(0)) revert("Finite channel implementation not set");
+
+        // this does nothing beyond forcing the proxies to show up in deployment receipts for verification
+
+        InfiniteUplink1155 infiniteChannelProxy = new InfiniteUplink1155(deployment.infiniteChannelImpl);
+        FiniteUplink1155 finiteChannelProxy = new FiniteUplink1155(deployment.finiteChannelImpl);
     }
 }

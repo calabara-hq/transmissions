@@ -4,9 +4,13 @@ type Channel @entity {
     "The channel address"
     id: ID!
 
-    "The channel default token URI"
+    "The channel token URI"
 
     uri: String!
+
+    "The channel name"
+
+    name: String!
 
     "The channel default admin address"
     
@@ -63,6 +67,7 @@ type TransportLayer @entity {
 
 type FiniteTransportConfig @entity(immutable: true) {
     id: ID!
+
     createStart: BigInt!
     mintStart: BigInt!
     mintEnd: BigInt!
@@ -70,6 +75,10 @@ type FiniteTransportConfig @entity(immutable: true) {
     allocations: [BigInt!]!
     totalAllocation: BigInt!
     token: Bytes!
+
+    settled: Boolean!
+    settledBy: Bytes!
+    settledAt: BigInt!
 }
 
 type InfiniteTransportConfig @entity {
@@ -123,6 +132,7 @@ type LogicConfig @entity {
 }
 
 type DynamicLogic @entity {
+    "The channel address + the logic type"
     id: ID!
     targets: [Bytes!]!
     signatures: [Bytes!]!

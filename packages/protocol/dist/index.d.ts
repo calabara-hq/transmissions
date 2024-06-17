@@ -66,6 +66,16 @@ export declare const channelAbi: readonly [{
     readonly stateMutability: "view";
 }, {
     readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "contractURI";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
     readonly inputs: readonly [{
         readonly name: "uri";
         readonly internalType: "string";
@@ -273,6 +283,10 @@ export declare const channelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
+        readonly name: "name";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
         readonly name: "defaultAdmin";
         readonly internalType: "address";
         readonly type: "address";
@@ -466,6 +480,16 @@ export declare const channelAbi: readonly [{
         readonly type: "bytes[]";
     }];
     readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "name";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
@@ -689,6 +713,20 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly name: "updateChannelMetadata";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
         readonly name: "uri";
         readonly internalType: "string";
         readonly type: "string";
@@ -713,7 +751,7 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "";
+        readonly name: "tokenId";
         readonly internalType: "uint256";
         readonly type: "uint256";
     }];
@@ -777,6 +815,26 @@ export declare const channelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "ApprovalForAll";
+}, {
+    readonly type: "event";
+    readonly anonymous: false;
+    readonly inputs: readonly [{
+        readonly name: "updater";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: true;
+    }, {
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }];
+    readonly name: "ChannelMetadataUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;
@@ -1333,7 +1391,7 @@ export declare const channelFactoryAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractName";
+    readonly name: "codeRepository";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -1343,7 +1401,7 @@ export declare const channelFactoryAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractURI";
+    readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -1364,6 +1422,10 @@ export declare const channelFactoryAbi: readonly [{
     readonly type: "function";
     readonly inputs: readonly [{
         readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
+        readonly name: "name";
         readonly internalType: "string";
         readonly type: "string";
     }, {
@@ -1394,6 +1456,10 @@ export declare const channelFactoryAbi: readonly [{
     readonly type: "function";
     readonly inputs: readonly [{
         readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
+        readonly name: "name";
         readonly internalType: "string";
         readonly type: "string";
     }, {
@@ -1540,6 +1606,11 @@ export declare const channelFactoryAbi: readonly [{
         readonly indexed: true;
     }, {
         readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }, {
+        readonly name: "name";
         readonly internalType: "string";
         readonly type: "string";
         readonly indexed: false;
@@ -1716,7 +1787,7 @@ export declare const customFeesAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractName";
+    readonly name: "codeRepository";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -1726,7 +1797,7 @@ export declare const customFeesAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractURI";
+    readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -2015,7 +2086,7 @@ export declare const dynamicLogicAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractName";
+    readonly name: "codeRepository";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -2025,7 +2096,7 @@ export declare const dynamicLogicAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractURI";
+    readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -2312,6 +2383,16 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
+    readonly name: "codeRepository";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "pure";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
     readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
@@ -2328,7 +2409,7 @@ export declare const finiteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }];
-    readonly stateMutability: "pure";
+    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
@@ -2597,6 +2678,10 @@ export declare const finiteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
+        readonly name: "name";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
         readonly name: "defaultAdmin";
         readonly internalType: "address";
         readonly type: "address";
@@ -2800,6 +2885,16 @@ export declare const finiteChannelAbi: readonly [{
         readonly type: "bytes[]";
     }];
     readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "name";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
@@ -3061,6 +3156,20 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly name: "updateChannelMetadata";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
         readonly name: "uri";
         readonly internalType: "string";
         readonly type: "string";
@@ -3085,7 +3194,7 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "";
+        readonly name: "tokenId";
         readonly internalType: "uint256";
         readonly type: "uint256";
     }];
@@ -3167,6 +3276,26 @@ export declare const finiteChannelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "ApprovalForAll";
+}, {
+    readonly type: "event";
+    readonly anonymous: false;
+    readonly inputs: readonly [{
+        readonly name: "updater";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: true;
+    }, {
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }];
+    readonly name: "ChannelMetadataUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;
@@ -3809,6 +3938,16 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
+    readonly name: "codeRepository";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "pure";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
     readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
@@ -3825,7 +3964,7 @@ export declare const infiniteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }];
-    readonly stateMutability: "pure";
+    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
@@ -4045,6 +4184,10 @@ export declare const infiniteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
+        readonly name: "name";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
         readonly name: "defaultAdmin";
         readonly internalType: "address";
         readonly type: "address";
@@ -4238,6 +4381,16 @@ export declare const infiniteChannelAbi: readonly [{
         readonly type: "bytes[]";
     }];
     readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "name";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly stateMutability: "view";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
@@ -4485,6 +4638,20 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+    }];
+    readonly name: "updateChannelMetadata";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
         readonly name: "uri";
         readonly internalType: "string";
         readonly type: "string";
@@ -4509,7 +4676,7 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "";
+        readonly name: "tokenId";
         readonly internalType: "uint256";
         readonly type: "uint256";
     }];
@@ -4573,6 +4740,26 @@ export declare const infiniteChannelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "ApprovalForAll";
+}, {
+    readonly type: "event";
+    readonly anonymous: false;
+    readonly inputs: readonly [{
+        readonly name: "updater";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: true;
+    }, {
+        readonly name: "channelName";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }, {
+        readonly name: "uri";
+        readonly internalType: "string";
+        readonly type: "string";
+        readonly indexed: false;
+    }];
+    readonly name: "ChannelMetadataUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;
@@ -5227,7 +5414,7 @@ export declare const upgradePathAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractName";
+    readonly name: "codeRepository";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";
@@ -5237,7 +5424,7 @@ export declare const upgradePathAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
-    readonly name: "contractURI";
+    readonly name: "contractName";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "string";

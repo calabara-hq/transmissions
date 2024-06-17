@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import { IChannel } from "../channel/Channel.sol";
 import { IChannelFactory } from "../interfaces/IChannelFactory.sol";
-import { IVersionedContract } from "../interfaces/IVersionedContract.sol";
 
 import { FiniteChannel } from "../channel/transport/FiniteChannel.sol";
 
@@ -65,6 +64,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
   event SetupNewContract(
     address indexed contractAddress,
     string uri,
+    string name,
     address defaultAdmin,
     address[] managers,
     bytes transportConfig
@@ -105,6 +105,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
   /**
    * @notice Create a new infinite channel
    * @param uri string URI for the channel
+   * @param name string name for the channel
    * @param defaultAdmin address of default admin
    * @param managers address[] channel managers
    * @param setupActions bytes[] setup actions
@@ -113,19 +114,21 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
    */
   function createInfiniteChannel(
     string calldata uri,
+    string calldata name,
     address defaultAdmin,
     address[] calldata managers,
     bytes[] calldata setupActions,
     bytes calldata transportConfig
   ) external returns (address) {
-    InfiniteUplink1155 newContract = new InfiniteUplink1155(infiniteChannelImpl);
-    _initializeContract(address(newContract), uri, defaultAdmin, managers, setupActions, transportConfig);
-    return address(newContract);
+    address newContract = address(new InfiniteUplink1155(infiniteChannelImpl));
+    _initializeContract(newContract, uri, name, defaultAdmin, managers, setupActions, transportConfig);
+    return newContract;
   }
 
   /**
    * @notice Create a new finite channel
    * @param uri string URI for the channel
+   * @param name string name for the channel
    * @param defaultAdmin address of default admin
    * @param managers address[] channel managers
    * @param setupActions bytes[] setup actions
@@ -134,6 +137,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
    */
   function createFiniteChannel(
     string calldata uri,
+    string calldata name,
     address defaultAdmin,
     address[] calldata managers,
     bytes[] calldata setupActions,
@@ -155,7 +159,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
       IERC20(params.rewards.token).approve(newContract, params.rewards.totalAllocation);
     }
 
-    _initializeContract(newContract, uri, defaultAdmin, managers, setupActions, transportConfig);
+    _initializeContract(newContract, uri, name, defaultAdmin, managers, setupActions, transportConfig);
 
     return newContract;
   }
@@ -182,6 +186,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
    * @notice Internal helper to deploy a new channel
    * @param newContract address of the new contract
    * @param uri string URI for the channel
+   * @param name string name for the channel
    * @param defaultAdmin address default admin
    * @param managers address[] channel managers
    * @param setupActions bytes[] setup actions
@@ -190,13 +195,21 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
   function _initializeContract(
     address newContract,
     string calldata uri,
+    string calldata name,
     address defaultAdmin,
     address[] calldata managers,
     bytes[] calldata setupActions,
     bytes calldata transportConfig
   ) private {
-    emit SetupNewContract(newContract, uri, defaultAdmin, managers, transportConfig);
-    IChannel(newContract).initialize{ value: msg.value }(uri, defaultAdmin, managers, setupActions, transportConfig);
+    emit SetupNewContract(newContract, uri, name, defaultAdmin, managers, transportConfig);
+    IChannel(newContract).initialize{ value: msg.value }(
+      uri,
+      name,
+      defaultAdmin,
+      managers,
+      setupActions,
+      transportConfig
+    );
   }
 
   /* -------------------------------------------------------------------------- */
@@ -212,10 +225,10 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
   }
 
   /**
-   * @notice Returns the contract uri
-   * @return string contract uri
+   * @notice Returns the contract source code repository
+   * @return string repository uri
    */
-  function contractURI() external pure returns (string memory) {
+  function codeRepository() external pure returns (string memory) {
     return "https://github.com/calabara-hq/transmissions/packages/protocol";
   }
 

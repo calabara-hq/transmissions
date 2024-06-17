@@ -1,10 +1,11 @@
 import { SetupNewContract } from "../src/generated/ChannelFactoryV1/ChannelFactory";
-import { AdminTransferred, ConfigUpdated, ERC20Transferred, ETHTransferred, ManagerRenounced, ManagersUpdated, TokenCreated, TokenMinted, TokenURIUpdated, TransferBatch, TransferSingle } from "../src/generated/templates/Channel/Channel";
+import { AdminTransferred, ChannelMetadataUpdated, ConfigUpdated, ERC20Transferred, ETHTransferred, ManagerRenounced, ManagersUpdated, TokenCreated, TokenMinted, TokenURIUpdated, TransferBatch, TransferSingle } from "../src/generated/templates/Channel/Channel";
 import { FeeConfigSet } from "../src/generated/CustomFeesV1/CustomFees";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from '../src/utils/constants';
 import { BigInt, Address, Bytes, ethereum, Int8 } from "@graphprotocol/graph-ts";
 import { newMockEvent } from 'matchstick-as/assembly/index';
 import { CreatorLogicSet, SignatureApproved } from "../src/generated/DynamicLogicV1/DynamicLogic";
+import { Settled } from "../src/generated/templates/FiniteChannel/FiniteChannel";
 
 
 export const finiteTransportBytes =
@@ -16,6 +17,7 @@ export const infiniteTransportBytes = "0x000000000000000000000000000000000000000
 export class ChannelCreatedData {
     contractAddress: Address = Address.fromString(ZERO_ADDRESS);
     uri: string = '';
+    name: string = '';
     admin: Address = Address.fromString(ZERO_ADDRESS);
     managers: Address[] = [];
     transportConfig: Bytes = Bytes.empty();
@@ -26,6 +28,34 @@ export class ChannelCreatedData {
     logIndex: BigInt = BIGINT_ZERO;
     address: Address = Address.fromString(ZERO_ADDRESS);
 }
+
+export function createChannelCreatedData(input: ChannelCreatedData): SetupNewContract {
+    let newEvent = changetype<SetupNewContract>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let contractAddressParam = new ethereum.EventParam("contractAddress", ethereum.Value.fromAddress(input.contractAddress));
+    let uriParam = new ethereum.EventParam("uri", ethereum.Value.fromString(input.uri));
+    let nameParam = new ethereum.EventParam("name", ethereum.Value.fromString(input.name));
+    let adminParam = new ethereum.EventParam("defaultAdmin", ethereum.Value.fromAddress(input.admin));
+    let managersParam = new ethereum.EventParam("managers", ethereum.Value.fromAddressArray(input.managers));
+    let transportConfigParam = new ethereum.EventParam("transportConfig", ethereum.Value.fromBytes(input.transportConfig));
+
+    newEvent.parameters.push(contractAddressParam);
+    newEvent.parameters.push(uriParam);
+    newEvent.parameters.push(nameParam);
+    newEvent.parameters.push(adminParam);
+    newEvent.parameters.push(managersParam);
+    newEvent.parameters.push(transportConfigParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent;
+}
+
 
 export class TokenURIUpdatedData {
     tokenId: BigInt = BIGINT_ZERO;
@@ -58,22 +88,29 @@ export function createTokenURIUpdatedData(input: TokenURIUpdatedData): TokenURIU
 
 }
 
+export class ChannelMetadataUpdatedData {
+    updater: Address = Address.fromString(ZERO_ADDRESS);
+    channelName: string = '';
+    uri: string = '';
 
-export function createChannelCreatedData(input: ChannelCreatedData): SetupNewContract {
-    let newEvent = changetype<SetupNewContract>(newMockEvent());
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
+
+export function createChannelMetadataUpdatedData(input: ChannelMetadataUpdatedData): ChannelMetadataUpdated {
+    let newEvent = changetype<ChannelMetadataUpdated>(newMockEvent());
     newEvent.parameters = new Array<ethereum.EventParam>();
 
-    let contractAddressParam = new ethereum.EventParam("contractAddress", ethereum.Value.fromAddress(input.contractAddress));
+    let updaterParam = new ethereum.EventParam("updater", ethereum.Value.fromAddress(input.updater));
+    let channelNameParam = new ethereum.EventParam("channelName", ethereum.Value.fromString(input.channelName));
     let uriParam = new ethereum.EventParam("uri", ethereum.Value.fromString(input.uri));
-    let adminParam = new ethereum.EventParam("defaultAdmin", ethereum.Value.fromAddress(input.admin));
-    let managersParam = new ethereum.EventParam("managers", ethereum.Value.fromAddressArray(input.managers));
-    let transportConfigParam = new ethereum.EventParam("transportConfig", ethereum.Value.fromBytes(input.transportConfig));
 
-    newEvent.parameters.push(contractAddressParam);
+    newEvent.parameters.push(updaterParam);
+    newEvent.parameters.push(channelNameParam);
     newEvent.parameters.push(uriParam);
-    newEvent.parameters.push(adminParam);
-    newEvent.parameters.push(managersParam);
-    newEvent.parameters.push(transportConfigParam);
 
     newEvent.block.number = input.eventBlockNumber;
     newEvent.block.timestamp = input.eventBlockTimestamp;
@@ -81,9 +118,10 @@ export function createChannelCreatedData(input: ChannelCreatedData): SetupNewCon
     newEvent.logIndex = input.logIndex;
     newEvent.address = input.address;
 
-    return newEvent;
-}
+    return newEvent as ChannelMetadataUpdated;
 
+
+}
 
 export class ManagersUpdatedData {
     managers: Address[] = [];
@@ -588,3 +626,29 @@ export function createSignatureApprovedData(input: SignatureApprovedData): Signa
     return newEvent as SignatureApproved;
 }
 
+export class FiniteChannelSettledData {
+    caller: Address = Address.fromString(ZERO_ADDRESS);
+
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
+
+export function createFiniteChannelSettledData(input: FiniteChannelSettledData): Settled {
+    let newEvent = changetype<Settled>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let callerParam = new ethereum.EventParam("caller", ethereum.Value.fromAddress(input.caller));
+
+    newEvent.parameters.push(callerParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent as Settled;
+}
