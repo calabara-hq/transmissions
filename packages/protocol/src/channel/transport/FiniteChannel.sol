@@ -24,6 +24,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
   error InvalidTiming();
   error AlreadySettled();
   error StillActive();
+  error InvalidRewards();
 
   /* -------------------------------------------------------------------------- */
   /*                                   EVENTS                                   */
@@ -59,13 +60,13 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
   /*                                   STORAGE                                  */
   /* -------------------------------------------------------------------------- */
 
-  bytes32 public head;
-  bytes32 public tail;
-  uint256 public length;
+  bytes32 internal head;
+  bytes32 internal tail;
+  uint256 internal length;
 
-  bool isSettled;
+  bool internal isSettled;
 
-  mapping(bytes32 => Node) public nodes;
+  mapping(bytes32 => Node) internal nodes;
 
   FiniteParams public finiteChannelParams;
 
@@ -119,7 +120,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
    * @param data encoded FiniteParams
    * @dev only callable during initialization
    */
-  function setTransportConfig(bytes calldata data) public payable override onlyAdminOrManager onlyInitializing {
+  function setTransportConfig(bytes calldata data) public override onlyAdminOrManager onlyInitializing {
     FiniteParams memory _params = abi.decode(data, (FiniteParams));
 
     _validateTimingParameters(_params.createStart, _params.mintStart, _params.mintEnd);
@@ -128,6 +129,9 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     finiteChannelParams = _params;
     _depositToEscrow(_params.rewards.token, _params.rewards.totalAllocation);
   }
+
+  receive() external payable {}
+  fallback() external payable {}
 
   /* -------------------------------------------------------------------------- */
   /*                             INTERNAL FUNCTIONS                             */
@@ -309,13 +313,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
   }
 
   function _validateRewardParameters(FiniteRewards memory rewards) internal {
-    if (rewards.ranks.length == 0) {
-      revert("invalid rewards");
-    }
-
-    if (rewards.ranks.length != rewards.allocations.length) {
-      revert("length mismatch");
-    }
+    if (rewards.ranks.length == 0 || rewards.ranks.length != rewards.allocations.length) revert InvalidRewards();
 
     uint256 _totalAllocation = 0;
 
@@ -324,17 +322,15 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
 
       /// @dev ensure ranks are in ascending order without duplicates
 
-      if (i < rewards.allocations.length - 1) {
-        require(rewards.ranks[i + 1] > rewards.ranks[i], "invalid ranks");
+      if (i < rewards.allocations.length - 1 && rewards.ranks[i + 1] <= rewards.ranks[i]) {
+        revert InvalidRewards();
       }
     }
 
-    if (_totalAllocation == 0) {
-      revert("total allocation cant be zero");
-    }
+    if (_totalAllocation == 0) revert InvalidRewards();
 
     if (rewards.totalAllocation != _totalAllocation) {
-      revert("invalid total allocation");
+      revert InvalidRewards();
     }
   }
 

@@ -10,8 +10,8 @@ import { IFees } from "../../src/interfaces/IFees.sol";
 import { ILogic } from "../../src/interfaces/ILogic.sol";
 import { IUpgradePath } from "../../src/interfaces/IUpgradePath.sol";
 import { DynamicLogic } from "../../src/logic/DynamicLogic.sol";
-import { UpgradePath } from "../../src/utils/UpgradePath.sol";
 
+import { UpgradePath } from "../../src/utils/UpgradePath.sol";
 import { ChannelHarness } from "../utils/ChannelHarness.t.sol";
 import { MockERC1155, MockERC20, MockERC721 } from "../utils/TokenHelpers.t.sol";
 import { WETH } from "../utils/WETH.t.sol";
@@ -111,7 +111,7 @@ contract ChannelTest is Test {
   }
 
   function createToken(address creator, uint256 maxSupply) internal returns (uint256) {
-    return channelImpl.createToken("https://example.com/api/token/1", creator, maxSupply);
+    return channelImpl.createToken("https://example.com/api/token/1", maxSupply);
   }
 
   function initializeChannelWithSetupActions(bytes memory feeArgs, bytes memory logicArgs) internal {
@@ -326,7 +326,7 @@ contract ChannelTest is Test {
     initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 
     vm.startPrank(creator);
-    channelImpl.createToken("sampleToken", admin, 3);
+    channelImpl.createToken("sampleToken", 3);
     vm.stopPrank();
 
     vm.startPrank(minter);

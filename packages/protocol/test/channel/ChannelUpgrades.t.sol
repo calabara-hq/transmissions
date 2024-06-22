@@ -53,8 +53,8 @@ contract ChannelTest is Test {
     ranks[0] = 1;
     allocations[0] = 100 ether;
 
-    vm.deal(address(this), 100 ether);
-    proxiedFinChannel.initialize{ value: 100 ether }(
+    vm.deal(address(proxiedFinChannel), 100 ether);
+    proxiedFinChannel.initialize(
       "https://example.com/api/token/0",
       "my contract",
       admin,
@@ -183,7 +183,7 @@ contract ChannelTest is Test {
   }
 
   function test_storageAfterUpgrade_infChannel() external {
-    proxiedInfChannel.createToken("http://test/1", address(0), 100);
+    proxiedInfChannel.createToken("http://test/1", 100);
 
     address[] memory oldImpls = new address[](1);
     oldImpls[0] = address(infChannelImpl);
@@ -199,7 +199,7 @@ contract ChannelTest is Test {
   }
 
   function test_storageAfterUpgrade_finChannel() external {
-    proxiedFinChannel.createToken("http://test/1", address(0), 100);
+    proxiedFinChannel.createToken("http://test/1", 100);
 
     address[] memory oldImpls = new address[](1);
     oldImpls[0] = address(finChannelImpl);

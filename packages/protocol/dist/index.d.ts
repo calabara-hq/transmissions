@@ -11,6 +11,36 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
+    readonly name: "DEFERRED_TOKEN_TYPEHASH";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "DOMAIN_SEPARATOR";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "EIP712_DOMAIN_TYPEHASH";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
     readonly name: "MANAGER_ROLE";
     readonly outputs: readonly [{
         readonly name: "";
@@ -81,10 +111,6 @@ export declare const channelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
         readonly name: "maxSupply";
         readonly internalType: "uint256";
         readonly type: "uint256";
@@ -104,26 +130,6 @@ export declare const channelAbi: readonly [{
         readonly type: "address";
     }];
     readonly name: "erc20Balances";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "erc20MintPrice";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "ethMintPrice";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "uint256";
@@ -224,29 +230,6 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "user";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "getUserStats";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "struct ChannelStorage.UserStats";
-        readonly type: "tuple";
-        readonly components: readonly [{
-            readonly name: "numCreations";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }, {
-            readonly name: "numMints";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }];
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "role";
         readonly internalType: "bytes32";
         readonly type: "bytes32";
@@ -305,7 +288,7 @@ export declare const channelAbi: readonly [{
     }];
     readonly name: "initialize";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -413,7 +396,7 @@ export declare const channelAbi: readonly [{
     }];
     readonly name: "mintBatchWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -465,7 +448,7 @@ export declare const channelAbi: readonly [{
     }];
     readonly name: "mintWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -488,16 +471,6 @@ export declare const channelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "nextTokenId";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -655,6 +628,124 @@ export declare const channelAbi: readonly [{
     }];
     readonly name: "setTransportConfig";
     readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithERC20";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithETH";
+    readonly outputs: readonly [];
     readonly stateMutability: "payable";
 }, {
     readonly type: "function";
@@ -668,36 +759,6 @@ export declare const channelAbi: readonly [{
         readonly name: "";
         readonly internalType: "bool";
         readonly type: "bool";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly name: "tokens";
-    readonly outputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
-        readonly name: "maxSupply";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "totalMinted";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "sponsor";
-        readonly internalType: "address";
-        readonly type: "address";
     }];
     readonly stateMutability: "view";
 }, {
@@ -760,24 +821,6 @@ export declare const channelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "userStats";
-    readonly outputs: readonly [{
-        readonly name: "numCreations";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "numMints";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -1316,6 +1359,10 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidTotalAllocation";
 }, {
     readonly type: "error";
@@ -1341,6 +1388,10 @@ export declare const channelAbi: readonly [{
         readonly type: "address";
     }];
     readonly name: "SafeERC20FailedOperation";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "SignatureExpired";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
@@ -2315,9 +2366,45 @@ export declare const finiteChannelAbi: readonly [{
     }];
     readonly stateMutability: "nonpayable";
 }, {
+    readonly type: "fallback";
+    readonly stateMutability: "payable";
+}, {
+    readonly type: "receive";
+    readonly stateMutability: "payable";
+}, {
     readonly type: "function";
     readonly inputs: readonly [];
     readonly name: "DEFAULT_ADMIN_ROLE";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "DEFERRED_TOKEN_TYPEHASH";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "DOMAIN_SEPARATOR";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "EIP712_DOMAIN_TYPEHASH";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "bytes32";
@@ -2427,10 +2514,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
         readonly name: "maxSupply";
         readonly internalType: "uint256";
         readonly type: "uint256";
@@ -2450,26 +2533,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly type: "address";
     }];
     readonly name: "erc20Balances";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "erc20MintPrice";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "ethMintPrice";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "uint256";
@@ -2609,29 +2672,6 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "user";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "getUserStats";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "struct ChannelStorage.UserStats";
-        readonly type: "tuple";
-        readonly components: readonly [{
-            readonly name: "numCreations";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }, {
-            readonly name: "numMints";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }];
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "role";
         readonly internalType: "bytes32";
         readonly type: "bytes32";
@@ -2663,16 +2703,6 @@ export declare const finiteChannelAbi: readonly [{
     readonly stateMutability: "view";
 }, {
     readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "head";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
     readonly inputs: readonly [{
         readonly name: "uri";
         readonly internalType: "string";
@@ -2700,7 +2730,7 @@ export declare const finiteChannelAbi: readonly [{
     }];
     readonly name: "initialize";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -2745,16 +2775,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "bool";
         readonly type: "bool";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "length";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -2818,7 +2838,7 @@ export declare const finiteChannelAbi: readonly [{
     }];
     readonly name: "mintBatchWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -2870,7 +2890,7 @@ export declare const finiteChannelAbi: readonly [{
     }];
     readonly name: "mintWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -2893,38 +2913,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "nextTokenId";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }];
-    readonly name: "nodes";
-    readonly outputs: readonly [{
-        readonly name: "next";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "prev";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "tokenId";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -3082,13 +3070,131 @@ export declare const finiteChannelAbi: readonly [{
     }];
     readonly name: "setTransportConfig";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [];
     readonly name: "settle";
     readonly outputs: readonly [];
     readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithERC20";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithETH";
+    readonly outputs: readonly [];
+    readonly stateMutability: "payable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -3101,46 +3207,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "bool";
         readonly type: "bool";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "tail";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly name: "tokens";
-    readonly outputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
-        readonly name: "maxSupply";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "totalMinted";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "sponsor";
-        readonly internalType: "address";
-        readonly type: "address";
     }];
     readonly stateMutability: "view";
 }, {
@@ -3203,24 +3269,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "userStats";
-    readonly outputs: readonly [{
-        readonly name: "numCreations";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "numMints";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -3791,6 +3839,14 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidRewards";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidTiming";
 }, {
     readonly type: "error";
@@ -3828,6 +3884,10 @@ export declare const finiteChannelAbi: readonly [{
         readonly type: "address";
     }];
     readonly name: "SafeERC20FailedOperation";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "SignatureExpired";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
@@ -3873,6 +3933,36 @@ export declare const infiniteChannelAbi: readonly [{
     readonly type: "function";
     readonly inputs: readonly [];
     readonly name: "DEFAULT_ADMIN_ROLE";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "DEFERRED_TOKEN_TYPEHASH";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "DOMAIN_SEPARATOR";
+    readonly outputs: readonly [{
+        readonly name: "";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }];
+    readonly stateMutability: "view";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [];
+    readonly name: "EIP712_DOMAIN_TYPEHASH";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "bytes32";
@@ -3982,10 +4072,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly internalType: "string";
         readonly type: "string";
     }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
         readonly name: "maxSupply";
         readonly internalType: "uint256";
         readonly type: "uint256";
@@ -4005,26 +4091,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly type: "address";
     }];
     readonly name: "erc20Balances";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "erc20MintPrice";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "ethMintPrice";
     readonly outputs: readonly [{
         readonly name: "";
         readonly internalType: "uint256";
@@ -4125,29 +4191,6 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "user";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "getUserStats";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "struct ChannelStorage.UserStats";
-        readonly type: "tuple";
-        readonly components: readonly [{
-            readonly name: "numCreations";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }, {
-            readonly name: "numMints";
-            readonly internalType: "uint256";
-            readonly type: "uint256";
-        }];
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "role";
         readonly internalType: "bytes32";
         readonly type: "bytes32";
@@ -4206,7 +4249,7 @@ export declare const infiniteChannelAbi: readonly [{
     }];
     readonly name: "initialize";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -4314,7 +4357,7 @@ export declare const infiniteChannelAbi: readonly [{
     }];
     readonly name: "mintBatchWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -4366,7 +4409,7 @@ export declare const infiniteChannelAbi: readonly [{
     }];
     readonly name: "mintWithERC20";
     readonly outputs: readonly [];
-    readonly stateMutability: "payable";
+    readonly stateMutability: "nonpayable";
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
@@ -4389,16 +4432,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [];
-    readonly name: "nextTokenId";
-    readonly outputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -4580,6 +4613,124 @@ export declare const infiniteChannelAbi: readonly [{
     }];
     readonly name: "setTransportConfig";
     readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithERC20";
+    readonly outputs: readonly [];
+    readonly stateMutability: "nonpayable";
+}, {
+    readonly type: "function";
+    readonly inputs: readonly [{
+        readonly name: "tokenPermission";
+        readonly internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission";
+        readonly type: "tuple";
+        readonly components: readonly [{
+            readonly name: "uri";
+            readonly internalType: "string";
+            readonly type: "string";
+        }, {
+            readonly name: "maxSupply";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "deadline";
+            readonly internalType: "uint256";
+            readonly type: "uint256";
+        }, {
+            readonly name: "nonce";
+            readonly internalType: "bytes32";
+            readonly type: "bytes32";
+        }];
+    }, {
+        readonly name: "author";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "v";
+        readonly internalType: "uint8";
+        readonly type: "uint8";
+    }, {
+        readonly name: "r";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "s";
+        readonly internalType: "bytes32";
+        readonly type: "bytes32";
+    }, {
+        readonly name: "to";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "amount";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+    }, {
+        readonly name: "mintReferral";
+        readonly internalType: "address";
+        readonly type: "address";
+    }, {
+        readonly name: "data";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
+    }];
+    readonly name: "sponsorWithETH";
+    readonly outputs: readonly [];
     readonly stateMutability: "payable";
 }, {
     readonly type: "function";
@@ -4593,36 +4744,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "bool";
         readonly type: "bool";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }];
-    readonly name: "tokens";
-    readonly outputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }, {
-        readonly name: "author";
-        readonly internalType: "address";
-        readonly type: "address";
-    }, {
-        readonly name: "maxSupply";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "totalMinted";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "sponsor";
-        readonly internalType: "address";
-        readonly type: "address";
     }];
     readonly stateMutability: "view";
 }, {
@@ -4685,24 +4806,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly name: "";
         readonly internalType: "string";
         readonly type: "string";
-    }];
-    readonly stateMutability: "view";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
-        readonly name: "";
-        readonly internalType: "address";
-        readonly type: "address";
-    }];
-    readonly name: "userStats";
-    readonly outputs: readonly [{
-        readonly name: "numCreations";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-    }, {
-        readonly name: "numMints";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
     }];
     readonly stateMutability: "view";
 }, {
@@ -5261,6 +5364,10 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidTiming";
 }, {
     readonly type: "error";
@@ -5294,6 +5401,10 @@ export declare const infiniteChannelAbi: readonly [{
     readonly type: "error";
     readonly inputs: readonly [];
     readonly name: "SaleOver";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "SignatureExpired";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];

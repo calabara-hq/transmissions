@@ -7,6 +7,7 @@ import { ILogic } from "../interfaces/ILogic.sol";
 import { Rewards } from "../rewards/Rewards.sol";
 import { ManagedChannel } from "../utils/ManagedChannel.sol";
 
+import { DeferredTokenAuthorization } from "../utils/DeferredTokenAuthorization.sol";
 import { Multicall } from "../utils/Multicall.sol";
 import { ChannelStorage } from "./ChannelStorage.sol";
 import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -16,7 +17,15 @@ import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/In
  * @author nick
  * @notice Channel contract for managing tokens. This contract is the base for all transport channels.
  */
-abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, Multicall, ManagedChannel {
+abstract contract Channel is
+  IChannel,
+  Initializable,
+  Rewards,
+  ChannelStorage,
+  Multicall,
+  ManagedChannel,
+  DeferredTokenAuthorization
+{
   /* -------------------------------------------------------------------------- */
   /*                                   ERRORS                                   */
   /* -------------------------------------------------------------------------- */
@@ -26,7 +35,6 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   error SoldOut();
   error AmountZero();
   error AmountExceedsMaxSupply();
-
   /* -------------------------------------------------------------------------- */
   /*                                   EVENTS                                   */
   /* -------------------------------------------------------------------------- */
@@ -67,10 +75,12 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     address[] calldata managers,
     bytes[] calldata setupActions,
     bytes calldata transportConfig
-  ) external payable nonReentrant initializer {
+  ) external nonReentrant initializer {
     __UUPSUpgradeable_init();
 
     __AccessControlEnumerable_init();
+
+    __DeferredTokenAuthorization_init();
 
     /// @dev temporarily set deployer as admin
     _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -88,7 +98,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     _setName(name);
 
     /// @dev set up the channel token
-    _setupNewToken(uri, 0, _implementation());
+    _setupNewToken(uri, 0, address(this));
 
     if (setupActions.length > 0) {
       multicall(setupActions);
@@ -106,7 +116,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
   function _transportProcessMint(uint256 tokenId) internal virtual;
 
-  function setTransportConfig(bytes calldata data) public payable virtual;
+  function setTransportConfig(bytes calldata data) public virtual;
 
   /* -------------------------------------------------------------------------- */
   /*                                 OVERRIDES                                  */
@@ -133,37 +143,12 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   }
 
   /**
-   * @notice Get the ETH mint price for tokens in the channel
-   * @return uint256 ETH price
-   */
-  function ethMintPrice() public view returns (uint256) {
-    return feeContract.getEthMintPrice();
-  }
-
-  /**
-   * @notice Get the ERC20 mint price for tokens in the channel
-   * @return uint256 ERC20 price
-   */
-  function erc20MintPrice() public view returns (uint256) {
-    return feeContract.getErc20MintPrice();
-  }
-
-  /**
    * @notice Used to get the token details
    * @param tokenId Token id
    * @return TokenConfig Token details
    */
   function getToken(uint256 tokenId) external view returns (TokenConfig memory) {
     return tokens[tokenId];
-  }
-
-  /**
-   * @notice Used to get the user stats
-   * @param user User address
-   * @return UserStats User stats
-   */
-  function getUserStats(address user) public view returns (UserStats memory) {
-    return userStats[user];
   }
 
   /**
@@ -230,24 +215,105 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
    * @notice Used to create a new token in the channel
    * Call the logic contract to check if the msg.sender is approved to create a new token
    * @param uri Token uri
-   * @param author Token author
    * @param maxSupply Token supply
    * @return tokenId Id of newly created token
    */
-  function createToken(
-    string calldata uri,
-    address author,
-    uint256 maxSupply
-  ) external nonReentrant returns (uint256 tokenId) {
-    tokenId = _setupNewToken(uri, maxSupply, author);
+  function createToken(string calldata uri, uint256 maxSupply) external nonReentrant returns (uint256 tokenId) {
+    tokenId = _setupNewToken(uri, maxSupply, msg.sender);
 
-    /// @dev increment the sponsor's numCreations
+    /// @dev increment the senders numCreations
     uint256 numUserCreations = _getAndUpdateUserCreations(msg.sender);
 
     _transportProcessNewToken(tokenId);
 
     /// @dev msg.sender used instead of author to allow for onchain sponsorships
-    _validateCreatorLogic(msg.sender, numUserCreations);
+    _validateLogic(msg.sender, numUserCreations, 0);
+  }
+
+  /**
+   * @notice create a token from signature and mint it to the to address with ERC20
+   * @param tokenPermission Token permission
+   * @param author Token author
+   * @param v Signature v
+   * @param r Signature r
+   * @param s Signature s
+   * @param to Address to mint to
+   * @param amount Amount to mint
+   * @param mintReferral Referral address for minting
+   * @param data Mint data
+   */
+  function sponsorWithERC20(
+    DeferredTokenAuthorization.DeferredTokenPermission memory tokenPermission,
+    address author,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    address to,
+    uint256 amount,
+    address mintReferral,
+    bytes memory data
+  ) external nonReentrant {
+    (uint256 tokenId, uint256 numUserCreations) = _processSponsoredToken(tokenPermission, author, v, r, s);
+
+    /// @dev mint the token to the sponsor
+    (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
+    _mintBatchWithERC20(to, ids, amounts, mintReferral, data);
+
+    /// @dev validate the creator logic
+    _validateLogic(msg.sender, numUserCreations, 0);
+  }
+
+  /**
+   * @notice create a token from signature and mint it to the to address with ETH
+   * @param tokenPermission Token permission
+   * @param author Token author
+   * @param v Signature v
+   * @param r Signature r
+   * @param s Signature s
+   * @param to Address to mint to
+   * @param amount Amount to mint
+   * @param mintReferral Referral address for minting
+   * @param data Mint data
+   */
+  function sponsorWithETH(
+    DeferredTokenAuthorization.DeferredTokenPermission memory tokenPermission,
+    address author,
+    uint8 v,
+    bytes32 r,
+    bytes32 s,
+    address to,
+    uint256 amount,
+    address mintReferral,
+    bytes memory data
+  ) external payable nonReentrant {
+    (uint256 tokenId, uint256 numUserCreations) = _processSponsoredToken(tokenPermission, author, v, r, s);
+
+    /// @dev mint the token to the sponsor
+    (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
+    _mintBatchWithETH(to, ids, amounts, mintReferral, data);
+
+    /// @dev validate the creator logic
+    _validateLogic(msg.sender, numUserCreations, 0);
+  }
+
+  function _processSponsoredToken(
+    DeferredTokenAuthorization.DeferredTokenPermission memory tokenPermission,
+    address author,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) internal returns (uint256, uint256) {
+    _validateDeferredTokenCreation(tokenPermission, author, v, r, s);
+
+    /// @dev create the token
+    uint256 tokenId = _setupNewToken(tokenPermission.uri, tokenPermission.maxSupply, author);
+
+    /// @dev increment the authors numCreations
+    uint256 numUserCreations = _getAndUpdateUserCreations(author);
+
+    _transportProcessNewToken(tokenId);
+
+    return (tokenId, numUserCreations);
   }
 
   /**
@@ -282,7 +348,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     uint256 amount,
     address mintReferral,
     bytes memory data
-  ) external payable nonReentrant {
+  ) external nonReentrant {
     (uint256[] memory ids, uint256[] memory amounts) = _toSingletonArrays(tokenId, amount);
     _mintBatchWithERC20(to, ids, amounts, mintReferral, data);
   }
@@ -319,7 +385,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
     uint256[] memory amounts,
     address mintReferral,
     bytes memory data
-  ) external payable nonReentrant {
+  ) external nonReentrant {
     _mintBatchWithERC20(to, ids, amounts, mintReferral, data);
   }
 
@@ -374,39 +440,36 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
   }
 
   /**
-   * @dev Validate the creator logic.
+   * @dev Validate the creator or minter logic.
    * @dev let execution continue or revert based on the logic contract.
-   * @param creator address of the creator.
+   * @param user address of the interactor.
+   * @param updatedInteractionCount updated number of interactions.
+   * @param mode 0 for creator, 1 for minter.
    */
-  function _validateCreatorLogic(address creator, uint256 updatedNumUserCreations) internal view {
-    /// @dev pass if no logic contract set
-    if (address(logicContract) == address(0)) return;
+  function _validateLogic(address user, uint256 updatedInteractionCount, uint8 mode) internal {
+    if (mode == 0) {
+      /// @dev pass if no logic contract set
+      if (address(logicContract) == address(0)) return;
 
-    uint256 maxTheoreticalCreatorPower = logicContract.calculateCreatorInteractionPower(creator);
+      uint256 maxTheoreticalCreatorPower = logicContract.calculateCreatorInteractionPower(user);
 
-    /// @dev pass if the maxTheoreticalCreatorPower is max uint256
-    if (maxTheoreticalCreatorPower == type(uint256).max) return;
+      /// @dev pass if the maxTheoreticalCreatorPower is max uint256
+      if (maxTheoreticalCreatorPower == type(uint256).max) return;
 
-    /// @dev revert if the updatedNumUserCreations is greater than the maxTheoreticalCreatorPower
-    if (updatedNumUserCreations > maxTheoreticalCreatorPower) revert InsufficientInteractionPower();
-  }
+      /// @dev revert if the updatedNumUserCreations is greater than the maxTheoreticalCreatorPower
+      if (updatedInteractionCount > maxTheoreticalCreatorPower) revert InsufficientInteractionPower();
+    } else {
+      /// @dev pass if no logic contract set
+      if (address(logicContract) == address(0)) return;
 
-  /**
-   * @dev Validate the minter logic.
-   * @dev let execution continue or revert based on the logic contract.
-   * @param minter address of the minter.
-   */
-  function _validateMinterLogic(address minter, uint256 updateNumUserMints) internal view {
-    /// @dev pass if no logic contract set
-    if (address(logicContract) == address(0)) return;
+      uint256 maxTheoreticalMinterPower = logicContract.calculateMinterInteractionPower(user);
 
-    uint256 maxTheoreticalMinterPower = logicContract.calculateMinterInteractionPower(minter);
+      /// @dev pass if the maxTheoreticalMinterPower is max uint256
+      if (maxTheoreticalMinterPower == type(uint256).max) return;
 
-    /// @dev pass if the maxTheoreticalMinterPower is max uint256
-    if (maxTheoreticalMinterPower == type(uint256).max) return;
-
-    /// @dev revert if the updateNumUserMints is greater than the maxTheoreticalMinterPower
-    if (updateNumUserMints > maxTheoreticalMinterPower) revert InsufficientInteractionPower();
+      /// @dev revert if the updateNumUserMints is greater than the maxTheoreticalMinterPower
+      if (updatedInteractionCount > maxTheoreticalMinterPower) revert InsufficientInteractionPower();
+    }
   }
 
   function _mintBatchWithETH(
@@ -427,7 +490,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
     _handleETHSplit(creators, sponsors, amounts, mintReferral);
 
-    _validateMinterLogic(msg.sender, updatedNumUserMints);
+    _validateLogic(msg.sender, updatedNumUserMints, 1);
     emit TokenMinted(to, mintReferral, ids, amounts, data);
   }
 
@@ -449,7 +512,7 @@ abstract contract Channel is IChannel, Initializable, Rewards, ChannelStorage, M
 
     _handleERC20Split(creators, sponsors, amounts, mintReferral);
 
-    _validateMinterLogic(msg.sender, updatedNumUserMints);
+    _validateLogic(msg.sender, updatedNumUserMints, 1);
     emit TokenMinted(to, mintReferral, ids, amounts, data);
   }
 

@@ -145,7 +145,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/templates/channel/rewardsMappings.ts
+      file: ./src/mappings/templates/rewards/rewardsMappings.ts
       entities:
         - RewardTransferEvent
       eventHandlers:

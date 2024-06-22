@@ -73,7 +73,7 @@ contract Rewards {
    * @dev deposit eth/erc20 for later distribution
    */
   function _depositToEscrow(address token, uint256 amount) internal {
-    _validateIncomingValue(token, amount);
+    _validateIncomingDeposit(token, amount);
 
     if (!token.isNativeToken()) {
       erc20Balances[token] += amount;
@@ -130,7 +130,10 @@ contract Rewards {
       }
     } else {
       for (uint256 i; i < split.recipients.length; i++) {
-        _transferExternalERC20(split.recipients[i], split.allocations[i], split.token);
+        if (msg.sender != split.recipients[i]) {
+          /// @dev if the recipient is the sender, no need to transfer
+          _transferExternalERC20(split.recipients[i], split.allocations[i], split.token);
+        }
       }
     }
   }
@@ -199,6 +202,19 @@ contract Rewards {
       // If the token is ETH, the total allocation must match the value sent
 
       if (msg.value != expectedValue) {
+        revert InvalidAmountSent();
+      }
+    } else if (msg.value != 0) {
+      // If the token is not ETH, the value sent must be 0
+      revert InvalidAmountSent();
+    }
+  }
+
+  function _validateIncomingDeposit(address token, uint256 expectedValue) internal view {
+    if (token.isNativeToken()) {
+      // If the token is ETH, the total allocation must match the value deposited during initialization
+
+      if (address(this).balance != expectedValue) {
         revert InvalidAmountSent();
       }
     } else if (msg.value != 0) {

@@ -47,8 +47,7 @@ contract InfiniteChannel is Channel, IVersionedContract {
    * @notice Set the sale duration for a channel
    * @param data encoded duration
    */
-  function setTransportConfig(bytes calldata data) public payable override onlyAdminOrManager {
-    if (msg.value > 0) revert("This function does not accept ether");
+  function setTransportConfig(bytes calldata data) public override onlyAdminOrManager {
     uint40 duration = abi.decode(data, (uint40));
     _setDuration(duration);
   }

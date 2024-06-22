@@ -86,7 +86,7 @@ contract InfiniteChannelTest is Test {
 
   function test_infChannel_revertOnSaleEnd() external {
     initializeSampleChannel(targetChannel, nick, "https://example.com/api/token/0", 1);
-    targetChannel.createToken("test", nick, 100);
+    targetChannel.createToken("test", 100);
 
     vm.warp(block.timestamp + 10);
     vm.expectRevert();

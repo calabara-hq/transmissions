@@ -14,7 +14,7 @@ import { OwnableUpgradeable } from "openzeppelin-contracts-upgradeable/access/Ow
 import { Initializable } from "openzeppelin-contracts-upgradeable/proxy/utils/Initializable.sol";
 import { UUPSUpgradeable } from "openzeppelin-contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
-
+import { SafeTransferLib } from "solady/utils/SafeTransferLib.sol";
 /**
  *
  * ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░))░░░░░░░░ *
@@ -48,6 +48,7 @@ import { IERC20 } from "openzeppelin-contracts/token/ERC20/IERC20.sol";
 contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, UUPSUpgradeable {
   using SafeERC20 for IERC20;
   using NativeTokenLib for address;
+  using SafeTransferLib for address;
 
   /* -------------------------------------------------------------------------- */
   /*                                   ERRORS                                   */
@@ -146,8 +147,11 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
     address newContract = address(new FiniteUplink1155(finiteChannelImpl));
 
     FiniteChannel.FiniteParams memory params = abi.decode(transportConfig, (FiniteChannel.FiniteParams));
-
-    if (!params.rewards.token.isNativeToken()) {
+    if (params.rewards.token.isNativeToken()) {
+      if (!newContract.trySafeTransferETH(msg.value, SafeTransferLib.GAS_STIPEND_NO_STORAGE_WRITES)) {
+        revert("ETH transfer failed");
+      }
+    } else {
       uint256 beforeBalance = IERC20(params.rewards.token).balanceOf(address(this));
       IERC20(params.rewards.token).safeTransferFrom(msg.sender, address(this), params.rewards.totalAllocation);
       uint256 afterBalance = IERC20(params.rewards.token).balanceOf(address(this));
@@ -202,14 +206,7 @@ contract ChannelFactory is IChannelFactory, Initializable, OwnableUpgradeable, U
     bytes calldata transportConfig
   ) private {
     emit SetupNewContract(newContract, uri, name, defaultAdmin, managers, transportConfig);
-    IChannel(newContract).initialize{ value: msg.value }(
-      uri,
-      name,
-      defaultAdmin,
-      managers,
-      setupActions,
-      transportConfig
-    );
+    IChannel(newContract).initialize(uri, name, defaultAdmin, managers, setupActions, transportConfig);
   }
 
   /* -------------------------------------------------------------------------- */

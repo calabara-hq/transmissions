@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { CustomFees } from "../fees/CustomFees.sol";
 import { Rewards } from "../rewards/Rewards.sol";
 import { IVersionedContract } from "./IVersionedContract.sol";
 

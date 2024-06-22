@@ -40,6 +40,27 @@ var channelAbi = [
   {
     type: "function",
     inputs: [],
+    name: "DEFERRED_TOKEN_TYPEHASH",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "DOMAIN_SEPARATOR",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "EIP712_DOMAIN_TYPEHASH",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
     name: "MANAGER_ROLE",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view"
@@ -82,7 +103,6 @@ var channelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
       { name: "maxSupply", internalType: "uint256", type: "uint256" }
     ],
     name: "createToken",
@@ -93,20 +113,6 @@ var channelAbi = [
     type: "function",
     inputs: [{ name: "", internalType: "address", type: "address" }],
     name: "erc20Balances",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "erc20MintPrice",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "ethMintPrice",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
@@ -163,23 +169,6 @@ var channelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "user", internalType: "address", type: "address" }],
-    name: "getUserStats",
-    outputs: [
-      {
-        name: "",
-        internalType: "struct ChannelStorage.UserStats",
-        type: "tuple",
-        components: [
-          { name: "numCreations", internalType: "uint256", type: "uint256" },
-          { name: "numMints", internalType: "uint256", type: "uint256" }
-        ]
-      }
-    ],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "role", internalType: "bytes32", type: "bytes32" },
       { name: "account", internalType: "address", type: "address" }
@@ -210,7 +199,7 @@ var channelAbi = [
     ],
     name: "initialize",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -267,7 +256,7 @@ var channelAbi = [
     ],
     name: "mintBatchWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -293,7 +282,7 @@ var channelAbi = [
     ],
     name: "mintWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -307,13 +296,6 @@ var channelAbi = [
     inputs: [],
     name: "name",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "nextTokenId",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -412,6 +394,60 @@ var channelAbi = [
     inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
     name: "setTransportConfig",
     outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithERC20",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithETH",
+    outputs: [],
     stateMutability: "payable"
   },
   {
@@ -419,19 +455,6 @@ var channelAbi = [
     inputs: [{ name: "interfaceId", internalType: "bytes4", type: "bytes4" }],
     name: "supportsInterface",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    name: "tokens",
-    outputs: [
-      { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
-      { name: "maxSupply", internalType: "uint256", type: "uint256" },
-      { name: "totalMinted", internalType: "uint256", type: "uint256" },
-      { name: "sponsor", internalType: "address", type: "address" }
-    ],
     stateMutability: "view"
   },
   {
@@ -473,16 +496,6 @@ var channelAbi = [
     inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "address", type: "address" }],
-    name: "userStats",
-    outputs: [
-      { name: "numCreations", internalType: "uint256", type: "uint256" },
-      { name: "numMints", internalType: "uint256", type: "uint256" }
-    ],
     stateMutability: "view"
   },
   {
@@ -952,6 +965,7 @@ var channelAbi = [
   { type: "error", inputs: [], name: "InsufficientInteractionPower" },
   { type: "error", inputs: [], name: "InvalidAmountSent" },
   { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
   { type: "error", inputs: [], name: "InvalidTotalAllocation" },
   { type: "error", inputs: [], name: "InvalidUpgrade" },
   { type: "error", inputs: [], name: "NotInitializing" },
@@ -962,6 +976,7 @@ var channelAbi = [
     inputs: [{ name: "token", internalType: "address", type: "address" }],
     name: "SafeERC20FailedOperation"
   },
+  { type: "error", inputs: [], name: "SignatureExpired" },
   { type: "error", inputs: [], name: "SoldOut" },
   { type: "error", inputs: [], name: "SplitLengthMismatch" },
   { type: "error", inputs: [], name: "UUPSUnauthorizedCallContext" },
@@ -1622,10 +1637,33 @@ var finiteChannelAbi = [
     ],
     stateMutability: "nonpayable"
   },
+  { type: "fallback", stateMutability: "payable" },
+  { type: "receive", stateMutability: "payable" },
   {
     type: "function",
     inputs: [],
     name: "DEFAULT_ADMIN_ROLE",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "DEFERRED_TOKEN_TYPEHASH",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "DOMAIN_SEPARATOR",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "EIP712_DOMAIN_TYPEHASH",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view"
   },
@@ -1695,7 +1733,6 @@ var finiteChannelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
       { name: "maxSupply", internalType: "uint256", type: "uint256" }
     ],
     name: "createToken",
@@ -1706,20 +1743,6 @@ var finiteChannelAbi = [
     type: "function",
     inputs: [{ name: "", internalType: "address", type: "address" }],
     name: "erc20Balances",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "erc20MintPrice",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "ethMintPrice",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
@@ -1798,23 +1821,6 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "user", internalType: "address", type: "address" }],
-    name: "getUserStats",
-    outputs: [
-      {
-        name: "",
-        internalType: "struct ChannelStorage.UserStats",
-        type: "tuple",
-        components: [
-          { name: "numCreations", internalType: "uint256", type: "uint256" },
-          { name: "numMints", internalType: "uint256", type: "uint256" }
-        ]
-      }
-    ],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "role", internalType: "bytes32", type: "bytes32" },
       { name: "account", internalType: "address", type: "address" }
@@ -1835,13 +1841,6 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [],
-    name: "head",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
       { name: "name", internalType: "string", type: "string" },
@@ -1852,7 +1851,7 @@ var finiteChannelAbi = [
     ],
     name: "initialize",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -1876,13 +1875,6 @@ var finiteChannelAbi = [
     inputs: [{ name: "addr", internalType: "address", type: "address" }],
     name: "isManager",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "length",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -1916,7 +1908,7 @@ var finiteChannelAbi = [
     ],
     name: "mintBatchWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -1942,7 +1934,7 @@ var finiteChannelAbi = [
     ],
     name: "mintWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -1956,24 +1948,6 @@ var finiteChannelAbi = [
     inputs: [],
     name: "name",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "nextTokenId",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    name: "nodes",
-    outputs: [
-      { name: "next", internalType: "bytes32", type: "bytes32" },
-      { name: "prev", internalType: "bytes32", type: "bytes32" },
-      { name: "tokenId", internalType: "uint256", type: "uint256" }
-    ],
     stateMutability: "view"
   },
   {
@@ -2072,7 +2046,7 @@ var finiteChannelAbi = [
     inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
     name: "setTransportConfig",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -2083,29 +2057,63 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithERC20",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithETH",
+    outputs: [],
+    stateMutability: "payable"
+  },
+  {
+    type: "function",
     inputs: [{ name: "interfaceId", internalType: "bytes4", type: "bytes4" }],
     name: "supportsInterface",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "tail",
-    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    name: "tokens",
-    outputs: [
-      { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
-      { name: "maxSupply", internalType: "uint256", type: "uint256" },
-      { name: "totalMinted", internalType: "uint256", type: "uint256" },
-      { name: "sponsor", internalType: "address", type: "address" }
-    ],
     stateMutability: "view"
   },
   {
@@ -2147,16 +2155,6 @@ var finiteChannelAbi = [
     inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "address", type: "address" }],
-    name: "userStats",
-    outputs: [
-      { name: "numCreations", internalType: "uint256", type: "uint256" },
-      { name: "numMints", internalType: "uint256", type: "uint256" }
-    ],
     stateMutability: "view"
   },
   {
@@ -2651,6 +2649,8 @@ var finiteChannelAbi = [
   { type: "error", inputs: [], name: "InsufficientInteractionPower" },
   { type: "error", inputs: [], name: "InvalidAmountSent" },
   { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "InvalidRewards" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
   { type: "error", inputs: [], name: "InvalidTiming" },
   { type: "error", inputs: [], name: "InvalidTotalAllocation" },
   { type: "error", inputs: [], name: "InvalidUpgrade" },
@@ -2664,6 +2664,7 @@ var finiteChannelAbi = [
     inputs: [{ name: "token", internalType: "address", type: "address" }],
     name: "SafeERC20FailedOperation"
   },
+  { type: "error", inputs: [], name: "SignatureExpired" },
   { type: "error", inputs: [], name: "SoldOut" },
   { type: "error", inputs: [], name: "SplitLengthMismatch" },
   { type: "error", inputs: [], name: "StillActive" },
@@ -2688,6 +2689,27 @@ var infiniteChannelAbi = [
     type: "function",
     inputs: [],
     name: "DEFAULT_ADMIN_ROLE",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "DEFERRED_TOKEN_TYPEHASH",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "DOMAIN_SEPARATOR",
+    outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
+    stateMutability: "view"
+  },
+  {
+    type: "function",
+    inputs: [],
+    name: "EIP712_DOMAIN_TYPEHASH",
     outputs: [{ name: "", internalType: "bytes32", type: "bytes32" }],
     stateMutability: "view"
   },
@@ -2757,7 +2779,6 @@ var infiniteChannelAbi = [
     type: "function",
     inputs: [
       { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
       { name: "maxSupply", internalType: "uint256", type: "uint256" }
     ],
     name: "createToken",
@@ -2768,20 +2789,6 @@ var infiniteChannelAbi = [
     type: "function",
     inputs: [{ name: "", internalType: "address", type: "address" }],
     name: "erc20Balances",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "erc20MintPrice",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "ethMintPrice",
     outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
@@ -2838,23 +2845,6 @@ var infiniteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "user", internalType: "address", type: "address" }],
-    name: "getUserStats",
-    outputs: [
-      {
-        name: "",
-        internalType: "struct ChannelStorage.UserStats",
-        type: "tuple",
-        components: [
-          { name: "numCreations", internalType: "uint256", type: "uint256" },
-          { name: "numMints", internalType: "uint256", type: "uint256" }
-        ]
-      }
-    ],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "role", internalType: "bytes32", type: "bytes32" },
       { name: "account", internalType: "address", type: "address" }
@@ -2885,7 +2875,7 @@ var infiniteChannelAbi = [
     ],
     name: "initialize",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -2942,7 +2932,7 @@ var infiniteChannelAbi = [
     ],
     name: "mintBatchWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -2968,7 +2958,7 @@ var infiniteChannelAbi = [
     ],
     name: "mintWithERC20",
     outputs: [],
-    stateMutability: "payable"
+    stateMutability: "nonpayable"
   },
   {
     type: "function",
@@ -2982,13 +2972,6 @@ var infiniteChannelAbi = [
     inputs: [],
     name: "name",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [],
-    name: "nextTokenId",
-    outputs: [{ name: "", internalType: "uint256", type: "uint256" }],
     stateMutability: "view"
   },
   {
@@ -3101,6 +3084,60 @@ var infiniteChannelAbi = [
     inputs: [{ name: "data", internalType: "bytes", type: "bytes" }],
     name: "setTransportConfig",
     outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithERC20",
+    outputs: [],
+    stateMutability: "nonpayable"
+  },
+  {
+    type: "function",
+    inputs: [
+      {
+        name: "tokenPermission",
+        internalType: "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        type: "tuple",
+        components: [
+          { name: "uri", internalType: "string", type: "string" },
+          { name: "maxSupply", internalType: "uint256", type: "uint256" },
+          { name: "deadline", internalType: "uint256", type: "uint256" },
+          { name: "nonce", internalType: "bytes32", type: "bytes32" }
+        ]
+      },
+      { name: "author", internalType: "address", type: "address" },
+      { name: "v", internalType: "uint8", type: "uint8" },
+      { name: "r", internalType: "bytes32", type: "bytes32" },
+      { name: "s", internalType: "bytes32", type: "bytes32" },
+      { name: "to", internalType: "address", type: "address" },
+      { name: "amount", internalType: "uint256", type: "uint256" },
+      { name: "mintReferral", internalType: "address", type: "address" },
+      { name: "data", internalType: "bytes", type: "bytes" }
+    ],
+    name: "sponsorWithETH",
+    outputs: [],
     stateMutability: "payable"
   },
   {
@@ -3108,19 +3145,6 @@ var infiniteChannelAbi = [
     inputs: [{ name: "interfaceId", internalType: "bytes4", type: "bytes4" }],
     name: "supportsInterface",
     outputs: [{ name: "", internalType: "bool", type: "bool" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "uint256", type: "uint256" }],
-    name: "tokens",
-    outputs: [
-      { name: "uri", internalType: "string", type: "string" },
-      { name: "author", internalType: "address", type: "address" },
-      { name: "maxSupply", internalType: "uint256", type: "uint256" },
-      { name: "totalMinted", internalType: "uint256", type: "uint256" },
-      { name: "sponsor", internalType: "address", type: "address" }
-    ],
     stateMutability: "view"
   },
   {
@@ -3162,16 +3186,6 @@ var infiniteChannelAbi = [
     inputs: [{ name: "tokenId", internalType: "uint256", type: "uint256" }],
     name: "uri",
     outputs: [{ name: "", internalType: "string", type: "string" }],
-    stateMutability: "view"
-  },
-  {
-    type: "function",
-    inputs: [{ name: "", internalType: "address", type: "address" }],
-    name: "userStats",
-    outputs: [
-      { name: "numCreations", internalType: "uint256", type: "uint256" },
-      { name: "numMints", internalType: "uint256", type: "uint256" }
-    ],
     stateMutability: "view"
   },
   {
@@ -3666,6 +3680,7 @@ var infiniteChannelAbi = [
   { type: "error", inputs: [], name: "InsufficientInteractionPower" },
   { type: "error", inputs: [], name: "InvalidAmountSent" },
   { type: "error", inputs: [], name: "InvalidInitialization" },
+  { type: "error", inputs: [], name: "InvalidSignature" },
   { type: "error", inputs: [], name: "InvalidTiming" },
   { type: "error", inputs: [], name: "InvalidTotalAllocation" },
   { type: "error", inputs: [], name: "InvalidUpgrade" },
@@ -3678,6 +3693,7 @@ var infiniteChannelAbi = [
     name: "SafeERC20FailedOperation"
   },
   { type: "error", inputs: [], name: "SaleOver" },
+  { type: "error", inputs: [], name: "SignatureExpired" },
   { type: "error", inputs: [], name: "SoldOut" },
   { type: "error", inputs: [], name: "SplitLengthMismatch" },
   { type: "error", inputs: [], name: "UUPSUnauthorizedCallContext" },

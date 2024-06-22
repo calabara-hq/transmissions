@@ -120,7 +120,8 @@ contract FiniteChannelTest is Test {
     uint256[] memory allocations = new uint256[](1);
     allocations[0] = 1;
 
-    targetChannel.initialize{ value: 1 }(
+    vm.deal(address(targetChannel), 1);
+    targetChannel.initialize(
       "https://example.com/api/token/0",
       "my contract",
       admin,
@@ -135,7 +136,8 @@ contract FiniteChannelTest is Test {
     uint256[] memory allocations,
     uint256 totalAllocation
   ) internal {
-    targetChannel.initialize{ value: totalAllocation }(
+    vm.deal(address(targetChannel), totalAllocation);
+    targetChannel.initialize(
       "https://example.com/api/token/0",
       "my contract",
       admin,
@@ -272,7 +274,7 @@ contract FiniteChannelTest is Test {
     address sampleCreator = makeAddr("sampleCreator");
 
     for (uint8 i = 0; i < numSubmissions; i++) {
-      targetChannel.createToken("test", sampleCreator, 1000);
+      targetChannel.createToken("test", 1000);
     }
 
     vm.warp(block.timestamp + 10);
@@ -396,8 +398,9 @@ contract FiniteChannelTest is Test {
 
     initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
 
+    vm.deal(address(targetChannel), 1);
     vm.expectRevert();
-    targetChannel.setTransportConfig{ value: 1 }(
+    targetChannel.setTransportConfig(
       createEncodedFiniteParams(
         uint80(block.timestamp),
         uint80(block.timestamp + 1),
@@ -429,14 +432,14 @@ contract FiniteChannelTest is Test {
     );
 
     vm.expectRevert(FiniteChannel.NotAcceptingCreations.selector);
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
 
     vm.warp(block.timestamp + 10);
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
 
     vm.warp(block.timestamp + 100);
     vm.expectRevert(FiniteChannel.NotAcceptingCreations.selector);
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
   }
 
   function test_finiteChannel_timingValidationOnMintToken() public {
@@ -446,7 +449,7 @@ contract FiniteChannelTest is Test {
       uint80(block.timestamp + 20)
     );
 
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
 
     vm.expectRevert(FiniteChannel.NotAcceptingMints.selector);
     targetChannel.mint(minter, 1, 1, referral, "");
@@ -481,7 +484,7 @@ contract FiniteChannelTest is Test {
     targetChannel.settle();
 
     vm.expectRevert();
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
 
     vm.expectRevert();
     targetChannel.mint(minter, 1, 1, referral, "");
@@ -499,7 +502,7 @@ contract FiniteChannelTest is Test {
     vm.stopPrank();
 
     vm.expectRevert();
-    targetChannel.createToken("test", creator, 1000);
+    targetChannel.createToken("test", 1000);
 
     vm.expectRevert();
     targetChannel.mint(minter, 1, 1, referral, "");
@@ -522,7 +525,7 @@ contract FiniteChannelTest is Test {
 
     initializeChannelWithETHRewards(_ranks, _allocations, _totalAllocation);
 
-    targetChannel.createToken("test", creator, 100);
+    targetChannel.createToken("test", 100);
 
     vm.warp(block.timestamp + 10);
     targetChannel.mint(minter, 1, 10, referral, "");

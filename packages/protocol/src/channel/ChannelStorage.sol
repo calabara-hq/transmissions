@@ -11,10 +11,12 @@ import { IUpgradePath } from "../interfaces/IUpgradePath.sol";
 contract ChannelStorage {
   /// @dev channel name
   string public name;
+
   /// @dev channel tokens
-  mapping(uint256 => TokenConfig) public tokens;
+  mapping(uint256 => TokenConfig) internal tokens;
+
   /// @dev token id counter
-  uint256 public nextTokenId;
+  uint256 internal nextTokenId;
 
   /// @dev channel fee contract
   IFees public feeContract;
@@ -22,7 +24,7 @@ contract ChannelStorage {
   ILogic public logicContract;
 
   /// @dev user stats
-  mapping(address => UserStats) public userStats;
+  mapping(address => UserStats) internal userStats;
 
   struct UserStats {
     /// @dev number of tokens created by user

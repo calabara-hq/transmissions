@@ -15,6 +15,45 @@
   {
     "type": "function",
     "inputs": [],
+    "name": "DEFERRED_TOKEN_TYPEHASH",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
+    "name": "EIP712_DOMAIN_TYPEHASH",
+    "outputs": [
+      {
+        "name": "",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "inputs": [],
     "name": "MANAGER_ROLE",
     "outputs": [
       {
@@ -108,11 +147,6 @@
         "type": "string"
       },
       {
-        "name": "author",
-        "internalType": "address",
-        "type": "address"
-      },
-      {
         "name": "maxSupply",
         "internalType": "uint256",
         "type": "uint256"
@@ -138,32 +172,6 @@
       }
     ],
     "name": "erc20Balances",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "uint256",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [],
-    "name": "erc20MintPrice",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "uint256",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [],
-    "name": "ethMintPrice",
     "outputs": [
       {
         "name": "",
@@ -298,37 +306,6 @@
     "type": "function",
     "inputs": [
       {
-        "name": "user",
-        "internalType": "address",
-        "type": "address"
-      }
-    ],
-    "name": "getUserStats",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "struct ChannelStorage.UserStats",
-        "type": "tuple",
-        "components": [
-          {
-            "name": "numCreations",
-            "internalType": "uint256",
-            "type": "uint256"
-          },
-          {
-            "name": "numMints",
-            "internalType": "uint256",
-            "type": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [
-      {
         "name": "role",
         "internalType": "bytes32",
         "type": "bytes32"
@@ -403,7 +380,7 @@
     ],
     "name": "initialize",
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -544,7 +521,7 @@
     ],
     "name": "mintBatchWithERC20",
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -610,7 +587,7 @@
     ],
     "name": "mintWithERC20",
     "outputs": [],
-    "stateMutability": "payable"
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -640,19 +617,6 @@
         "name": "",
         "internalType": "string",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [],
-    "name": "nextTokenId",
-    "outputs": [
-      {
-        "name": "",
-        "internalType": "uint256",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -855,6 +819,156 @@
     ],
     "name": "setTransportConfig",
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "tokenPermission",
+        "internalType": "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "uri",
+            "internalType": "string",
+            "type": "string"
+          },
+          {
+            "name": "maxSupply",
+            "internalType": "uint256",
+            "type": "uint256"
+          },
+          {
+            "name": "deadline",
+            "internalType": "uint256",
+            "type": "uint256"
+          },
+          {
+            "name": "nonce",
+            "internalType": "bytes32",
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "name": "author",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "v",
+        "internalType": "uint8",
+        "type": "uint8"
+      },
+      {
+        "name": "r",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      },
+      {
+        "name": "s",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      },
+      {
+        "name": "to",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "internalType": "uint256",
+        "type": "uint256"
+      },
+      {
+        "name": "mintReferral",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes"
+      }
+    ],
+    "name": "sponsorWithERC20",
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "inputs": [
+      {
+        "name": "tokenPermission",
+        "internalType": "struct DeferredTokenAuthorization.DeferredTokenPermission",
+        "type": "tuple",
+        "components": [
+          {
+            "name": "uri",
+            "internalType": "string",
+            "type": "string"
+          },
+          {
+            "name": "maxSupply",
+            "internalType": "uint256",
+            "type": "uint256"
+          },
+          {
+            "name": "deadline",
+            "internalType": "uint256",
+            "type": "uint256"
+          },
+          {
+            "name": "nonce",
+            "internalType": "bytes32",
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "name": "author",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "v",
+        "internalType": "uint8",
+        "type": "uint8"
+      },
+      {
+        "name": "r",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      },
+      {
+        "name": "s",
+        "internalType": "bytes32",
+        "type": "bytes32"
+      },
+      {
+        "name": "to",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "internalType": "uint256",
+        "type": "uint256"
+      },
+      {
+        "name": "mintReferral",
+        "internalType": "address",
+        "type": "address"
+      },
+      {
+        "name": "data",
+        "internalType": "bytes",
+        "type": "bytes"
+      }
+    ],
+    "name": "sponsorWithETH",
+    "outputs": [],
     "stateMutability": "payable"
   },
   {
@@ -872,45 +986,6 @@
         "name": "",
         "internalType": "bool",
         "type": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [
-      {
-        "name": "",
-        "internalType": "uint256",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokens",
-    "outputs": [
-      {
-        "name": "uri",
-        "internalType": "string",
-        "type": "string"
-      },
-      {
-        "name": "author",
-        "internalType": "address",
-        "type": "address"
-      },
-      {
-        "name": "maxSupply",
-        "internalType": "uint256",
-        "type": "uint256"
-      },
-      {
-        "name": "totalMinted",
-        "internalType": "uint256",
-        "type": "uint256"
-      },
-      {
-        "name": "sponsor",
-        "internalType": "address",
-        "type": "address"
       }
     ],
     "stateMutability": "view"
@@ -992,30 +1067,6 @@
         "name": "",
         "internalType": "string",
         "type": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "inputs": [
-      {
-        "name": "",
-        "internalType": "address",
-        "type": "address"
-      }
-    ],
-    "name": "userStats",
-    "outputs": [
-      {
-        "name": "numCreations",
-        "internalType": "uint256",
-        "type": "uint256"
-      },
-      {
-        "name": "numMints",
-        "internalType": "uint256",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view"
@@ -1702,6 +1753,11 @@
   {
     "type": "error",
     "inputs": [],
+    "name": "InvalidSignature"
+  },
+  {
+    "type": "error",
+    "inputs": [],
     "name": "InvalidTotalAllocation"
   },
   {
@@ -1734,6 +1790,11 @@
       }
     ],
     "name": "SafeERC20FailedOperation"
+  },
+  {
+    "type": "error",
+    "inputs": [],
+    "name": "SignatureExpired"
   },
   {
     "type": "error",

@@ -2,17 +2,17 @@
   "chainid": "84532",
   "network": "base-sepolia",
   "channelFactory": {
-    "address": "0xc297A1E85Eb13585E37670470d38f1C76730C4D8",
+    "address": "0x5433f79E82c136C9c2dc2f48d229627F7920acAf",
     "startBlock": "10883135",
     "version": "1"
   },
   "customFees": {
-    "address": "0x6D6B7FA3F48065c2db6B75d0395D3F0C38846960",
+    "address": "0x2e407758a16fa3f7D464BA6146C3cC7F1854a089",
     "startBlock": "10883135",
     "version": "1"
   },
   "dynamicLogic": {
-    "address": "0xE832b31E0F12B756Beb3779AD5FBE9B5Ab8B0208",
+    "address": "0x9674f70c5cEb61f990977D325AbF2C0201a4c520",
     "startBlock": "10883135",
     "version": "1"
   }
