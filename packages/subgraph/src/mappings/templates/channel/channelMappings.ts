@@ -15,22 +15,9 @@ import {
     ManagersUpdated,
     TokenCreated,
     TokenMinted,
-    TokenURIUpdated,
     TransferBatch,
     TransferSingle
 } from "../../../generated/templates/Channel/Channel";
-
-
-export function handleTokenURIUpdated(event: TokenURIUpdated): void {
-
-    let channel = getOrCreateChannel(event.address.toHexString());
-    let token = getOrCreateToken(channel.id + '-' + event.params.tokenId.toString());
-
-    channel.uri = event.params.uri;
-    token.uri = event.params.uri;
-    token.save();
-    channel.save();
-}
 
 
 export function handleUpdateChannelMetadata(event: ChannelMetadataUpdated): void {

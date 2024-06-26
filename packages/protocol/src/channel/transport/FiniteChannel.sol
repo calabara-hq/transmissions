@@ -50,9 +50,9 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
   }
 
   struct FiniteParams {
-    uint80 createStart;
-    uint80 mintStart;
-    uint80 mintEnd;
+    uint40 createStart;
+    uint40 mintStart;
+    uint40 mintEnd;
     FiniteRewards rewards;
   }
 
@@ -306,7 +306,7 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     _processIncoming(tokenId);
   }
 
-  function _validateTimingParameters(uint80 _createStart, uint80 _mintStart, uint80 _mintEnd) internal pure {
+  function _validateTimingParameters(uint40 _createStart, uint40 _mintStart, uint40 _mintEnd) internal pure {
     if (_createStart >= _mintStart || _mintStart >= _mintEnd) {
       revert InvalidTiming();
     }

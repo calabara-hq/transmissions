@@ -109,9 +109,9 @@ contract ChannelFactoryTest is Test {
       new bytes[](0),
       abi.encode(
         FiniteChannel.FiniteParams({
-          createStart: uint80(block.timestamp),
-          mintStart: uint80(block.timestamp + 1),
-          mintEnd: uint80(block.timestamp + 20),
+          createStart: uint40(block.timestamp),
+          mintStart: uint40(block.timestamp + 1),
+          mintEnd: uint40(block.timestamp + 20),
           rewards: FiniteChannel.FiniteRewards({
             ranks: ranks,
             allocations: allocations,
@@ -143,9 +143,9 @@ contract ChannelFactoryTest is Test {
       new bytes[](0),
       abi.encode(
         FiniteChannel.FiniteParams({
-          createStart: uint80(block.timestamp),
-          mintStart: uint80(block.timestamp + 1),
-          mintEnd: uint80(block.timestamp + 20),
+          createStart: uint40(block.timestamp),
+          mintStart: uint40(block.timestamp + 1),
+          mintEnd: uint40(block.timestamp + 20),
           rewards: FiniteChannel.FiniteRewards({
             ranks: ranks,
             allocations: allocations,

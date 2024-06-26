@@ -547,18 +547,18 @@
     "inputs": [
       {
         "name": "createStart",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       },
       {
         "name": "mintStart",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       },
       {
         "name": "mintEnd",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       }
     ],
     "outputs": [],

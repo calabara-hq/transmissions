@@ -20,7 +20,6 @@ interface IChannel {
   function setFees(address fees, bytes calldata data) external;
   function setLogic(address logic, bytes calldata creatorLogic, bytes calldata minterLogic) external;
   function updateChannelMetadata(string calldata name, string calldata uri) external;
-  function updateChannelTokenUri(string calldata uri) external;
   function createToken(string calldata uri, uint256 maxSupply) external returns (uint256 tokenId);
   function sponsorWithERC20(
     DeferredTokenAuthorization.DeferredTokenPermission memory tokenPermission,

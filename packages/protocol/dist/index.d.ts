@@ -788,16 +788,6 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }];
-    readonly name: "updateChannelTokenUri";
-    readonly outputs: readonly [];
-    readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "newImplementation";
         readonly internalType: "address";
         readonly type: "address";
@@ -1104,21 +1094,6 @@ export declare const channelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "TokenMinted";
-}, {
-    readonly type: "event";
-    readonly anonymous: false;
-    readonly inputs: readonly [{
-        readonly name: "tokenId";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-        readonly indexed: true;
-    }, {
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-        readonly indexed: false;
-    }];
-    readonly name: "TokenURIUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;
@@ -2555,16 +2530,16 @@ export declare const finiteChannelAbi: readonly [{
     readonly name: "finiteChannelParams";
     readonly outputs: readonly [{
         readonly name: "createStart";
-        readonly internalType: "uint80";
-        readonly type: "uint80";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
     }, {
         readonly name: "mintStart";
-        readonly internalType: "uint80";
-        readonly type: "uint80";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
     }, {
         readonly name: "mintEnd";
-        readonly internalType: "uint80";
-        readonly type: "uint80";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
     }, {
         readonly name: "rewards";
         readonly internalType: "struct FiniteChannel.FiniteRewards";
@@ -3236,16 +3211,6 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }];
-    readonly name: "updateChannelTokenUri";
-    readonly outputs: readonly [];
-    readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "newImplementation";
         readonly internalType: "address";
         readonly type: "address";
@@ -3580,21 +3545,6 @@ export declare const finiteChannelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "TokenMinted";
-}, {
-    readonly type: "event";
-    readonly anonymous: false;
-    readonly inputs: readonly [{
-        readonly name: "tokenId";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-        readonly indexed: true;
-    }, {
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-        readonly indexed: false;
-    }];
-    readonly name: "TokenURIUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;
@@ -4773,16 +4723,6 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "function";
     readonly inputs: readonly [{
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-    }];
-    readonly name: "updateChannelTokenUri";
-    readonly outputs: readonly [];
-    readonly stateMutability: "nonpayable";
-}, {
-    readonly type: "function";
-    readonly inputs: readonly [{
         readonly name: "newImplementation";
         readonly internalType: "address";
         readonly type: "address";
@@ -5109,21 +5049,6 @@ export declare const infiniteChannelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "TokenSaleSet";
-}, {
-    readonly type: "event";
-    readonly anonymous: false;
-    readonly inputs: readonly [{
-        readonly name: "tokenId";
-        readonly internalType: "uint256";
-        readonly type: "uint256";
-        readonly indexed: true;
-    }, {
-        readonly name: "uri";
-        readonly internalType: "string";
-        readonly type: "string";
-        readonly indexed: false;
-    }];
-    readonly name: "TokenURIUpdated";
 }, {
     readonly type: "event";
     readonly anonymous: false;

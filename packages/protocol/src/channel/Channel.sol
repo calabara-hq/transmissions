@@ -53,7 +53,6 @@ abstract contract Channel is
     bytes data
   );
 
-  event TokenURIUpdated(uint256 indexed tokenId, string uri);
   event ChannelMetadataUpdated(address indexed updater, string channelName, string uri);
   event ConfigUpdated(
     address indexed updater,
@@ -163,15 +162,6 @@ abstract contract Channel is
   }
 
   /**
-   * @notice Used to update the default channel token uri
-   * @param uri Token uri
-   */
-  function updateChannelTokenUri(string calldata uri) external onlyAdminOrManager {
-    tokens[0].uri = uri;
-    emit TokenURIUpdated(0, uri);
-  }
-
-  /**
    * @notice Set the logic structure for the channel
    * @dev Address 0 is acceptable, and is treated as a no-op on logic validation
    * @dev Only call into the logic contract if the address is not 0
@@ -226,7 +216,6 @@ abstract contract Channel is
 
     _transportProcessNewToken(tokenId);
 
-    /// @dev msg.sender used instead of author to allow for onchain sponsorships
     _validateLogic(msg.sender, numUserCreations, 0);
   }
 

@@ -476,13 +476,6 @@ var channelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "uri", internalType: "string", type: "string" }],
-    name: "updateChannelTokenUri",
-    outputs: [],
-    stateMutability: "nonpayable"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "newImplementation", internalType: "address", type: "address" },
       { name: "data", internalType: "bytes", type: "bytes" }
@@ -800,20 +793,6 @@ var channelAbi = [
       { name: "data", internalType: "bytes", type: "bytes", indexed: false }
     ],
     name: "TokenMinted"
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true
-      },
-      { name: "uri", internalType: "string", type: "string", indexed: false }
-    ],
-    name: "TokenURIUpdated"
   },
   {
     type: "event",
@@ -1758,9 +1737,9 @@ var finiteChannelAbi = [
     inputs: [],
     name: "finiteChannelParams",
     outputs: [
-      { name: "createStart", internalType: "uint80", type: "uint80" },
-      { name: "mintStart", internalType: "uint80", type: "uint80" },
-      { name: "mintEnd", internalType: "uint80", type: "uint80" },
+      { name: "createStart", internalType: "uint40", type: "uint40" },
+      { name: "mintStart", internalType: "uint40", type: "uint40" },
+      { name: "mintEnd", internalType: "uint40", type: "uint40" },
       {
         name: "rewards",
         internalType: "struct FiniteChannel.FiniteRewards",
@@ -2135,13 +2114,6 @@ var finiteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "uri", internalType: "string", type: "string" }],
-    name: "updateChannelTokenUri",
-    outputs: [],
-    stateMutability: "nonpayable"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "newImplementation", internalType: "address", type: "address" },
       { name: "data", internalType: "bytes", type: "bytes" }
@@ -2483,20 +2455,6 @@ var finiteChannelAbi = [
       { name: "data", internalType: "bytes", type: "bytes", indexed: false }
     ],
     name: "TokenMinted"
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true
-      },
-      { name: "uri", internalType: "string", type: "string", indexed: false }
-    ],
-    name: "TokenURIUpdated"
   },
   {
     type: "event",
@@ -3166,13 +3124,6 @@ var infiniteChannelAbi = [
   },
   {
     type: "function",
-    inputs: [{ name: "uri", internalType: "string", type: "string" }],
-    name: "updateChannelTokenUri",
-    outputs: [],
-    stateMutability: "nonpayable"
-  },
-  {
-    type: "function",
     inputs: [
       { name: "newImplementation", internalType: "address", type: "address" },
       { name: "data", internalType: "bytes", type: "bytes" }
@@ -3515,20 +3466,6 @@ var infiniteChannelAbi = [
       }
     ],
     name: "TokenSaleSet"
-  },
-  {
-    type: "event",
-    anonymous: false,
-    inputs: [
-      {
-        name: "tokenId",
-        internalType: "uint256",
-        type: "uint256",
-        indexed: true
-      },
-      { name: "uri", internalType: "string", type: "string", indexed: false }
-    ],
-    name: "TokenURIUpdated"
   },
   {
     type: "event",

@@ -7,7 +7,7 @@ dataSources:
     network: base-sepolia
     source:
       abi: ChannelFactory
-      address: "0x5433f79E82c136C9c2dc2f48d229627F7920acAf"
+      address: "0x25196Db9772e46F58A56B4E51B69709B483F4bEc"
       startBlock: 10883135
     mapping:
       kind: ethereum/events
@@ -29,7 +29,7 @@ dataSources:
     network: base-sepolia
     source:
       abi: CustomFees
-      address: "0x2e407758a16fa3f7D464BA6146C3cC7F1854a089"
+      address: "0x59A10Cf3D703FE4c2C4dea9Dad39940fb7162e02"
       startBlock: 10883135
     mapping:
       kind: ethereum/events
@@ -50,7 +50,7 @@ dataSources:
     network: base-sepolia
     source:
       abi: DynamicLogic
-      address: "0x9674f70c5cEb61f990977D325AbF2C0201a4c520"
+      address: "0x2383FcF6F4596ba26f002EB4cA8540bEB460aB8D"
       startBlock: 10883135
     mapping:
       kind: ethereum/events
@@ -92,8 +92,6 @@ templates:
         - name: Channel
           file: ./abis/Channel.json
       eventHandlers:
-        - event: TokenURIUpdated(indexed uint256,string)
-          handler: handleUpdateTokenURI
         - event: ManagersUpdated(address[])
           handler: handleUpdateManagers
         - event: ManagerRenounced(indexed address)

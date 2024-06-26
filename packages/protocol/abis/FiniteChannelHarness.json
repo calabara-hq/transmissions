@@ -264,18 +264,18 @@
     "outputs": [
       {
         "name": "createStart",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       },
       {
         "name": "mintStart",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       },
       {
         "name": "mintEnd",
-        "type": "uint80",
-        "internalType": "uint80"
+        "type": "uint40",
+        "internalType": "uint40"
       },
       {
         "name": "rewards",
@@ -1169,19 +1169,6 @@
   },
   {
     "type": "function",
-    "name": "updateChannelTokenUri",
-    "inputs": [
-      {
-        "name": "uri",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "upgradeToAndCall",
     "inputs": [
       {
@@ -1602,25 +1589,6 @@
         "type": "bytes",
         "indexed": false,
         "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "TokenURIUpdated",
-    "inputs": [
-      {
-        "name": "tokenId",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      },
-      {
-        "name": "uri",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
       }
     ],
     "anonymous": false

@@ -1,5 +1,5 @@
 import { SetupNewContract } from "../src/generated/ChannelFactoryV1/ChannelFactory";
-import { AdminTransferred, ChannelMetadataUpdated, ConfigUpdated, ERC20Transferred, ETHTransferred, ManagerRenounced, ManagersUpdated, TokenCreated, TokenMinted, TokenURIUpdated, TransferBatch, TransferSingle } from "../src/generated/templates/Channel/Channel";
+import { AdminTransferred, ChannelMetadataUpdated, ConfigUpdated, ERC20Transferred, ETHTransferred, ManagerRenounced, ManagersUpdated, TokenCreated, TokenMinted, TransferBatch, TransferSingle } from "../src/generated/templates/Channel/Channel";
 import { FeeConfigSet } from "../src/generated/CustomFeesV1/CustomFees";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from '../src/utils/constants';
 import { BigInt, Address, Bytes, ethereum, Int8 } from "@graphprotocol/graph-ts";
@@ -54,38 +54,6 @@ export function createChannelCreatedData(input: ChannelCreatedData): SetupNewCon
     newEvent.address = input.address;
 
     return newEvent;
-}
-
-
-export class TokenURIUpdatedData {
-    tokenId: BigInt = BIGINT_ZERO;
-    uri: string = '';
-
-    eventBlockNumber: BigInt = BIGINT_ZERO;
-    eventBlockTimestamp: BigInt = BIGINT_ZERO;
-    txHash: Bytes = Bytes.fromI32(0);
-    logIndex: BigInt = BIGINT_ZERO;
-    address: Address = Address.fromString(ZERO_ADDRESS);
-}
-
-export function createTokenURIUpdatedData(input: TokenURIUpdatedData): TokenURIUpdated {
-    let newEvent = changetype<TokenURIUpdated>(newMockEvent());
-    newEvent.parameters = new Array<ethereum.EventParam>();
-
-    let tokenIdParam = new ethereum.EventParam("tokenId", ethereum.Value.fromUnsignedBigInt(input.tokenId));
-    let uriParam = new ethereum.EventParam("uri", ethereum.Value.fromString(input.uri));
-
-    newEvent.parameters.push(tokenIdParam);
-    newEvent.parameters.push(uriParam);
-
-    newEvent.block.number = input.eventBlockNumber;
-    newEvent.block.timestamp = input.eventBlockTimestamp;
-    newEvent.transaction.hash = input.txHash;
-    newEvent.logIndex = input.logIndex;
-    newEvent.address = input.address;
-
-    return newEvent as TokenURIUpdated;
-
 }
 
 export class ChannelMetadataUpdatedData {

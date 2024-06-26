@@ -400,28 +400,6 @@ export class TokenMinted__Params {
   }
 }
 
-export class TokenURIUpdated extends ethereum.Event {
-  get params(): TokenURIUpdated__Params {
-    return new TokenURIUpdated__Params(this);
-  }
-}
-
-export class TokenURIUpdated__Params {
-  _event: TokenURIUpdated;
-
-  constructor(event: TokenURIUpdated) {
-    this._event = event;
-  }
-
-  get tokenId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get uri(): string {
-    return this._event.parameters[1].value.toString();
-  }
-}
-
 export class TransferBatch extends ethereum.Event {
   get params(): TransferBatch__Params {
     return new TransferBatch__Params(this);
@@ -952,7 +930,7 @@ export class FiniteChannel extends ethereum.SmartContract {
   finiteChannelParams(): FiniteChannel__finiteChannelParamsResult {
     let result = super.call(
       "finiteChannelParams",
-      "finiteChannelParams():(uint80,uint80,uint80,(uint40[],uint256[],uint256,address))",
+      "finiteChannelParams():(uint40,uint40,uint40,(uint40[],uint256[],uint256,address))",
       [],
     );
 
@@ -969,7 +947,7 @@ export class FiniteChannel extends ethereum.SmartContract {
   try_finiteChannelParams(): ethereum.CallResult<FiniteChannel__finiteChannelParamsResult> {
     let result = super.tryCall(
       "finiteChannelParams",
-      "finiteChannelParams():(uint80,uint80,uint80,(uint40[],uint256[],uint256,address))",
+      "finiteChannelParams():(uint40,uint40,uint40,(uint40[],uint256[],uint256,address))",
       [],
     );
     if (result.reverted) {
@@ -2272,36 +2250,6 @@ export class UpdateChannelMetadataCall__Outputs {
   _call: UpdateChannelMetadataCall;
 
   constructor(call: UpdateChannelMetadataCall) {
-    this._call = call;
-  }
-}
-
-export class UpdateChannelTokenUriCall extends ethereum.Call {
-  get inputs(): UpdateChannelTokenUriCall__Inputs {
-    return new UpdateChannelTokenUriCall__Inputs(this);
-  }
-
-  get outputs(): UpdateChannelTokenUriCall__Outputs {
-    return new UpdateChannelTokenUriCall__Outputs(this);
-  }
-}
-
-export class UpdateChannelTokenUriCall__Inputs {
-  _call: UpdateChannelTokenUriCall;
-
-  constructor(call: UpdateChannelTokenUriCall) {
-    this._call = call;
-  }
-
-  get uri(): string {
-    return this._call.inputValues[0].value.toString();
-  }
-}
-
-export class UpdateChannelTokenUriCall__Outputs {
-  _call: UpdateChannelTokenUriCall;
-
-  constructor(call: UpdateChannelTokenUriCall) {
     this._call = call;
   }
 }

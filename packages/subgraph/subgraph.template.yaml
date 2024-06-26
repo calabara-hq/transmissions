@@ -98,8 +98,6 @@ templates:
         - name: Channel
           file: ./abis/Channel.json
       eventHandlers:
-        - event: TokenURIUpdated(indexed uint256,string)
-          handler: handleUpdateTokenURI
         - event: ManagersUpdated(address[])
           handler: handleUpdateManagers
         - event: ManagerRenounced(indexed address)

@@ -152,18 +152,6 @@ contract ChannelTest is Test {
     assertEq(channelImpl.name(), "my contract");
   }
 
-  function test_channel_updateChannelTokenUri() external {
-    initializeChannelWithSetupActions(new bytes(0), new bytes(0));
-
-    vm.startPrank(admin);
-    vm.expectEmit();
-    emit Channel.TokenURIUpdated(0, "https://example.com/api/token/1");
-    channelImpl.updateChannelTokenUri("https://example.com/api/token/1");
-    vm.stopPrank();
-
-    assertEq(channelImpl.uri(0), "https://example.com/api/token/1");
-  }
-
   function test_channel_updateChannelMetadata() external {
     initializeChannelWithSetupActions(new bytes(0), new bytes(0));
 

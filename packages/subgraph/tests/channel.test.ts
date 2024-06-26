@@ -10,11 +10,11 @@ import {
     createMockedFunction,
     logStore
 } from 'matchstick-as/assembly/index';
-import { BatchTokenTransferredData, ChannelCreatedData, ChannelMetadataUpdatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createChannelMetadataUpdatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTokenURIUpdatedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TokenURIUpdatedData, TransferAdminData } from './utils';
+import { BatchTokenTransferredData, ChannelCreatedData, ChannelMetadataUpdatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createChannelMetadataUpdatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TransferAdminData } from './utils';
 import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
 import { ApprovedDynamicLogicSignature, Channel, CustomFees, DynamicLogic, FeeConfig, LogicConfig, Mint, RewardTransferEvent, Token, TokenHolder, User } from '../src/generated/schema';
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
-import { handleRenounceManager, handleTokenBatchMinted, handleTokenCreated, handleTokenURIUpdated, handleTransferAdmin, handleTransferBatchToken, handleTransferSingleToken, handleUpdateChannelMetadata, handleUpdateConfig, handleUpdateManagers } from '../src/mappings/templates/channel/channelMappings';
+import { handleRenounceManager, handleTokenBatchMinted, handleTokenCreated, handleTransferAdmin, handleTransferBatchToken, handleTransferSingleToken, handleUpdateChannelMetadata, handleUpdateConfig, handleUpdateManagers } from '../src/mappings/templates/channel/channelMappings';
 import { handleUpdateCustomFees } from '../src/mappings/customFeeMappings';
 import { BIGINT_10K, ZERO_ADDRESS } from '../src/utils/constants';
 import { handleSignatureApproved, handleUpdateDynamicCreatorLogic, handleUpdateDynamicMinterLogic } from '../src/mappings/dynamicLogicMappings';
@@ -79,49 +79,6 @@ describe("Channel", () => {
         handleChannelCreated(event);
 
     })
-
-    describe("handle token uri updated event", () => {
-
-        beforeEach(() => {
-            /// mock the default token on initialization
-            const tokenCreatedData = new TokenCreatedData();
-            tokenCreatedData.tokenId = BigInt.fromI32(0);
-            tokenCreatedData.author = Address.fromString(CREATOR_ADDRESS);
-            tokenCreatedData.sponsor = Address.fromString(SPONSOR_ADDRESS);
-            tokenCreatedData.uri = "sample uri";
-            tokenCreatedData.maxSupply = BigInt.fromI32(100);
-            tokenCreatedData.totalMinted = BigInt.fromI32(0);
-
-            tokenCreatedData.eventBlockNumber = BigInt.fromI32(123456);
-            tokenCreatedData.eventBlockTimestamp = BigInt.fromI32(1620012345);
-            tokenCreatedData.txHash = Bytes.fromHexString("0x1234");
-            tokenCreatedData.logIndex = BigInt.fromI32(0);
-            tokenCreatedData.address = Address.fromString(CHANNEL_ADDRESS);
-
-            const event = createTokenCreatedData(tokenCreatedData);
-
-            handleTokenCreated(event);
-
-        });
-
-        test("properly updates token uri", () => {
-            const tokenUriUpdatedData = new TokenURIUpdatedData();
-            tokenUriUpdatedData.tokenId = BigInt.fromI32(0);
-            tokenUriUpdatedData.uri = "new uri";
-            tokenUriUpdatedData.address = Address.fromString(CHANNEL_ADDRESS);
-
-            const event = createTokenURIUpdatedData(tokenUriUpdatedData);
-
-            handleTokenURIUpdated(event);
-
-            const updatedToken = Token.load(CHANNEL_ADDRESS + '-0');
-            const updatedChannel = Channel.load(CHANNEL_ADDRESS);
-
-            assert.stringEquals(updatedToken!.uri, "new uri");
-            assert.stringEquals(updatedChannel!.uri, "new uri");
-
-        });
-    });
 
     describe("handle channel metadata updated event", () => {
         beforeEach(() => {

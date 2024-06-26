@@ -89,9 +89,9 @@ contract FiniteChannelTest is Test {
   /* -------------------------------------------------------------------------- */
 
   function createEncodedFiniteParams(
-    uint80 createStart,
-    uint80 mintStart,
-    uint80 mintEnd,
+    uint40 createStart,
+    uint40 mintStart,
+    uint40 mintEnd,
     uint40[] memory ranks,
     uint256[] memory allocations,
     uint256 totalAllocation,
@@ -113,7 +113,7 @@ contract FiniteChannelTest is Test {
       );
   }
 
-  function initializeChannelWithTimingScenario(uint80 createStart, uint80 mintStart, uint80 mintEnd) internal {
+  function initializeChannelWithTimingScenario(uint40 createStart, uint40 mintStart, uint40 mintEnd) internal {
     uint40[] memory ranks = new uint40[](1);
     ranks[0] = 1;
 
@@ -144,9 +144,9 @@ contract FiniteChannelTest is Test {
       new address[](0),
       new bytes[](0),
       createEncodedFiniteParams(
-        uint80(block.timestamp),
-        uint80(block.timestamp + 1),
-        uint80(block.timestamp + 20),
+        uint40(block.timestamp),
+        uint40(block.timestamp + 1),
+        uint40(block.timestamp + 20),
         ranks,
         allocations,
         totalAllocation,
@@ -170,9 +170,9 @@ contract FiniteChannelTest is Test {
       new address[](0),
       new bytes[](0),
       createEncodedFiniteParams(
-        uint80(block.timestamp),
-        uint80(block.timestamp + 1),
-        uint80(block.timestamp + 20),
+        uint40(block.timestamp),
+        uint40(block.timestamp + 1),
+        uint40(block.timestamp + 20),
         ranks,
         allocations,
         totalAllocation,
@@ -402,9 +402,9 @@ contract FiniteChannelTest is Test {
     vm.expectRevert();
     targetChannel.setTransportConfig(
       createEncodedFiniteParams(
-        uint80(block.timestamp),
-        uint80(block.timestamp + 1),
-        uint80(block.timestamp + 20),
+        uint40(block.timestamp),
+        uint40(block.timestamp + 1),
+        uint40(block.timestamp + 20),
         new uint40[](1),
         new uint256[](1),
         1,
@@ -413,7 +413,7 @@ contract FiniteChannelTest is Test {
     );
   }
 
-  function test_finiteChannel_timingValidationOnSetParams(uint80 createStart, uint80 mintStart, uint80 mintEnd) public {
+  function test_finiteChannel_timingValidationOnSetParams(uint40 createStart, uint40 mintStart, uint40 mintEnd) public {
     uint40[] memory ranks = new uint40[](1);
     ranks[0] = 1;
 
@@ -426,9 +426,9 @@ contract FiniteChannelTest is Test {
 
   function test_finiteChannel_timingValidationOnCreateToken() public {
     initializeChannelWithTimingScenario(
-      uint80(block.timestamp + 10),
-      uint80(block.timestamp + 20),
-      uint80(block.timestamp + 30)
+      uint40(block.timestamp + 10),
+      uint40(block.timestamp + 20),
+      uint40(block.timestamp + 30)
     );
 
     vm.expectRevert(FiniteChannel.NotAcceptingCreations.selector);
@@ -444,9 +444,9 @@ contract FiniteChannelTest is Test {
 
   function test_finiteChannel_timingValidationOnMintToken() public {
     initializeChannelWithTimingScenario(
-      uint80(block.timestamp),
-      uint80(block.timestamp + 10),
-      uint80(block.timestamp + 20)
+      uint40(block.timestamp),
+      uint40(block.timestamp + 10),
+      uint40(block.timestamp + 20)
     );
 
     targetChannel.createToken("test", 1000);
@@ -464,9 +464,9 @@ contract FiniteChannelTest is Test {
 
   function test_finiteChannel_revertOnNonAdminWithdraw() public {
     initializeChannelWithTimingScenario(
-      uint80(block.timestamp),
-      uint80(block.timestamp + 10),
-      uint80(block.timestamp + 20)
+      uint40(block.timestamp),
+      uint40(block.timestamp + 10),
+      uint40(block.timestamp + 20)
     );
 
     vm.expectRevert();
@@ -475,9 +475,9 @@ contract FiniteChannelTest is Test {
 
   function test_finiteChannel_noInteractionsAllowedAfterSettle() public {
     initializeChannelWithTimingScenario(
-      uint80(block.timestamp),
-      uint80(block.timestamp + 10),
-      uint80(block.timestamp + 20)
+      uint40(block.timestamp),
+      uint40(block.timestamp + 10),
+      uint40(block.timestamp + 20)
     );
 
     vm.warp(block.timestamp + 20);
@@ -492,9 +492,9 @@ contract FiniteChannelTest is Test {
 
   function test_finiteChannel_noInteractionsAllowedAfterWithdraw() public {
     initializeChannelWithTimingScenario(
-      uint80(block.timestamp),
-      uint80(block.timestamp + 10),
-      uint80(block.timestamp + 20)
+      uint40(block.timestamp),
+      uint40(block.timestamp + 10),
+      uint40(block.timestamp + 20)
     );
 
     vm.startPrank(admin);

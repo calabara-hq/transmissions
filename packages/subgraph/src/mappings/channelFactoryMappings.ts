@@ -53,7 +53,7 @@ export function handleChannelCreated(event: SetupNewContract): void {
         let finiteTransportConfig = getOrCreateFiniteTransportConfig(channelId);
 
         /// decode the finite transport layer
-        let decoded = ethereum.decode('(uint80,uint80,uint80,(uint40[],uint256[],uint256,address))', event.params.transportConfig);
+        let decoded = ethereum.decode('(uint40,uint40,uint40,(uint40[],uint256[],uint256,address))', event.params.transportConfig);
 
 
         let tuple = decoded!.toTuple();
