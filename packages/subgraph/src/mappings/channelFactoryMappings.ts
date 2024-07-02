@@ -1,15 +1,16 @@
-import { Channel as ChannelTemplate } from "../generated/templates";
-import { FiniteChannel as FiniteChannelTemplate } from "../generated/templates";
-import { Address, ethereum } from '@graphprotocol/graph-ts';
+import {
+    Channel as ChannelTemplate,
+    Rewards as RewardsTemplate,
+    InfiniteChannel as InfiniteChannelTemplate,
+    FiniteChannel as FiniteChannelTemplate
+} from "../generated/templates";
+
 import { SetupNewContract } from "../generated/ChannelFactoryV1/ChannelFactory";
 import {
     getOrCreateChannel,
-    getOrCreateFiniteTransportConfig,
-    getOrCreateInfiniteTransportConfig,
     getOrCreateTransportLayer,
     getOrCreateUser
 } from "../utils/helpers";
-import { BIGINT_ZERO, ZERO_ADDRESS } from "../utils/constants";
 
 
 export function handleChannelCreated(event: SetupNewContract): void {
@@ -36,53 +37,27 @@ export function handleChannelCreated(event: SetupNewContract): void {
     if (event.params.transportConfig.length == 32) {
 
         transportLayer.type = 'infinite';
-        let infiniteTransportConfig = getOrCreateInfiniteTransportConfig(channelId);
-
-        /// decode the infinite transport layer
-        let decoded = ethereum.decode('(uint40)', event.params.transportConfig);
-        let tuple = decoded!.toTuple();
-
-        infiniteTransportConfig.saleDuration = tuple[0].toBigInt();
-
-        infiniteTransportConfig.save();
-
-        transportLayer.infiniteTransportConfig = infiniteTransportConfig.id;
+        transportLayer.blockNumber = event.block.number;
+        transportLayer.blockTimestamp = event.block.timestamp;
+        InfiniteChannelTemplate.create(event.params.contractAddress);
 
     } else {
+
         transportLayer.type = 'finite';
-        let finiteTransportConfig = getOrCreateFiniteTransportConfig(channelId);
-
-        /// decode the finite transport layer
-        let decoded = ethereum.decode('(uint40,uint40,uint40,(uint40[],uint256[],uint256,address))', event.params.transportConfig);
-
-
-        let tuple = decoded!.toTuple();
-        let rewardsTuple = tuple[3].toTuple();
-
-        finiteTransportConfig.createStart = tuple[0].toBigInt();
-        finiteTransportConfig.mintStart = tuple[1].toBigInt();
-        finiteTransportConfig.mintEnd = tuple[2].toBigInt();
-        finiteTransportConfig.ranks = rewardsTuple[0].toBigIntArray();
-        finiteTransportConfig.allocations = rewardsTuple[1].toBigIntArray();
-        finiteTransportConfig.totalAllocation = rewardsTuple[2].toBigInt();
-        finiteTransportConfig.token = rewardsTuple[3].toAddress();
-
-        finiteTransportConfig.settled = false;
-        finiteTransportConfig.settledBy = Address.fromString(ZERO_ADDRESS);
-        finiteTransportConfig.settledAt = BIGINT_ZERO;
-
-        finiteTransportConfig.save();
-
-        transportLayer.finiteTransportConfig = finiteTransportConfig.id;
-
+        transportLayer.blockNumber = event.block.number;
+        transportLayer.blockTimestamp = event.block.timestamp;
         FiniteChannelTemplate.create(event.params.contractAddress);
 
     }
 
+    transportLayer.save();
+
+    channel.blockNumber = event.block.number;
+    channel.blockTimestamp = event.block.timestamp;
     channel.transportLayer = transportLayer.id;
 
-    transportLayer.save();
     channel.save();
 
     ChannelTemplate.create(event.params.contractAddress);
+    RewardsTemplate.create(event.params.contractAddress);
 }

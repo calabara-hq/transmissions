@@ -48,14 +48,19 @@ type Channel @entity {
 
     rewardTransferEvents: [RewardTransferEvent!]! @derivedFrom(field: "channel")
 
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+
 }
 
 type ApprovedDynamicLogicSignature @entity {
     "Concatenation of tx hash + log index"
     id: ID!
-
     signature: Bytes!
     calldataAddressOffset: BigInt!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }
 
 type TransportLayer @entity {
@@ -63,11 +68,13 @@ type TransportLayer @entity {
     type: String!
     finiteTransportConfig: FiniteTransportConfig
     infiniteTransportConfig: InfiniteTransportConfig
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }
 
-type FiniteTransportConfig @entity(immutable: true) {
+type FiniteTransportConfig @entity {
     id: ID!
-
     createStart: BigInt!
     mintStart: BigInt!
     mintEnd: BigInt!
@@ -89,16 +96,15 @@ type InfiniteTransportConfig @entity {
 type FeeConfig @entity {
     "The channel address"
     id: ID!
-
     updatedBy: Bytes!
-
     "The fee contract address"
     feeContract: Bytes!
-
     type: String!
-
     "The custom fee configuration"
     customFees: CustomFees
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }
 
 type CustomFees @entity {
@@ -120,15 +126,14 @@ type CustomFees @entity {
 type LogicConfig @entity {
     "The channel address + the logic type"
     id: ID!
-
     updatedBy: Bytes!
-
     "The logic contract address"
     logicContract: Bytes!
-
     type: String!
-
     dynamicLogic: DynamicLogic
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }
 
 type DynamicLogic @entity {
@@ -171,13 +176,13 @@ type Token @entity {
     uri: String!
     totalMinted: BigInt!
     maxSupply: BigInt!
-
-    createdAt: BigInt!
-
     holders: [TokenHolder!]! @derivedFrom(field: "token")
 
     "The token channel"
     channel: Channel!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 }
 
 type Mint @entity(immutable: true) {
@@ -189,22 +194,22 @@ type Mint @entity(immutable: true) {
     minter: User!
     referral: User!
 
-    mintedAt: BigInt!
-
     "The token channel"
     channel: Channel!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
 } 
 
 type RewardTransferEvent @entity(immutable: true) {
     "Concatenation of tx hash and log index"  
     id: ID!
-
     from: User!
     to: User!
     amount: BigInt!
     token: Bytes!
-
     channel: Channel!
+
     blockNumber: BigInt!
     blockTimestamp: BigInt!
 }
@@ -212,7 +217,6 @@ type RewardTransferEvent @entity(immutable: true) {
 type ChannelTokenTransferEvent @entity(immutable: true) {
     "Concatenation of tx hash and log index"  
     id: ID!
-
     operator: User!
     from: User!
     to: User!
@@ -221,6 +225,7 @@ type ChannelTokenTransferEvent @entity(immutable: true) {
 
     token: Token!
     channel: Channel!
+
     blockNumber: BigInt!
     blockTimestamp: BigInt!
 }

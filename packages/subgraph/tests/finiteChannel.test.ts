@@ -10,17 +10,19 @@ import {
     logStore
 } from 'matchstick-as/assembly/index';
 
-import { ChannelCreatedData, createChannelCreatedData, createFiniteChannelSettledData, FiniteChannelSettledData } from "./utils";
+import { ChannelCreatedData, createChannelCreatedData, createFiniteChannelSettledData, createFiniteTransportConfigSetData, FiniteChannelSettledData, FiniteTransportConfigSetData } from "./utils";
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
 import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
 import { finiteTransportBytes } from './utils';
-import { handleFiniteChannelSettled } from '../src/mappings/templates/finiteChannel/finiteChannelMappings';
-import { FiniteTransportConfig } from '../src/generated/schema';
+import { handleFiniteChannelSettled, handleFiniteTransportConfigSet } from '../src/mappings/templates/channel/finiteChannelMappings';
+import { FiniteTransportConfig, TransportLayer } from '../src/generated/schema';
+import { ZERO_ADDRESS } from '../src/utils/constants';
 
 
 const CHANNEL_ADDRESS = "0x0000000000000000000000000000000000000001";
 const ADMIN_ADDRESS = "0x0000000000000000000000000000000000000002";
 const MANAGER_ADDRESS = "0x0000000000000000000000000000000000000003";
+const ERC20_CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000007";
 
 
 afterEach(() => {
@@ -28,7 +30,7 @@ afterEach(() => {
 })
 
 
-describe('Finite Channel settlement', () => {
+describe('Finite Channel', () => {
 
     beforeEach(() => {
         const channelData = new ChannelCreatedData();
@@ -44,10 +46,54 @@ describe('Finite Channel settlement', () => {
         channelData.logIndex = BigInt.fromI32(0);
         channelData.address = Address.fromString(CHANNEL_ADDRESS);
 
-        const event = createChannelCreatedData(channelData);
+        const channelCreatedEvent = createChannelCreatedData(channelData);
 
-        handleChannelCreated(event);
+        handleChannelCreated(channelCreatedEvent);
+
+        const finiteTransportConfig = new FiniteTransportConfigSetData();
+        finiteTransportConfig.caller = Address.fromString(ADMIN_ADDRESS);
+        finiteTransportConfig.createStart = BigInt.fromI32(123);
+        finiteTransportConfig.mintStart = BigInt.fromI32(456);
+        finiteTransportConfig.mintEnd = BigInt.fromI32(789);
+        finiteTransportConfig.ranks = [BigInt.fromI32(1), BigInt.fromI32(2)];
+        finiteTransportConfig.allocations = [BigInt.fromI32(100), BigInt.fromI32(200)];
+        finiteTransportConfig.totalAllocation = BigInt.fromI32(300);
+        finiteTransportConfig.token = Address.fromString(ERC20_CONTRACT_ADDRESS);
+        finiteTransportConfig.address = Address.fromString(CHANNEL_ADDRESS);
+
+        const finiteTransportConfigEvent = createFiniteTransportConfigSetData(finiteTransportConfig);
+
+        handleFiniteTransportConfigSet(finiteTransportConfigEvent);
+
+
     })
+
+
+    describe('Transport Layer', () => {
+        test("properly sets fields on FiniteTransportConfigSet", () => {
+            const finiteTransportConfig = FiniteTransportConfig.load(CHANNEL_ADDRESS);
+            const transportLayer = TransportLayer.load(CHANNEL_ADDRESS);
+
+            assert.bigIntEquals(finiteTransportConfig!.createStart, BigInt.fromI32(123));
+            assert.bigIntEquals(finiteTransportConfig!.mintStart, BigInt.fromI32(456));
+            assert.bigIntEquals(finiteTransportConfig!.mintEnd, BigInt.fromI32(789));
+            assert.bigIntEquals(finiteTransportConfig!.ranks[0], BigInt.fromI32(1));
+            assert.bigIntEquals(finiteTransportConfig!.ranks[1], BigInt.fromI32(2));
+            assert.bigIntEquals(finiteTransportConfig!.allocations[0], BigInt.fromI32(100));
+            assert.bigIntEquals(finiteTransportConfig!.allocations[1], BigInt.fromI32(200));
+            assert.bigIntEquals(finiteTransportConfig!.totalAllocation, BigInt.fromI32(300));
+            assert.bytesEquals(finiteTransportConfig!.token, Address.fromString(ERC20_CONTRACT_ADDRESS));
+
+            assert.booleanEquals(finiteTransportConfig!.settled, false);
+            assert.bytesEquals(finiteTransportConfig!.settledBy, Address.fromString(ZERO_ADDRESS));
+            assert.bigIntEquals(finiteTransportConfig!.settledAt, BigInt.fromI32(0));
+
+            assert.stringEquals(transportLayer!.id, CHANNEL_ADDRESS);
+            assert.stringEquals(transportLayer!.type, 'finite');
+            assert.stringEquals(transportLayer!.finiteTransportConfig!, CHANNEL_ADDRESS);
+
+        });
+    });
 
 
     test("properly handles settled event", () => {

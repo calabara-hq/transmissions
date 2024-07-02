@@ -7,8 +7,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: ChannelFactory
-      address: "0x25196Db9772e46F58A56B4E51B69709B483F4bEc"
-      startBlock: 10883135
+      address: "0x080D84B7D76350e19B277946e9eA7d5660F04e49"
+      startBlock: 12085356
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,8 +29,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: CustomFees
-      address: "0x59A10Cf3D703FE4c2C4dea9Dad39940fb7162e02"
-      startBlock: 10883135
+      address: "0x3f0f9C18aF122c6E8afF209473d99e9C88621fEc"
+      startBlock: 12085356
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -50,8 +50,8 @@ dataSources:
     network: base-sepolia
     source:
       abi: DynamicLogic
-      address: "0x2383FcF6F4596ba26f002EB4cA8540bEB460aB8D"
-      startBlock: 10883135
+      address: "0x24f2a673f89462811BDd688aD1699Ace09Bc84cD"
+      startBlock: 12085356
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -119,15 +119,35 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/templates/channel/channelMappings.ts
+      file: ./src/mappings/templates/channel/finiteChannelMappings.ts
       entities:
         - FiniteTransportConfig
       eventHandlers:
         - event: Settled(indexed address)
           handler: handleFiniteChannelSettled
+        - event: FiniteTransportConfigSet(indexed address,uint40,uint40,uint40,uint40[],uint256[],uint256,address)
+          handler: handleFiniteTransportConfigSet
       abis:
         - name: FiniteChannel
           file: ./abis/FiniteChannel.json
+  - name: InfiniteChannel
+    kind: ethereum/contract
+    network: base-sepolia
+    source:
+      abi: InfiniteChannel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/infiniteChannelMappings.ts
+      entities:
+        - InfiniteTransportConfig
+      eventHandlers:
+        - event: InfiniteTransportConfigSet(indexed address,uint40)
+          handler: handleInfiniteTransportConfigSet
+      abis:
+        - name: InfiniteChannel
+          file: ./abis/InfiniteChannel.json
   - name: Rewards
     kind: ethereum/contract
     network: base-sepolia

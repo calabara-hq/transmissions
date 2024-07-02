@@ -108,9 +108,10 @@ export function handleTokenCreated(event: TokenCreated): void {
     token.maxSupply = tokenConfig.maxSupply;
     token.totalMinted = tokenConfig.totalMinted;
 
-    token.createdAt = event.block.timestamp;
-
     token.channel = channel.id;
+
+    token.blockNumber = event.block.number;
+    token.blockTimestamp = event.block.timestamp;
 
     token.save();
     author.save();
@@ -137,10 +138,12 @@ export function handleTokenBatchMinted(event: TokenMinted): void {
         mint.amount = amounts[i];
         mint.data = data;
         mint.minter = minter.id;
-        mint.mintedAt = event.block.timestamp;
         mint.referral = referral.id;
 
         mint.channel = channel.id;
+
+        mint.blockNumber = event.block.number;
+        mint.blockTimestamp = event.block.timestamp;
 
         token.totalMinted = token.totalMinted.plus(amounts[i]);
 

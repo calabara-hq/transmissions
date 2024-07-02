@@ -1306,6 +1306,25 @@
     "anonymous": false,
     "inputs": [
       {
+        "name": "caller",
+        "internalType": "address",
+        "type": "address",
+        "indexed": true
+      },
+      {
+        "name": "saleDuration",
+        "internalType": "uint40",
+        "type": "uint40",
+        "indexed": false
+      }
+    ],
+    "name": "InfiniteTransportConfigSet"
+  },
+  {
+    "type": "event",
+    "anonymous": false,
+    "inputs": [
+      {
         "name": "version",
         "internalType": "uint64",
         "type": "uint64",

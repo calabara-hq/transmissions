@@ -31,6 +31,16 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
   /* -------------------------------------------------------------------------- */
 
   event Settled(address indexed caller);
+  event FiniteTransportConfigSet(
+    address indexed caller,
+    uint40 createStart,
+    uint40 mintStart,
+    uint40 mintEnd,
+    uint40[] ranks,
+    uint256[] allocations,
+    uint256 totalAllocation,
+    address token
+  );
 
   /* -------------------------------------------------------------------------- */
   /*                                   STRUCTS                                  */
@@ -127,6 +137,18 @@ contract FiniteChannel is IFiniteChannel, Channel, IVersionedContract {
     _validateRewardParameters(_params.rewards);
 
     finiteChannelParams = _params;
+
+    emit FiniteTransportConfigSet(
+      msg.sender,
+      _params.createStart,
+      _params.mintStart,
+      _params.mintEnd,
+      _params.rewards.ranks,
+      _params.rewards.allocations,
+      _params.rewards.totalAllocation,
+      _params.rewards.token
+    );
+
     _depositToEscrow(_params.rewards.token, _params.rewards.totalAllocation);
   }
 

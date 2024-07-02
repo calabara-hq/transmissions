@@ -23,6 +23,7 @@ contract InfiniteChannel is Channel, IVersionedContract {
   /* -------------------------------------------------------------------------- */
 
   event TokenSaleSet(address indexed caller, uint256 indexed tokenId, uint40 saleEnd);
+  event InfiniteTransportConfigSet(address indexed caller, uint40 saleDuration);
 
   /* -------------------------------------------------------------------------- */
   /*                                   STORAGE                                  */
@@ -50,6 +51,7 @@ contract InfiniteChannel is Channel, IVersionedContract {
   function setTransportConfig(bytes calldata data) public override onlyAdminOrManager {
     uint40 duration = abi.decode(data, (uint40));
     _setDuration(duration);
+    emit InfiniteTransportConfigSet(msg.sender, duration);
   }
 
   /* -------------------------------------------------------------------------- */

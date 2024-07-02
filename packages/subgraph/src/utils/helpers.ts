@@ -24,7 +24,8 @@ export function updateFeeConfig(channelId: string, event: ConfigUpdated): string
 
     feeConfig.feeContract = event.params.feeContract;
     feeConfig.updatedBy = event.params.updater;
-
+    feeConfig.blockNumber = event.block.number;
+    feeConfig.blockTimestamp = event.block.timestamp;
 
     if (event.params.feeContract == Address.fromHexString(ZERO_ADDRESS)) {
         feeConfig.customFees = null;
@@ -51,9 +52,13 @@ export function updateLogicConfig(channelId: string, event: ConfigUpdated): Upda
 
     creatorLogicConfig.logicContract = event.params.logicContract;
     creatorLogicConfig.updatedBy = event.params.updater;
+    creatorLogicConfig.blockNumber = event.block.number;
+    creatorLogicConfig.blockTimestamp = event.block.timestamp;
 
     minterLogicConfig.logicContract = event.params.logicContract;
     minterLogicConfig.updatedBy = event.params.updater;
+    minterLogicConfig.blockNumber = event.block.number;
+    minterLogicConfig.blockTimestamp = event.block.timestamp;
 
 
     if (event.params.logicContract == Address.fromHexString(ZERO_ADDRESS)) {

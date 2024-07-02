@@ -42,5 +42,8 @@ export function handleSignatureApproved(event: SignatureApproved): void {
     approvedSignature.signature = event.params.signature;
     approvedSignature.calldataAddressOffset = event.params.calldataAddressPosition;
 
+    approvedSignature.blockNumber = event.block.number;
+    approvedSignature.blockTimestamp = event.block.timestamp;
+
     approvedSignature.save();
 }

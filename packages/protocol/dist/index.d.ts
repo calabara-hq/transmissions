@@ -3383,6 +3383,51 @@ export declare const finiteChannelAbi: readonly [{
     readonly type: "event";
     readonly anonymous: false;
     readonly inputs: readonly [{
+        readonly name: "caller";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: true;
+    }, {
+        readonly name: "createStart";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
+        readonly indexed: false;
+    }, {
+        readonly name: "mintStart";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
+        readonly indexed: false;
+    }, {
+        readonly name: "mintEnd";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
+        readonly indexed: false;
+    }, {
+        readonly name: "ranks";
+        readonly internalType: "uint40[]";
+        readonly type: "uint40[]";
+        readonly indexed: false;
+    }, {
+        readonly name: "allocations";
+        readonly internalType: "uint256[]";
+        readonly type: "uint256[]";
+        readonly indexed: false;
+    }, {
+        readonly name: "totalAllocation";
+        readonly internalType: "uint256";
+        readonly type: "uint256";
+        readonly indexed: false;
+    }, {
+        readonly name: "token";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: false;
+    }];
+    readonly name: "FiniteTransportConfigSet";
+}, {
+    readonly type: "event";
+    readonly anonymous: false;
+    readonly inputs: readonly [{
         readonly name: "version";
         readonly internalType: "uint64";
         readonly type: "uint64";
@@ -4873,6 +4918,21 @@ export declare const infiniteChannelAbi: readonly [{
         readonly indexed: false;
     }];
     readonly name: "ETHTransferred";
+}, {
+    readonly type: "event";
+    readonly anonymous: false;
+    readonly inputs: readonly [{
+        readonly name: "caller";
+        readonly internalType: "address";
+        readonly type: "address";
+        readonly indexed: true;
+    }, {
+        readonly name: "saleDuration";
+        readonly internalType: "uint40";
+        readonly type: "uint40";
+        readonly indexed: false;
+    }];
+    readonly name: "InfiniteTransportConfigSet";
 }, {
     readonly type: "event";
     readonly anonymous: false;

@@ -5,7 +5,8 @@ import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from '../src/utils/constants';
 import { BigInt, Address, Bytes, ethereum, Int8 } from "@graphprotocol/graph-ts";
 import { newMockEvent } from 'matchstick-as/assembly/index';
 import { CreatorLogicSet, SignatureApproved } from "../src/generated/DynamicLogicV1/DynamicLogic";
-import { Settled } from "../src/generated/templates/FiniteChannel/FiniteChannel";
+import { FiniteTransportConfigSet, Settled } from "../src/generated/templates/FiniteChannel/FiniteChannel";
+import { InfiniteTransportConfigSet } from "../src/generated/templates/InfiniteChannel/InfiniteChannel";
 
 
 export const finiteTransportBytes =
@@ -55,6 +56,85 @@ export function createChannelCreatedData(input: ChannelCreatedData): SetupNewCon
 
     return newEvent;
 }
+
+export class FiniteTransportConfigSetData {
+    caller: Address = Address.fromString(ZERO_ADDRESS);
+    createStart: BigInt = BIGINT_ZERO;
+    mintStart: BigInt = BIGINT_ZERO;
+    mintEnd: BigInt = BIGINT_ZERO;
+    ranks: BigInt[] = [];
+    allocations: BigInt[] = [];
+    totalAllocation: BigInt = BIGINT_ZERO;
+    token: Address = Address.fromString(ZERO_ADDRESS);
+
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
+
+export function createFiniteTransportConfigSetData(input: FiniteTransportConfigSetData): FiniteTransportConfigSet {
+    let newEvent = changetype<FiniteTransportConfigSet>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let callerParam = new ethereum.EventParam("updater", ethereum.Value.fromAddress(input.caller));
+    let createStartParam = new ethereum.EventParam("createStart", ethereum.Value.fromUnsignedBigInt(input.createStart));
+    let mintStartParam = new ethereum.EventParam("mintStart", ethereum.Value.fromUnsignedBigInt(input.mintStart));
+    let mintEndParam = new ethereum.EventParam("mintEnd", ethereum.Value.fromUnsignedBigInt(input.mintEnd));
+    let ranksParam = new ethereum.EventParam("ranks", ethereum.Value.fromUnsignedBigIntArray(input.ranks));
+    let allocationsParam = new ethereum.EventParam("allocations", ethereum.Value.fromUnsignedBigIntArray(input.allocations));
+    let totalAllocationParam = new ethereum.EventParam("totalAllocation", ethereum.Value.fromUnsignedBigInt(input.totalAllocation));
+    let tokenParam = new ethereum.EventParam("token", ethereum.Value.fromAddress(input.token));
+
+    newEvent.parameters.push(callerParam);
+    newEvent.parameters.push(createStartParam);
+    newEvent.parameters.push(mintStartParam);
+    newEvent.parameters.push(mintEndParam);
+    newEvent.parameters.push(ranksParam);
+    newEvent.parameters.push(allocationsParam);
+    newEvent.parameters.push(totalAllocationParam);
+    newEvent.parameters.push(tokenParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent as FiniteTransportConfigSet;
+}
+
+export class InfiniteTransportConfigSetData {
+    caller: Address = Address.fromString(ZERO_ADDRESS);
+    saleDuration: BigInt = BIGINT_ZERO;
+
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
+
+export function createInfiniteTransportConfigSetData(input: InfiniteTransportConfigSetData): InfiniteTransportConfigSet {
+    let newEvent = changetype<InfiniteTransportConfigSet>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let callerParam = new ethereum.EventParam("updater", ethereum.Value.fromAddress(input.caller));
+    let saleDurationParam = new ethereum.EventParam("saleDuration", ethereum.Value.fromUnsignedBigInt(input.saleDuration));
+
+    newEvent.parameters.push(callerParam);
+    newEvent.parameters.push(saleDurationParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent;
+}
+
 
 export class ChannelMetadataUpdatedData {
     updater: Address = Address.fromString(ZERO_ADDRESS);

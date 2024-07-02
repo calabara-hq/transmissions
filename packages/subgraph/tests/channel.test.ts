@@ -442,7 +442,7 @@ describe("Channel", () => {
             assert.stringEquals(author!.id, CREATOR_ADDRESS);
             assert.stringEquals(sponsor!.id, SPONSOR_ADDRESS);
 
-            assert.bigIntEquals(token!.createdAt, BigInt.fromI32(1620012345));
+            assert.bigIntEquals(token!.blockTimestamp, BigInt.fromI32(1620012345));
 
         });
 
@@ -474,7 +474,7 @@ describe("Channel", () => {
             assert.bigIntEquals(mint!.amount, BigInt.fromI32(1));
             assert.bytesEquals(mint!.data, Bytes.fromHexString("0x00"));
             assert.stringEquals(mint!.minter, MINTER_ADDRESS);
-            assert.bigIntEquals(mint!.mintedAt, tokenMintedData.eventBlockTimestamp);
+            assert.bigIntEquals(mint!.blockTimestamp, tokenMintedData.eventBlockTimestamp);
 
             /// user validation
             const minter = User.load(MINTER_ADDRESS);
@@ -497,7 +497,8 @@ describe("Channel", () => {
             token.maxSupply = BigInt.fromI32(100);
             token.totalMinted = BigInt.fromI32(0);
             token.channel = CHANNEL_ADDRESS;
-            token.createdAt = BigInt.fromI32(1620012345);
+            token.blockTimestamp = BigInt.fromI32(1620012345);
+            token.blockNumber = BigInt.fromI32(123456);
 
             token.save();
 
@@ -568,7 +569,8 @@ describe("Channel", () => {
             token1.maxSupply = BigInt.fromI32(100);
             token1.totalMinted = BigInt.fromI32(0);
             token1.channel = CHANNEL_ADDRESS;
-            token1.createdAt = BigInt.fromI32(1620012345);
+            token1.blockTimestamp = BigInt.fromI32(1620012345);
+            token1.blockNumber = BigInt.fromI32(123456);
 
             token1.save();
 
@@ -580,7 +582,8 @@ describe("Channel", () => {
             token2.maxSupply = BigInt.fromI32(100);
             token2.totalMinted = BigInt.fromI32(0);
             token2.channel = CHANNEL_ADDRESS;
-            token2.createdAt = BigInt.fromI32(1620012345);
+            token2.blockTimestamp = BigInt.fromI32(1620012345);
+            token2.blockNumber = BigInt.fromI32(123456);
 
             token2.save();
 

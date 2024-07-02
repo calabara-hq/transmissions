@@ -125,15 +125,35 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/mappings/templates/channel/channelMappings.ts
+      file: ./src/mappings/templates/channel/finiteChannelMappings.ts
       entities:
         - FiniteTransportConfig
       eventHandlers:
         - event: Settled(indexed address)
           handler: handleFiniteChannelSettled
+        - event: FiniteTransportConfigSet(indexed address,uint40,uint40,uint40,uint40[],uint256[],uint256,address)
+          handler: handleFiniteTransportConfigSet
       abis:
         - name: FiniteChannel
           file: ./abis/FiniteChannel.json
+  - name: InfiniteChannel
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: InfiniteChannel
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/channel/infiniteChannelMappings.ts
+      entities:
+        - InfiniteTransportConfig
+      eventHandlers:
+        - event: InfiniteTransportConfigSet(indexed address,uint40)
+          handler: handleInfiniteTransportConfigSet
+      abis:
+        - name: InfiniteChannel
+          file: ./abis/InfiniteChannel.json
   - name: Rewards
     kind: ethereum/contract
     network: {{network}}

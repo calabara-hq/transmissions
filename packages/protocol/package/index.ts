@@ -2284,6 +2284,61 @@ export const finiteChannelAbi = [
     anonymous: false,
     inputs: [
       {
+        name: "caller",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "createStart",
+        internalType: "uint40",
+        type: "uint40",
+        indexed: false,
+      },
+      {
+        name: "mintStart",
+        internalType: "uint40",
+        type: "uint40",
+        indexed: false,
+      },
+      {
+        name: "mintEnd",
+        internalType: "uint40",
+        type: "uint40",
+        indexed: false,
+      },
+      {
+        name: "ranks",
+        internalType: "uint40[]",
+        type: "uint40[]",
+        indexed: false,
+      },
+      {
+        name: "allocations",
+        internalType: "uint256[]",
+        type: "uint256[]",
+        indexed: false,
+      },
+      {
+        name: "totalAllocation",
+        internalType: "uint256",
+        type: "uint256",
+        indexed: false,
+      },
+      {
+        name: "token",
+        internalType: "address",
+        type: "address",
+        indexed: false,
+      },
+    ],
+    name: "FiniteTransportConfigSet",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
         name: "version",
         internalType: "uint64",
         type: "uint64",
@@ -3282,6 +3337,25 @@ export const infiniteChannelAbi = [
       },
     ],
     name: "ETHTransferred",
+  },
+  {
+    type: "event",
+    anonymous: false,
+    inputs: [
+      {
+        name: "caller",
+        internalType: "address",
+        type: "address",
+        indexed: true,
+      },
+      {
+        name: "saleDuration",
+        internalType: "uint40",
+        type: "uint40",
+        indexed: false,
+      },
+    ],
+    name: "InfiniteTransportConfigSet",
   },
   {
     type: "event",
