@@ -18,7 +18,7 @@ import {
     TransferBatch,
     TransferSingle
 } from "../../../generated/templates/Channel/Channel";
-
+import { TokenMetadata as TokenMetadataTemplate } from "../../../generated/templates";
 
 export function handleUpdateChannelMetadata(event: ChannelMetadataUpdated): void {
     let channel = getOrCreateChannel(event.address.toHexString());
@@ -107,6 +107,15 @@ export function handleTokenCreated(event: TokenCreated): void {
     token.uri = tokenConfig.uri;
     token.maxSupply = tokenConfig.maxSupply;
     token.totalMinted = tokenConfig.totalMinted;
+
+    // /// set metadata if it's an ipfs hash, but don't break the runtime if it's not
+    const ipfsSplit = tokenConfig.uri.split('ipfs://')
+
+    if (ipfsSplit.length > 1) {
+        let ipfsHash = ipfsSplit[1];
+        token.metadata = ipfsHash;
+        TokenMetadataTemplate.create(ipfsHash);
+    }
 
     token.channel = channel.id;
 

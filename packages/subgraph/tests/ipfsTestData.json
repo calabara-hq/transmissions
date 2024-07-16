@@ -1,0 +1,10 @@
+{
+    "name": "test",
+    "description": "",
+    "image": "ipfs://QmQX7dbEnExQ9UXGDqnjkctXNcoK35JjrRBYxTc2FXW4Gd",
+    "type": "uplink-v2",
+    "content": {
+        "mime": "image/png",
+        "uri": "ipfs://QmQX7dbEnExQ9UXGDqnjkctXNcoK35JjrRBYxTc2FXW4Gd"
+    }
+}

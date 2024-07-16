@@ -4,11 +4,11 @@ schema:
 dataSources:
   - name: ChannelFactoryV1
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: ChannelFactory
-      address: "0x080D84B7D76350e19B277946e9eA7d5660F04e49"
-      startBlock: 12085356
+      address: "0x25196Db9772e46F58A56B4E51B69709B483F4bEc"
+      startBlock: 17154542
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -26,11 +26,11 @@ dataSources:
           handler: handleChannelCreated
   - name: CustomFeesV1
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: CustomFees
-      address: "0x3f0f9C18aF122c6E8afF209473d99e9C88621fEc"
-      startBlock: 12085356
+      address: "0x59A10Cf3D703FE4c2C4dea9Dad39940fb7162e02"
+      startBlock: 17154542
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -47,11 +47,11 @@ dataSources:
           handler: handleUpdateCustomFees
   - name: DynamicLogicV1
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: DynamicLogic
-      address: "0x24f2a673f89462811BDd688aD1699Ace09Bc84cD"
-      startBlock: 12085356
+      address: "0x2383FcF6F4596ba26f002EB4cA8540bEB460aB8D"
+      startBlock: 17154542
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -74,7 +74,7 @@ dataSources:
 templates:
   - name: Channel
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: Channel
     mapping:
@@ -112,7 +112,7 @@ templates:
           handler: handleUpdateChannelMetadata
   - name: FiniteChannel
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: FiniteChannel
     mapping:
@@ -132,7 +132,7 @@ templates:
           file: ./abis/FiniteChannel.json
   - name: InfiniteChannel
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: InfiniteChannel
     mapping:
@@ -150,7 +150,7 @@ templates:
           file: ./abis/InfiniteChannel.json
   - name: Rewards
     kind: ethereum/contract
-    network: base-sepolia
+    network: base
     source:
       abi: Rewards
     mapping:
@@ -168,4 +168,15 @@ templates:
       abis:
         - name: Rewards
           file: ./abis/Rewards.json
-
+  - name: TokenMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/tokenMetadata/tokenMetadataMappings.ts
+      handler: handleTokenMetadata
+      entities:
+        - TokenMetadata
+      abis:
+        - name: Channel
+          file: ./abis/Channel.json

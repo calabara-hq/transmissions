@@ -23,7 +23,7 @@ afterEach(() => {
 })
 
 
-describe('Finite Channel', () => {
+describe('Infinite Channel', () => {
 
     beforeEach(() => {
         const channelData = new ChannelCreatedData();
@@ -63,7 +63,7 @@ describe('Finite Channel', () => {
             assert.bigIntEquals(infiniteTransportConfig!.saleDuration, BigInt.fromI32(123));
 
             assert.stringEquals(transportLayer!.id, CHANNEL_ADDRESS);
-            assert.stringEquals(transportLayer!.type, 'finite');
+            assert.stringEquals(transportLayer!.type, 'infinite');
             assert.stringEquals(transportLayer!.infiniteTransportConfig!, CHANNEL_ADDRESS);
 
         });

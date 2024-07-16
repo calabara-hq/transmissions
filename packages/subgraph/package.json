@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "prepare:base-sepolia": "yarn extract-abis && mustache config/base-sepolia.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:base-mainnet": "yarn extract-abis && mustache config/base-mainnet.json subgraph.template.yaml > subgraph.yaml",
     "extract-abis": "yarn tsx script/extract-abis.ts",
     "codegen": "graph codegen --output-dir src/generated",
     "build": "graph build",
@@ -17,7 +18,6 @@
     "deploy-goldsky": "sh -c 'goldsky subgraph deploy ${0}/${1} --path .'"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.73.0",
     "@graphprotocol/graph-ts": "^0.35.1",
     "@types/node": "^20.12.10",
     "matchstick-as": "^0.6.0",
@@ -27,5 +27,8 @@
     "typescript": "^5.4.5",
     "viem": "^2.13.7",
     "yamljs": "^0.3.0"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.78.0"
   }
 }

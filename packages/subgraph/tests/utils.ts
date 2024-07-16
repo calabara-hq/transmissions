@@ -2,11 +2,12 @@ import { SetupNewContract } from "../src/generated/ChannelFactoryV1/ChannelFacto
 import { AdminTransferred, ChannelMetadataUpdated, ConfigUpdated, ERC20Transferred, ETHTransferred, ManagerRenounced, ManagersUpdated, TokenCreated, TokenMinted, TransferBatch, TransferSingle } from "../src/generated/templates/Channel/Channel";
 import { FeeConfigSet } from "../src/generated/CustomFeesV1/CustomFees";
 import { BIGINT_ONE, BIGINT_ZERO, ZERO_ADDRESS } from '../src/utils/constants';
-import { BigInt, Address, Bytes, ethereum, Int8 } from "@graphprotocol/graph-ts";
+import { BigInt, Address, Bytes, ethereum, Int8, json, dataSource } from "@graphprotocol/graph-ts";
 import { newMockEvent } from 'matchstick-as/assembly/index';
 import { CreatorLogicSet, SignatureApproved } from "../src/generated/DynamicLogicV1/DynamicLogic";
 import { FiniteTransportConfigSet, Settled } from "../src/generated/templates/FiniteChannel/FiniteChannel";
 import { InfiniteTransportConfigSet } from "../src/generated/templates/InfiniteChannel/InfiniteChannel";
+import { TokenMetadata } from "../src/generated/templates";
 
 
 export const finiteTransportBytes =
@@ -699,4 +700,15 @@ export function createFiniteChannelSettledData(input: FiniteChannelSettledData):
     newEvent.address = input.address;
 
     return newEvent as Settled;
+}
+
+export function createMockIPFSContent(): Bytes {
+    let jsonString = `
+    {
+        "name": "Test Token Metadata"
+    }`;
+
+    let ipfsContent = Bytes.fromUTF8(jsonString);
+
+    return ipfsContent;
 }

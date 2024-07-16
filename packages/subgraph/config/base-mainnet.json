@@ -1,0 +1,19 @@
+{
+  "chainid": "8453",
+  "network": "base",
+  "channelFactory": {
+    "address": "0x25196Db9772e46F58A56B4E51B69709B483F4bEc",
+    "startBlock": "17154542",
+    "version": "1"
+  },
+  "customFees": {
+    "address": "0x59A10Cf3D703FE4c2C4dea9Dad39940fb7162e02",
+    "startBlock": "17154542",
+    "version": "1"
+  },
+  "dynamicLogic": {
+    "address": "0x2383FcF6F4596ba26f002EB4cA8540bEB460aB8D",
+    "startBlock": "17154542",
+    "version": "1"
+  }
+}

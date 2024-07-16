@@ -174,4 +174,15 @@ templates:
       abis:
         - name: Rewards
           file: ./abis/Rewards.json
-
+  - name: TokenMetadata
+    kind: file/ipfs
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/templates/tokenMetadata/tokenMetadataMappings.ts
+      handler: handleTokenMetadata
+      entities:
+        - TokenMetadata
+      abis:
+        - name: Channel
+          file: ./abis/Channel.json

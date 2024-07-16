@@ -8,16 +8,22 @@ import {
     beforeEach,
     afterEach,
     createMockedFunction,
-    logStore
+    logStore,
+    mockIpfsFile,
+    dataSourceMock,
+    logDataSources,
+    readFile
 } from 'matchstick-as/assembly/index';
-import { BatchTokenTransferredData, ChannelCreatedData, ChannelMetadataUpdatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createChannelMetadataUpdatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TransferAdminData } from './utils';
-import { Address, Bytes, BigInt, log } from '@graphprotocol/graph-ts';
-import { ApprovedDynamicLogicSignature, Channel, CustomFees, DynamicLogic, FeeConfig, LogicConfig, Mint, RewardTransferEvent, Token, TokenHolder, User } from '../src/generated/schema';
+import { BatchTokenTransferredData, ChannelCreatedData, ChannelMetadataUpdatedData, ConfigUpdatedData, createBatchTokenTransferredData, createChannelCreatedData, createChannelMetadataUpdatedData, createConfigUpdatedData, createCustomFeesUpdatedData, createDynamicLogicUpdatedData, createERC20TransferredData, createETHTransferredData, createManagerRenouncedData, createManagersUpdatedData, createMockIPFSContent, createSignatureApprovedData, createSingleTokenTransferredData, createTokenCreatedData, createTokenMintedData, createTransferAdminData, CustomFeesUpdatedData, DynamicLogicUpdatedData, ERC20TransferredData, ETHTransferredData, infiniteTransportBytes, ManagerRenouncedData, ManagersUpdatedData, SignatureApprovedData, SingleTokenTransferredData, TokenCreatedData, TokenMintedData, TransferAdminData } from './utils';
+import { Address, Bytes, BigInt, log, dataSource, DataSourceContext } from '@graphprotocol/graph-ts';
+import { ApprovedDynamicLogicSignature, Channel, CustomFees, DynamicLogic, FeeConfig, LogicConfig, Mint, RewardTransferEvent, Token, TokenHolder, TokenMetadata, User } from '../src/generated/schema';
 import { handleChannelCreated } from '../src/mappings/channelFactoryMappings';
 import { handleRenounceManager, handleTokenBatchMinted, handleTokenCreated, handleTransferAdmin, handleTransferBatchToken, handleTransferSingleToken, handleUpdateChannelMetadata, handleUpdateConfig, handleUpdateManagers } from '../src/mappings/templates/channel/channelMappings';
 import { handleUpdateCustomFees } from '../src/mappings/customFeeMappings';
 import { BIGINT_10K, ZERO_ADDRESS } from '../src/utils/constants';
 import { handleSignatureApproved, handleUpdateDynamicCreatorLogic, handleUpdateDynamicMinterLogic } from '../src/mappings/dynamicLogicMappings';
+import { handleTokenMetadata } from '../src/mappings/templates/tokenMetadata/tokenMetadataMappings';
+import { TokenMetadata as TokenMetadataTemplate } from '../src/generated/templates';
 
 const CHANNEL_ADDRESS = "0x0000000000000000000000000000000000000001";
 const ADMIN_ADDRESS = "0x0000000000000000000000000000000000000002";
@@ -436,6 +442,9 @@ describe("Channel", () => {
 
             assert.stringEquals(token!.channel, CHANNEL_ADDRESS);
 
+            /// metadata shouldn't be set for this uri
+            assert.assertNull(token!.metadata);
+
             assert.stringEquals(token!.author, CREATOR_ADDRESS);
             assert.stringEquals(token!.sponsor, SPONSOR_ADDRESS);
 
@@ -482,6 +491,73 @@ describe("Channel", () => {
 
         })
     });
+
+    describe("handle token metadata", () => {
+        test("properly sets metadata", () => {
+
+            const ipfsHash = "QmYqUk9rRrKMNosB9xuDvt8UijZmRZT6h72hNmMDVD8CSE";
+            TokenMetadataTemplate.create(ipfsHash)
+
+            assert.dataSourceCount("TokenMetadata", 1)
+            assert.dataSourceExists("TokenMetadata", ipfsHash)
+
+            dataSourceMock.resetValues()
+            dataSourceMock.setAddress(ipfsHash);
+
+            const content = readFile('./tests/ipfsTestData.json');
+            handleTokenMetadata(content);
+
+            const metadata = TokenMetadata.load(ipfsHash);
+
+            assert.stringEquals(metadata!.id, ipfsHash);
+            assert.stringEquals(metadata!.name, "test")
+            assert.stringEquals(metadata!.description, "")
+            assert.stringEquals(metadata!.image, "ipfs://QmQX7dbEnExQ9UXGDqnjkctXNcoK35JjrRBYxTc2FXW4Gd")
+            assert.stringEquals(metadata!.animation, "")
+            assert.stringEquals(metadata!.type, "uplink-v2")
+
+        });
+
+        test("properly links token metadata on handleCreateToken", () => {
+
+            const ipfsHash = "QmYqUk9rRrKMNosB9xuDvt8UijZmRZT6h72hNmMDVD8CSE"
+
+            /// mock the datasource.StringParam() call
+            dataSourceMock.resetValues()
+            dataSourceMock.setAddress(ipfsHash);
+
+            const tokenCreatedData = new TokenCreatedData();
+            tokenCreatedData.tokenId = BigInt.fromI32(0);
+            tokenCreatedData.author = Address.fromString(CREATOR_ADDRESS);
+            tokenCreatedData.sponsor = Address.fromString(SPONSOR_ADDRESS);
+            tokenCreatedData.uri = `ipfs://${ipfsHash}`;
+            tokenCreatedData.maxSupply = BigInt.fromI32(100);
+            tokenCreatedData.totalMinted = BigInt.fromI32(0);
+
+            tokenCreatedData.eventBlockNumber = BigInt.fromI32(123456);
+            tokenCreatedData.eventBlockTimestamp = BigInt.fromI32(1620012345);
+            tokenCreatedData.txHash = Bytes.fromHexString("0x1234");
+            tokenCreatedData.logIndex = BigInt.fromI32(0);
+            tokenCreatedData.address = Address.fromString(CHANNEL_ADDRESS);
+
+            const event = createTokenCreatedData(tokenCreatedData);
+
+            handleTokenCreated(event);
+
+            const token = Token.load(CHANNEL_ADDRESS + '-0');
+
+            assert.stringEquals(token!.metadata!, ipfsHash);
+
+            const metadata = TokenMetadata.load("QmYqUk9rRrKMNosB9xuDvt8UijZmRZT6h72hNmMDVD8CSE");
+
+
+            //logStore();
+
+            assert.stringEquals(token!.uri, tokenCreatedData.uri);
+            assert.stringEquals(token!.channel, CHANNEL_ADDRESS);
+
+        })
+    })
 
 
     describe("handle single token transfer events", () => {

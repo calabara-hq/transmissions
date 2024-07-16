@@ -10,7 +10,7 @@ export function handleInfiniteTransportConfigSet(event: InfiniteTransportConfigS
     infiniteTransportConfig.save();
 
     transportLayer.infiniteTransportConfig = infiniteTransportConfig.id;
-    transportLayer.type = 'finite';
+    transportLayer.type = 'infinite';
     transportLayer.blockNumber = event.block.number;
     transportLayer.blockTimestamp = event.block.timestamp;
 

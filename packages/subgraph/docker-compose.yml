@@ -20,9 +20,9 @@ services:
       postgres_db: graph-node
       ipfs: 'ipfs:5001'
       ethereum: 'base-sepolia:https://sepolia.base.org'
-      GRAPH_LOG: info
+      GRAPH_LOG: debug
   ipfs:
-    image: ipfs/kubo:v0.17.0
+    image: ipfs/kubo:master-latest
     ports:
       - '5001:5001'
     volumes:
