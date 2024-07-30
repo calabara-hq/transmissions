@@ -978,19 +978,9 @@
         "internalType": "address"
       },
       {
-        "name": "v",
-        "type": "uint8",
-        "internalType": "uint8"
-      },
-      {
-        "name": "r",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "s",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "signature",
+        "type": "bytes",
+        "internalType": "bytes"
       },
       {
         "name": "to",
@@ -1053,19 +1043,9 @@
         "internalType": "address"
       },
       {
-        "name": "v",
-        "type": "uint8",
-        "internalType": "uint8"
-      },
-      {
-        "name": "r",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      },
-      {
-        "name": "s",
-        "type": "bytes32",
-        "internalType": "bytes32"
+        "name": "signature",
+        "type": "bytes",
+        "internalType": "bytes"
       },
       {
         "name": "to",
@@ -1931,6 +1911,11 @@
   },
   {
     "type": "error",
+    "name": "InvalidContractSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
     "name": "InvalidInitialization",
     "inputs": []
   },
@@ -1942,6 +1927,21 @@
   {
     "type": "error",
     "name": "InvalidSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignatureLength",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSigner",
     "inputs": []
   },
   {

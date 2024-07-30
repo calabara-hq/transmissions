@@ -15,5 +15,10 @@
     "address": "0x2383FcF6F4596ba26f002EB4cA8540bEB460aB8D",
     "startBlock": "17154542",
     "version": "1"
+  },
+  "upgradePath": {
+    "address": "0x83E35028c8B772f7e83b9e6646881D8f9592D994",
+    "startBlock": "17154542",
+    "version": "1"
   }
 }

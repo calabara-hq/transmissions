@@ -13,7 +13,8 @@ import {
     Mint,
     RewardTransferEvent,
     TokenHolder,
-    ApprovedDynamicLogicSignature
+    ApprovedDynamicLogicSignature,
+    ChannelUpgradeRegisteredEvent
 } from "../generated/schema";
 import { BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import { ConfigUpdated } from "../generated/templates/Channel/Channel";
@@ -328,3 +329,16 @@ export function getOrCreateApprovedSignature(id: string, createIfNotFound: boole
     return approvedSignature as ApprovedDynamicLogicSignature;
 }
 
+export function getOrCreateUpgrade(id: string, createIfNotFound: boolean = true, save: boolean = false): ChannelUpgradeRegisteredEvent {
+    let upgrade = ChannelUpgradeRegisteredEvent.load(id);
+
+    if (upgrade == null && createIfNotFound) {
+        upgrade = new ChannelUpgradeRegisteredEvent(id);
+
+        if (save) {
+            upgrade.save();
+        }
+    }
+
+    return upgrade as ChannelUpgradeRegisteredEvent;
+}

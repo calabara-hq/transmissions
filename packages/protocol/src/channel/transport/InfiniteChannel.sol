@@ -104,7 +104,7 @@ contract InfiniteChannel is Channel, IVersionedContract {
    * @return string contract version
    */
   function contractVersion() external pure returns (string memory) {
-    return "1.0.0";
+    return "1.1.0";
   }
 
   /**

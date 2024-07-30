@@ -67,7 +67,7 @@ contract InfiniteChannelTest is Test {
   }
 
   function test_infChannel_versioning() external {
-    assertEq("1.0.0", targetChannel.contractVersion());
+    assertEq("1.1.0", targetChannel.contractVersion());
     assertEq("Infinite Channel", targetChannel.contractName());
     assertEq(targetChannel.codeRepository(), "https://github.com/calabara-hq/transmissions/packages/protocol");
   }

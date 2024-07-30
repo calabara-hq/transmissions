@@ -71,6 +71,28 @@ dataSources:
           handler: handleUpdateDynamicMinterLogic
         - event: SignatureApproved(bytes4,uint256)
           handler: handleSignatureApproved
+  - name: UpgradePathV1
+    kind: ethereum/contract
+    network: base
+    source:
+      abi: UpgradePath
+      address: "0x83E35028c8B772f7e83b9e6646881D8f9592D994"
+      startBlock: 17154542
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/upgradePathMappings.ts
+      entities:
+        - ChannelUpgradeRegisteredEvent
+      abis:
+        - name: UpgradePath
+          file: ./abis/UpgradePath.json
+      eventHandlers:
+        - event: UpgradeRegistered(indexed address,indexed address)
+          handler: handleUpgradeRegistered
+        - event: UpgradeRemoved(indexed address,indexed address)
+          handler: handleUpgradeRemoved
 templates:
   - name: Channel
     kind: ethereum/contract

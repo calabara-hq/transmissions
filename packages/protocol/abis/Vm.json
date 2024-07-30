@@ -70,6 +70,2604 @@
   },
   {
     "type": "function",
+    "name": "assertApproxEqAbs",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbs",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbs",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbs",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbsDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbsDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbsDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqAbsDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRel",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRel",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRel",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRel",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRelDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRelDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRelDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertApproxEqRelDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "maxPercentDelta",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "right",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "right",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "right",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "right",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "right",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "right",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "right",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "right",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "right",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "right",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "right",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "right",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "right",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "right",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "right",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "right",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "right",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "right",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "right",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "right",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertFalse",
+    "inputs": [
+      {
+        "name": "condition",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertFalse",
+    "inputs": [
+      {
+        "name": "condition",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertGtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLe",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLeDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLt",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertLtDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "right",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "right",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "right",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "right",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "right",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "right",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "right",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "right",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "right",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "right",
+        "type": "address[]",
+        "internalType": "address[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "right",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "right",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "right",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "right",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "right",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "right",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "right",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "right",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "right",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "right",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      },
+      {
+        "name": "right",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEq",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "right",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertNotEqDecimal",
+    "inputs": [
+      {
+        "name": "left",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "right",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertTrue",
+    "inputs": [
+      {
+        "name": "condition",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assertTrue",
+    "inputs": [
+      {
+        "name": "condition",
+        "type": "bool",
+        "internalType": "bool"
+      },
+      {
+        "name": "error",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "assume",
     "inputs": [
       {
@@ -80,6 +2678,32 @@
     ],
     "outputs": [],
     "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "blobBaseFee",
+    "inputs": [
+      {
+        "name": "newBlobBaseFee",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "blobhashes",
+    "inputs": [
+      {
+        "name": "hashes",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -190,6 +2814,83 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "computeCreate2Address",
+    "inputs": [
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "initCodeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "computeCreate2Address",
+    "inputs": [
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "initCodeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "deployer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "computeCreateAddress",
+    "inputs": [
+      {
+        "name": "deployer",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "nonce",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -515,6 +3216,95 @@
   },
   {
     "type": "function",
+    "name": "deleteSnapshot",
+    "inputs": [
+      {
+        "name": "snapshotId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deleteSnapshots",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deriveKey",
+    "inputs": [
+      {
+        "name": "mnemonic",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "derivationPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "index",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "deriveKey",
+    "inputs": [
+      {
+        "name": "mnemonic",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "index",
+        "type": "uint32",
+        "internalType": "uint32"
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "deriveKey",
     "inputs": [
       {
@@ -581,6 +3371,38 @@
   },
   {
     "type": "function",
+    "name": "dumpState",
+    "inputs": [
+      {
+        "name": "pathToStateJson",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "ensNamehash",
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "envAddress",
     "inputs": [
       {
@@ -753,6 +3575,25 @@
   },
   {
     "type": "function",
+    "name": "envExists",
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "envInt",
     "inputs": [
       {
@@ -821,7 +3662,7 @@
         "internalType": "bytes32[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -850,7 +3691,7 @@
         "internalType": "int256[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -874,7 +3715,7 @@
         "internalType": "bool"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -898,7 +3739,7 @@
         "internalType": "address"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -922,7 +3763,7 @@
         "internalType": "uint256"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -951,7 +3792,7 @@
         "internalType": "bytes[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -980,7 +3821,7 @@
         "internalType": "uint256[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1009,7 +3850,7 @@
         "internalType": "string[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1033,7 +3874,7 @@
         "internalType": "bytes"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1057,7 +3898,7 @@
         "internalType": "bytes32"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1081,7 +3922,7 @@
         "internalType": "int256"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1110,7 +3951,7 @@
         "internalType": "address[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1134,7 +3975,7 @@
         "internalType": "string"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1163,7 +4004,7 @@
         "internalType": "bool[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1267,6 +4108,87 @@
       }
     ],
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "eth_getLogs",
+    "inputs": [
+      {
+        "name": "fromBlock",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "toBlock",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "topics",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "logs",
+        "type": "tuple[]",
+        "internalType": "struct VmSafe.EthGetLogs[]",
+        "components": [
+          {
+            "name": "emitter",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "topics",
+            "type": "bytes32[]",
+            "internalType": "bytes32[]"
+          },
+          {
+            "name": "data",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "blockHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "blockNumber",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "transactionHash",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "transactionIndex",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "logIndex",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "removed",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
@@ -1742,6 +4664,58 @@
   },
   {
     "type": "function",
+    "name": "getBlobBaseFee",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "blobBaseFee",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBlobhashes",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "hashes",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBlockNumber",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "height",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBlockTimestamp",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "timestamp",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getCode",
     "inputs": [
       {
@@ -1795,7 +4769,7 @@
         "internalType": "string"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -1976,6 +4950,49 @@
   },
   {
     "type": "function",
+    "name": "indexOf",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "isContext",
+    "inputs": [
+      {
+        "name": "context",
+        "type": "uint8",
+        "internalType": "enum VmSafe.ForgeContext"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "isDir",
     "inputs": [
       {
@@ -2057,6 +5074,54 @@
   },
   {
     "type": "function",
+    "name": "keyExistsJson",
+    "inputs": [
+      {
+        "name": "json",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "keyExistsToml",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "label",
     "inputs": [
       {
@@ -2072,6 +5137,46 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "lastCallGas",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "gas",
+        "type": "tuple",
+        "internalType": "struct VmSafe.Gas",
+        "components": [
+          {
+            "name": "gasLimit",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "gasTotalUsed",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "gasMemoryUsed",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "gasRefunded",
+            "type": "int64",
+            "internalType": "int64"
+          },
+          {
+            "name": "gasRemaining",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -2096,6 +5201,19 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "loadAllocs",
+    "inputs": [
+      {
+        "name": "pathToAllocsJson",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -2666,7 +5784,7 @@
         "internalType": "string[]"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -2766,6 +5884,409 @@
   },
   {
     "type": "function",
+    "name": "parseToml",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "abiEncodedData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseToml",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "abiEncodedData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlAddress",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlAddressArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBool",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBoolArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool[]",
+        "internalType": "bool[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBytes",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBytes32",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBytes32Array",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32[]",
+        "internalType": "bytes32[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlBytesArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlInt",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlIntArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256[]",
+        "internalType": "int256[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlKeys",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "keys",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlString",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlStringArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlUint",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "parseTomlUintArray",
+    "inputs": [
+      {
+        "name": "toml",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "key",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "parseUint",
     "inputs": [
       {
@@ -2836,6 +6357,19 @@
   },
   {
     "type": "function",
+    "name": "prevrandao",
+    "inputs": [
+      {
+        "name": "newPrevrandao",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "projectRoot",
     "inputs": [],
     "outputs": [
@@ -2846,6 +6380,151 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "prompt",
+    "inputs": [
+      {
+        "name": "promptText",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "promptAddress",
+    "inputs": [
+      {
+        "name": "promptText",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "promptSecret",
+    "inputs": [
+      {
+        "name": "promptText",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "promptSecretUint",
+    "inputs": [
+      {
+        "name": "promptText",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "promptUint",
+    "inputs": [
+      {
+        "name": "promptText",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "randomAddress",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "randomUint",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "randomUint",
+    "inputs": [
+      {
+        "name": "min",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "max",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -3165,6 +6844,35 @@
   },
   {
     "type": "function",
+    "name": "replace",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "from",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "to",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "resetNonce",
     "inputs": [
       {
@@ -3186,6 +6894,25 @@
   {
     "type": "function",
     "name": "revertTo",
+    "inputs": [
+      {
+        "name": "snapshotId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "success",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "revertToAndDelete",
     "inputs": [
       {
         "name": "snapshotId",
@@ -3301,6 +7028,30 @@
       }
     ],
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "rpc",
+    "inputs": [
+      {
+        "name": "method",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "params",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
@@ -3805,6 +7556,35 @@
   },
   {
     "type": "function",
+    "name": "serializeUintToHex",
+    "inputs": [
+      {
+        "name": "objectKey",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "valueKey",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "json",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setEnv",
     "inputs": [
       {
@@ -3856,6 +7636,69 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "sign",
+    "inputs": [
+      {
+        "name": "digest",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "v",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "r",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "s",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "sign",
+    "inputs": [
+      {
+        "name": "signer",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "digest",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "v",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "r",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "s",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -3949,6 +7792,35 @@
   },
   {
     "type": "function",
+    "name": "signP256",
+    "inputs": [
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "digest",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "r",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "s",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "skip",
     "inputs": [
       {
@@ -3985,6 +7857,30 @@
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "split",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "delimiter",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "outputs",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -4059,7 +7955,145 @@
   },
   {
     "type": "function",
+    "name": "startStateDiffRecording",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "stopAndReturnStateDiff",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "accountAccesses",
+        "type": "tuple[]",
+        "internalType": "struct VmSafe.AccountAccess[]",
+        "components": [
+          {
+            "name": "chainInfo",
+            "type": "tuple",
+            "internalType": "struct VmSafe.ChainInfo",
+            "components": [
+              {
+                "name": "forkId",
+                "type": "uint256",
+                "internalType": "uint256"
+              },
+              {
+                "name": "chainId",
+                "type": "uint256",
+                "internalType": "uint256"
+              }
+            ]
+          },
+          {
+            "name": "kind",
+            "type": "uint8",
+            "internalType": "enum VmSafe.AccountAccessKind"
+          },
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "accessor",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "initialized",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "oldBalance",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "newBalance",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "deployedCode",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "value",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "data",
+            "type": "bytes",
+            "internalType": "bytes"
+          },
+          {
+            "name": "reverted",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "storageAccesses",
+            "type": "tuple[]",
+            "internalType": "struct VmSafe.StorageAccess[]",
+            "components": [
+              {
+                "name": "account",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "slot",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              },
+              {
+                "name": "isWrite",
+                "type": "bool",
+                "internalType": "bool"
+              },
+              {
+                "name": "previousValue",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              },
+              {
+                "name": "newValue",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              },
+              {
+                "name": "reverted",
+                "type": "bool",
+                "internalType": "bool"
+              }
+            ]
+          },
+          {
+            "name": "depth",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "stopBroadcast",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "stopExpectSafeMemory",
     "inputs": [],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -4100,6 +8134,101 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "toBase64",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "toBase64",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "toBase64URL",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "toBase64URL",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "toLowercase",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -4217,6 +8346,25 @@
   },
   {
     "type": "function",
+    "name": "toUppercase",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "transact",
     "inputs": [
       {
@@ -4248,6 +8396,25 @@
   },
   {
     "type": "function",
+    "name": "trim",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "output",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
     "name": "tryFfi",
     "inputs": [
       {
@@ -4263,7 +8430,7 @@
         "internalType": "struct VmSafe.FfiResult",
         "components": [
           {
-            "name": "exit_code",
+            "name": "exitCode",
             "type": "int32",
             "internalType": "int32"
           },
@@ -4293,6 +8460,19 @@
       }
     ],
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "unixTime",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "milliseconds",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
@@ -4396,6 +8576,47 @@
       },
       {
         "name": "data",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "writeToml",
+    "inputs": [
+      {
+        "name": "json",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "path",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "valueKey",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "writeToml",
+    "inputs": [
+      {
+        "name": "json",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "path",
         "type": "string",
         "internalType": "string"
       }

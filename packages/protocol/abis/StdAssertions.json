@@ -1,19 +1,6 @@
 [
   {
     "type": "function",
-    "name": "IS_TEST",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "failed",
     "inputs": [],
     "outputs": [
@@ -23,7 +10,7 @@
         "internalType": "bool"
       }
     ],
-    "stateMutability": "nonpayable"
+    "stateMutability": "view"
   },
   {
     "type": "event",

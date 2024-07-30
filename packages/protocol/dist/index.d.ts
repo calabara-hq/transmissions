@@ -657,17 +657,9 @@ export declare const channelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -716,17 +708,9 @@ export declare const channelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -1330,11 +1314,27 @@ export declare const channelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidContractSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidInitialization";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
     readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignatureLength";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSigner";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
@@ -3080,17 +3080,9 @@ export declare const finiteChannelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -3139,17 +3131,9 @@ export declare const finiteChannelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -3830,6 +3814,10 @@ export declare const finiteChannelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidContractSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidInitialization";
 }, {
     readonly type: "error";
@@ -3839,6 +3827,18 @@ export declare const finiteChannelAbi: readonly [{
     readonly type: "error";
     readonly inputs: readonly [];
     readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignatureLength";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSigner";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
@@ -4637,17 +4637,9 @@ export declare const infiniteChannelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -4696,17 +4688,9 @@ export declare const infiniteChannelAbi: readonly [{
         readonly internalType: "address";
         readonly type: "address";
     }, {
-        readonly name: "v";
-        readonly internalType: "uint8";
-        readonly type: "uint8";
-    }, {
-        readonly name: "r";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
-    }, {
-        readonly name: "s";
-        readonly internalType: "bytes32";
-        readonly type: "bytes32";
+        readonly name: "signature";
+        readonly internalType: "bytes";
+        readonly type: "bytes";
     }, {
         readonly name: "to";
         readonly internalType: "address";
@@ -5345,11 +5329,27 @@ export declare const infiniteChannelAbi: readonly [{
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
+    readonly name: "InvalidContractSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
     readonly name: "InvalidInitialization";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];
     readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignature";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSignatureLength";
+}, {
+    readonly type: "error";
+    readonly inputs: readonly [];
+    readonly name: "InvalidSigner";
 }, {
     readonly type: "error";
     readonly inputs: readonly [];

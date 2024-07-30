@@ -196,8 +196,6 @@ type TokenMetadata @entity(immutable: true) {
     type: String!
 }
 
-
-
 type Mint @entity(immutable: true) {
     "Concatenation of tx hash and batch loop index"
     id: ID!
@@ -238,6 +236,17 @@ type ChannelTokenTransferEvent @entity(immutable: true) {
 
     token: Token!
     channel: Channel!
+
+    blockNumber: BigInt!
+    blockTimestamp: BigInt!
+}
+
+type ChannelUpgradeRegisteredEvent @entity(immutable: true) {
+    "Concatenation of baseImpl and upgradeImpl"  
+    id: ID!
+
+    baseImpl: Bytes!
+    upgradeImpl: Bytes!
 
     blockNumber: BigInt!
     blockTimestamp: BigInt!

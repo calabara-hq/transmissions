@@ -1,0 +1,22 @@
+[
+  {
+    "type": "error",
+    "name": "InvalidContractSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignature",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSignatureLength",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidSigner",
+    "inputs": []
+  }
+]

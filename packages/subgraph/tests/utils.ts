@@ -8,6 +8,7 @@ import { CreatorLogicSet, SignatureApproved } from "../src/generated/DynamicLogi
 import { FiniteTransportConfigSet, Settled } from "../src/generated/templates/FiniteChannel/FiniteChannel";
 import { InfiniteTransportConfigSet } from "../src/generated/templates/InfiniteChannel/InfiniteChannel";
 import { TokenMetadata } from "../src/generated/templates";
+import { UpgradeRegistered, UpgradeRemoved } from "../src/generated/UpgradePathV1/UpgradePath";
 
 
 export const finiteTransportBytes =
@@ -702,13 +703,62 @@ export function createFiniteChannelSettledData(input: FiniteChannelSettledData):
     return newEvent as Settled;
 }
 
-export function createMockIPFSContent(): Bytes {
-    let jsonString = `
-    {
-        "name": "Test Token Metadata"
-    }`;
+export class UpgradeRegisteredData {
+    baseImpl: Address = Address.fromString(ZERO_ADDRESS);
+    upgradeImpl: Address = Address.fromString(ZERO_ADDRESS);
 
-    let ipfsContent = Bytes.fromUTF8(jsonString);
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
 
-    return ipfsContent;
+export function createUpgradeRegisteredData(input: UpgradeRegisteredData): UpgradeRegistered {
+    let newEvent = changetype<UpgradeRegistered>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let baseImplParam = new ethereum.EventParam("baseImpl", ethereum.Value.fromAddress(input.baseImpl));
+    let upgradeImplParam = new ethereum.EventParam("upgradeImpl", ethereum.Value.fromAddress(input.upgradeImpl));
+
+    newEvent.parameters.push(baseImplParam);
+    newEvent.parameters.push(upgradeImplParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent as UpgradeRegistered;
+}
+
+export class UpgradeRemovedData {
+    baseImpl: Address = Address.fromString(ZERO_ADDRESS);
+    upgradeImpl: Address = Address.fromString(ZERO_ADDRESS);
+
+    eventBlockNumber: BigInt = BIGINT_ZERO;
+    eventBlockTimestamp: BigInt = BIGINT_ZERO;
+    txHash: Bytes = Bytes.fromI32(0);
+    logIndex: BigInt = BIGINT_ZERO;
+    address: Address = Address.fromString(ZERO_ADDRESS);
+}
+
+export function createUpgradeRemovedData(input: UpgradeRemovedData): UpgradeRemoved {
+    let newEvent = changetype<UpgradeRemoved>(newMockEvent());
+    newEvent.parameters = new Array<ethereum.EventParam>();
+
+    let baseImplParam = new ethereum.EventParam("baseImpl", ethereum.Value.fromAddress(input.baseImpl));
+    let upgradeImplParam = new ethereum.EventParam("upgradeImpl", ethereum.Value.fromAddress(input.upgradeImpl));
+
+    newEvent.parameters.push(baseImplParam);
+    newEvent.parameters.push(upgradeImplParam);
+
+    newEvent.block.number = input.eventBlockNumber;
+    newEvent.block.timestamp = input.eventBlockTimestamp;
+    newEvent.transaction.hash = input.txHash;
+    newEvent.logIndex = input.logIndex;
+    newEvent.address = input.address;
+
+    return newEvent as UpgradeRemoved;
 }

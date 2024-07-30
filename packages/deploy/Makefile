@@ -29,3 +29,13 @@ approve-logic-sepolia:
 approve-logic-mainnet:
 	@echo "Approving dynamic logic on base-mainnet"
 	make link-latest && make copy-deployed-contracts && forge script ./script/ApproveDynamicLogicSigs.s.sol:ApproveLogic --chain base --fork-url https://mainnet.base.org --account deployerKey --sender 0x94D9cb3cbdab30140cE9FAA620f81E4cCaaAFDa3  --broadcast --verify -vvvv && make copy-deployed-contracts
+
+.PHONY: upgrade-channels-sepolia
+upgrade-channels-sepolia:
+	@echo "Upgrading channels on base-sepolia"
+	make link-latest && forge script ./script/UpgradeChannels.s.sol:UpgradeChannels --chain base-sepolia --fork-url https://sepolia.base.org --account deployerKey --sender 0x94D9cb3cbdab30140cE9FAA620f81E4cCaaAFDa3 --broadcast --verify -vvvv && make copy-deployed-contracts
+
+.PHONY: upgrade-channels-mainnet
+upgrade-channels-mainnet:
+	@echo "Upgrading channels on base-mainnet"
+	make link-latest && forge script ./script/UpgradeChannels.s.sol:UpgradeChannels --chain base --fork-url https://mainnet.base.org --account deployerKey --sender 0x94D9cb3cbdab30140cE9FAA620f81E4cCaaAFDa3 --broadcast --verify -vvvv && make copy-deployed-contracts

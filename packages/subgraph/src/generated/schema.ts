@@ -2077,6 +2077,105 @@ export class ChannelTokenTransferEvent extends Entity {
   }
 }
 
+export class ChannelUpgradeRegisteredEvent extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(
+      id != null,
+      "Cannot save ChannelUpgradeRegisteredEvent entity without an ID",
+    );
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        `Entities of type ChannelUpgradeRegisteredEvent must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+      );
+      store.set("ChannelUpgradeRegisteredEvent", id.toString(), this);
+    }
+  }
+
+  static loadInBlock(id: string): ChannelUpgradeRegisteredEvent | null {
+    return changetype<ChannelUpgradeRegisteredEvent | null>(
+      store.get_in_block("ChannelUpgradeRegisteredEvent", id),
+    );
+  }
+
+  static load(id: string): ChannelUpgradeRegisteredEvent | null {
+    return changetype<ChannelUpgradeRegisteredEvent | null>(
+      store.get("ChannelUpgradeRegisteredEvent", id),
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toString();
+    }
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get baseImpl(): Bytes {
+    let value = this.get("baseImpl");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set baseImpl(value: Bytes) {
+    this.set("baseImpl", Value.fromBytes(value));
+  }
+
+  get upgradeImpl(): Bytes {
+    let value = this.get("upgradeImpl");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set upgradeImpl(value: Bytes) {
+    this.set("upgradeImpl", Value.fromBytes(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get blockTimestamp(): BigInt {
+    let value = this.get("blockTimestamp");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set blockTimestamp(value: BigInt) {
+    this.set("blockTimestamp", Value.fromBigInt(value));
+  }
+}
+
 export class TokenLoader extends Entity {
   _entity: string;
   _field: string;

@@ -77,6 +77,30 @@ dataSources:
         - event: SignatureApproved(bytes4,uint256)
           handler: handleSignatureApproved
 {{/dynamicLogic}}
+{{#upgradePath}}
+  - name: UpgradePathV{{version}}
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: UpgradePath
+      address: "{{address}}"
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/upgradePathMappings.ts
+      entities:
+        - ChannelUpgradeRegisteredEvent
+      abis:
+        - name: UpgradePath
+          file: ./abis/UpgradePath.json
+      eventHandlers:
+        - event: UpgradeRegistered(indexed address,indexed address)
+          handler: handleUpgradeRegistered
+        - event: UpgradeRemoved(indexed address,indexed address)
+          handler: handleUpgradeRemoved
+{{/upgradePath}}
 templates:
   - name: Channel
     kind: ethereum/contract

@@ -2099,32 +2099,24 @@ export class SponsorWithERC20Call__Inputs {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get v(): i32 {
-    return this._call.inputValues[2].value.toI32();
-  }
-
-  get r(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
-  }
-
-  get s(): Bytes {
-    return this._call.inputValues[4].value.toBytes();
+  get signature(): Bytes {
+    return this._call.inputValues[2].value.toBytes();
   }
 
   get to(): Address {
-    return this._call.inputValues[5].value.toAddress();
+    return this._call.inputValues[3].value.toAddress();
   }
 
   get amount(): BigInt {
-    return this._call.inputValues[6].value.toBigInt();
+    return this._call.inputValues[4].value.toBigInt();
   }
 
   get mintReferral(): Address {
-    return this._call.inputValues[7].value.toAddress();
+    return this._call.inputValues[5].value.toAddress();
   }
 
   get data(): Bytes {
-    return this._call.inputValues[8].value.toBytes();
+    return this._call.inputValues[6].value.toBytes();
   }
 }
 
@@ -2181,32 +2173,24 @@ export class SponsorWithETHCall__Inputs {
     return this._call.inputValues[1].value.toAddress();
   }
 
-  get v(): i32 {
-    return this._call.inputValues[2].value.toI32();
-  }
-
-  get r(): Bytes {
-    return this._call.inputValues[3].value.toBytes();
-  }
-
-  get s(): Bytes {
-    return this._call.inputValues[4].value.toBytes();
+  get signature(): Bytes {
+    return this._call.inputValues[2].value.toBytes();
   }
 
   get to(): Address {
-    return this._call.inputValues[5].value.toAddress();
+    return this._call.inputValues[3].value.toAddress();
   }
 
   get amount(): BigInt {
-    return this._call.inputValues[6].value.toBigInt();
+    return this._call.inputValues[4].value.toBigInt();
   }
 
   get mintReferral(): Address {
-    return this._call.inputValues[7].value.toAddress();
+    return this._call.inputValues[5].value.toAddress();
   }
 
   get data(): Bytes {
-    return this._call.inputValues[8].value.toBytes();
+    return this._call.inputValues[6].value.toBytes();
   }
 }
 

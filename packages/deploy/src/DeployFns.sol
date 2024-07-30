@@ -11,7 +11,7 @@ import { ChainConfig, Deployment, ScriptDeploymentConfig } from "./DeployConfig.
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 
 import "forge-std/Test.sol";
-
+import { IUpgradePath } from "protocol/src/interfaces/IUpgradePath.sol";
 import { FiniteUplink1155 } from "protocol/src/proxies/FiniteUplink1155.sol";
 import { InfiniteUplink1155 } from "protocol/src/proxies/InfiniteUplink1155.sol";
 import { Uplink1155Factory } from "protocol/src/proxies/Uplink1155Factory.sol";
@@ -112,5 +112,23 @@ abstract contract DeployFns is ScriptDeploymentConfig {
 
         InfiniteUplink1155 infiniteChannelProxy = new InfiniteUplink1155(deployment.infiniteChannelImpl);
         FiniteUplink1155 finiteChannelProxy = new FiniteUplink1155(deployment.finiteChannelImpl);
+    }
+
+    function registerUpgradePath(
+        Deployment memory deployment,
+        address[] memory baseImpls,
+        address upgradeImpl
+    )
+        internal
+    {
+        IUpgradePath upgradePath = IUpgradePath(deployment.upgradePath);
+        upgradePath.registerUpgradePath(baseImpls, upgradeImpl);
+    }
+
+    function upgradeFactoryImpl(Deployment memory deployment) internal {
+        // upgrade factory proxy to new implementation
+
+        ChannelFactory channelFactory = ChannelFactory(address(deployment.factoryProxy));
+        channelFactory.upgradeToAndCall(deployment.factoryImpl, "");
     }
 }
